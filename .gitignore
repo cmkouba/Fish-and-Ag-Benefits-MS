@@ -1,3 +1,8 @@
+Archive/
+scratch_work/
+manuscript_data.RData
+Data/hillshade_cropped_raster.tif
+
 # History files
 .Rhistory
 .Rapp.history
