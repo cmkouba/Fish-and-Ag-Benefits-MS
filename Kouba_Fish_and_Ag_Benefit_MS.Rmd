@@ -20,7 +20,7 @@ library(sf)
 library(terra)
 library(geodata)
 library(rpostgis)
-library(rgeos)
+# library(rgeos)
 # library(postGIStools)
 # library(httr)
 # library(stringr)
@@ -52,8 +52,8 @@ library(zoo) # rolling means
 library(rgl) # plot3d
 # library(ggplot2) # water budget bar chart
 #spatial data libraries
-library(rgeos)
-library(maptools)
+# library(rgeos)
+# library(maptools)
 library(RANN)
 library(tmap)
 library(RColorBrewer)
@@ -377,15 +377,17 @@ Where:
 
 $HB_{wy}$ is the Hydrologic Benefit value for a given water year (predicted coho spf or coho spf equivalent)
 
-$b = 93.4$ coho spf equiv.
+$b = 87.4$ coho spf equiv.
 
-$m_{1} = -1.15$ coho spf equiv. per day of reconnection after Aug. 31, 10 cfs
+$m_{1} = -0.030$ coho spf equiv. per day of reconnection after Aug. 31, 100 cfs
 
-$m_{2} = -0.17$ coho spf equiv. per day of reconnection after Aug. 31, 100 cfs
+$m_{2} = -0.365$ coho spf equiv. per day of reconnection after Aug. 31, 200 cfs
 
-$m_{3} = -0.20$ coho spf equiv. per day of wet season onset after Sep. 30
+$m_{3} = 0.033$ coho spf equiv. per day of disconnection after Aug. 31, 200 cfs
 
-$m_{4} = 0.12$ coho spf equiv. per day of wet season baseflow duration
+$m_{4} = -0.191$ coho spf equiv. per day of reconnection after Aug. 31, 8 cfs
+
+$m_{5} = -0.004$ coho spf equiv. per cubic meter of lower dry season flow magnitude
 
 The HB function was formulated based on functional flow metrics of the observed daily average flow record of the FJ gauge ($FJ_{obs}$). One key result of the historical basecase scenario is a simulated estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$); however, although SVIHM was extensively calibrated [@Tolley2019], because all models involve structural simplifications of a full-scale watershed, $FJ_{sim,~basecase}$ sometimes over- or under-estimates $FJ_{obs}$. As a result of these differences, HB values calculated from flow metrics of $FJ_{sim,~basecase}$ tend to be higher than HB values derived from $FJ_{obs}$ by a mean of 4.5 coho spf-equiv.
 
@@ -417,7 +419,7 @@ This reflects the first-order understanding that, for example, building a reserv
 
 As discussed previously, balancing agricultural and environmental water demands in this watershed typically takes the form of seeking management actions that can improve flow conditions while minimizing the resulting reduction in agricultural water availability. These objectives are non-commensurable (i.e., an estimated level of fish reproduction cannot be converted into units of agricultural productivity), making an explicit quantification and consideration of benefit trade-offs a critical feature of this decision-support analysis [@Cohon1975]. Environmental benefits are less commonly quantified than agricultural costs [e.g., @Sunding1996, which assessed numerical costs of a management action and assumed qualitative environmental/human health benefits], but the HB function makes this trade-off quantification possible in the Scott Valley case. 
 
-For this analysis, which is not intended to identify one âbestâ or optimal solution, these trade-offs can be considered using scenario objective value differences relative to their basecase (historical simulated) values. We will call this quantity the âtrade-off efficiencyâ of a management scenario. For a given scenario, the trade-off efficiency, or Eff~scen~, is unitless (i.e., it has units of coho spf-equiv. per coho spf-equiv. / million m^3^ per million m^3^), as shown in the formula below.
+For this analysis, which is not intended to identify one "best" or optimal solution, these trade-offs can be considered using scenario objective value differences relative to their basecase (historical simulated) values. We will call this quantity the "trade-off efficiency" of a management scenario. For a given scenario, the trade-off efficiency, or Eff~scen~, is unitless (i.e., it has units of coho spf-equiv. per coho spf-equiv. / million m^3^ per million m^3^), as shown in the formula below.
 
 An efficiency for a subset of years can be calculated by averaging the efficiency values over that set of water years only. The set of years with low basecase HB values (operationally defined as values lower than 45 coho spf-equivalent, composed of 1993, 1995, 2002, and 2014-16) is relevant to water managers (see Discussion), and is henceforth referred to as the set of "low-coho" years. A low-coho year efficiency was calculated in addition to the efficiencies averaged over all water years.
 
@@ -475,7 +477,7 @@ scen_cat_tab_ft
 
 ## Results
 
-```{r farmer_fish_tradeoff_table, echo = F, warning =F}
+```{r farmerFishTradeoffTable, echo = F, warning =F}
 
 
 scenario_tab_init = get_scenario_tab_init()
@@ -484,21 +486,18 @@ scenario_tab_init = get_scenario_tab_init()
 
 # Read in slopes table for all predictors
 coef_tab = read.csv(file.path(fig_dir,
-                              "best linear model coefficients table_2022 march.csv"))
-colnames(coef_tab) = c("model_id", colnames(coef_tab)[2:(ncol(coef_tab))])
-# Averaged row for HBF weights
-metric_weights = t(coef_tab[coef_tab$model_id=="Ensemble Avg.", 2:(ncol(coef_tab))])
+                              "Hydrologic Benefit model coefficients table_2024 nov.csv"))
 
 # Calculate mean of 28 years of hydrologic benefit value and ET 
 obj_fn_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
-                                        weights = metric_weights,
+                                        weights = coef_tab,
                                         include_years = "all")
 
 scenario_tab = obj_fn_results$scenario_tab
 obj_fn_wy = obj_fn_results$obj_fn_results_by_wy
 ```
 
-As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value (in units of predicted coho smolt production per spawning female, or coho spf-equivalent) and a total crop ET volume was calculated for each water year in the 28-year simulation period, for each scenario. Each scenario has also been given an infrastructure feasibility proxy (\autoref{tab:scenario_results_tab}).
+As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value (in units of predicted coho smolt production per spawning female, or coho spf-equivalent) and a total crop ET volume was calculated for each water year in the 28-year simulation period, for each scenario. Each scenario has also been given an infrastructure feasibility proxy (\autoref{tab:scenarioResultsTab}).
 
 <!-- ## 4.1 Environmental and agricultural objective function values -->
 ### Environmental and agricultural objective function values
@@ -571,7 +570,7 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 
 
 
-```{r benefit_by_wy, echo = F, fig.cap="\\label{fig:benefit_by_wy} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2018. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels C and D show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 10th, August 1st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, and '18." , fig.height=8.3, fig.width=7, warning=F}
+```{r benefitByWY, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2018. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels C and D show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 10th, August 1st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, and '18." , fig.height=8.3, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -600,7 +599,7 @@ fig_i = fig_i + 1
 
 ```
 
-```{r farmer_fish_tradeoff_figure, echo = F, fig.cap="\\label{fig:farmer_fish_tradeoff_figure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 39 management scenarios. Symbol x and y coordinates are the average of 28 annual HB and ET values for each scenario over the full model period (water years 1991-2018). Whiskers show standard error of the 28 years of annual HB values; standard errors in the direction of the y-axis are smaller than the height covered by each symbol." , fig.height=8, fig.width=7, warning=F}
+```{r farmerFishTradeoffFigure, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 39 management scenarios. Symbol x and y coordinates are the average of 28 annual HB and ET values for each scenario over the full model period (water years 1991-2018). Whiskers show standard error of the 28 years of annual HB values; standard errors in the direction of the y-axis are smaller than the height covered by each symbol." , fig.height=8, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -619,17 +618,17 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 
 ```
 
-The aggregate hydrologic impact of each management scenario can be compared against the historical basecase using the annual objective function values over the full 28-year record (e.g., \autoref{fig:benefit_by_wy}) or using the 28-year mean values for each scenario (\autoref{fig:farmer_fish_tradeoff_figure}; \autoref{tab:scenario_results_tab}). In the basecase scenario, the 28-year mean annual ET volume is `r round(bc_et_mean)` million m^3^ of water, and the 28-year mean of annual HB values is `r round(bc_hb_mean,1)` coho spf-equivalent (\autoref{tab:scenario_results_tab}). Annual ET volume is relatively stable over the model period of water years 1991-2018, while annual HB values are much more variable (\autoref{fig:benefit_by_wy}). Among the 39 management scenarios, mean ET values ranged from `r round(scen_et_range[1])` to `r round(scen_et_range[2])` million m^3^ of water, while HB values ranged from `r round(scen_hb_range[1],1)` to `r round(scen_hb_range[2],1)` coho spf-equivalent.
+The aggregate hydrologic impact of each management scenario can be compared against the historical basecase using the annual objective function values over the full 28-year record (e.g., \autoref{fig:benefitByWY}) or using the 28-year mean values for each scenario (\autoref{fig:farmerFishTradeoffFigure}; \autoref{tab:scenarioResultsTab}). In the basecase scenario, the 28-year mean annual ET volume is `r round(bc_et_mean)` million m^3^ of water, and the 28-year mean of annual HB values is `r round(bc_hb_mean,1)` coho spf-equivalent (\autoref{tab:scenarioResultsTab}). Annual ET volume is relatively stable over the model period of water years 1991-2018, while annual HB values are much more variable (\autoref{fig:benefitByWY}). Among the 39 management scenarios, mean ET values ranged from `r round(scen_et_range[1])` to `r round(scen_et_range[2])` million m^3^ of water, while HB values ranged from `r round(scen_hb_range[1],1)` to `r round(scen_hb_range[2],1)` coho spf-equivalent.
  
-Four scenario categories fall in a cluster with relatively high ET values, indicating that these scenarios conserve nearly all the basecase economic benefits for local growers: Enhanced Recharge, Expanded Enhanced Recharge, Irrigation Efficiency, and Small Reservoir (\autoref{fig:farmer_fish_tradeoff_figure}). The scenarios in this group all require some degree of infrastructure investment, and they have a minimal impact on crop ET: the mean ET values of scenarios in this cluster are `r round(top_4_et_range[1])` to `r round(top_4_et_range[2])` million m^3^, or `r round(top_4_et_worse[1]/bc_et_mean*100)` percent less to `r round(top_4_et_worse[2]/bc_et_mean,3)*-1*100` percent more than basecase. Their mean improvement in HB values over the basecase ranges from `r round(top_4_hbf_improve[1])` to `r round(top_4_hbf_improve[2])` coho spf-equivalent. 
+Four scenario categories fall in a cluster with relatively high ET values, indicating that these scenarios conserve nearly all the basecase economic benefits for local growers: Enhanced Recharge, Expanded Enhanced Recharge, Irrigation Efficiency, and Small Reservoir (\autoref{fig:farmerFishTradeoffFigure}). The scenarios in this group all require some degree of infrastructure investment, and they have a minimal impact on crop ET: the mean ET values of scenarios in this cluster are `r round(top_4_et_range[1])` to `r round(top_4_et_range[2])` million m^3^, or `r round(top_4_et_worse[1]/bc_et_mean*100)` percent less to `r round(top_4_et_worse[2]/bc_et_mean,3)*-1*100` percent more than basecase. Their mean improvement in HB values over the basecase ranges from `r round(top_4_hbf_improve[1])` to `r round(top_4_hbf_improve[2])` coho spf-equivalent. 
 
-The mean ET volumes of the two Crop Change scenarios fall below those in the aforementioned cluster, with `r round(scenario_tab$et_mean[ scenario_tab$scenario_id == "irrig_0.8"] / 10^6 * -1)` and `r round(scenario_tab$et_mean[ scenario_tab$scenario_id == "irrig_0.9"] / 10^6 * -1)` million m^3^, while HB values are `r round(scenario_tab$HBF_mean[ scenario_tab$scenario_id == "irrig_0.8"],1)` and `r round(scenario_tab$HBF_mean[ scenario_tab$scenario_id == "irrig_0.9"],1)` respectively (\autoref{fig:farmer_fish_tradeoff_figure}). In these scenarios, existing crop coefficients are multiplied by a factor of 0.8 or 0.9; conceptually, this would involve replacing all existing irrigated acreage with unspecified crops which had a designated 80% and 90% of historical ET demand. As discussed later, in this scenario the relationship between water use and revenue may be distinctly different from that of alfalfa and pasture, so the actual "farmer benefit" may be higher or lower than this proxy suggests.
+The mean ET volumes of the two Crop Change scenarios fall below those in the aforementioned cluster, with `r round(scenario_tab$et_mean[ scenario_tab$scenario_id == "irrig_0.8"] / 10^6 * -1)` and `r round(scenario_tab$et_mean[ scenario_tab$scenario_id == "irrig_0.9"] / 10^6 * -1)` million m^3^, while HB values are `r round(scenario_tab$HBF_mean[ scenario_tab$scenario_id == "irrig_0.8"],1)` and `r round(scenario_tab$HBF_mean[ scenario_tab$scenario_id == "irrig_0.9"],1)` respectively (\autoref{fig:farmerFishTradeoffFigure}). In these scenarios, existing crop coefficients are multiplied by a factor of 0.8 or 0.9; conceptually, this would involve replacing all existing irrigated acreage with unspecified crops which had a designated 80% and 90% of historical ET demand. As discussed later, in this scenario the relationship between water use and revenue may be distinctly different from that of alfalfa and pasture, so the actual "farmer benefit" may be higher or lower than this proxy suggests.
 
-Two regulatory management categories, Alfalfa Irrigation and Curtailment, involve irrigation schedule changes, and result in a range of reductions in applied irrigation volume, depending on the date of intervention. The scenarios in these categories trace two trade-off arcs in average HB-ET space (\autoref{fig:farmer_fish_tradeoff_figure}). The first category, early cessation of alfalfa irrigation (during all or only dry water years), is intended to simulate growers harvesting two cuttings only (i.e., one or two fewer cuttings than current) in a given year. This was simulated by ceasing alfalfa irrigation earlier in the growing season (with cutoff dates on July 10, August 1 and August 15) than the basecase default date of Sept. 1. (The Sept. 1 cutoff date assumes that growers obtain three cuttings, but does not incorporate the known small number of growers which occasionally irrigate longer to obtain a fourth cutting.) Alfalfa acreage is concentrated near the Scott River channel, much of it in the Adjudicated Zone (\autoref{fig:scott_landuse_map}), with predominately groundwater irrigation sources. The second regulatory category, Curtailment of all irrigation starting on a range of dates (June 1st through August 15th), represent book-end scenario simulations to approximate regulatory actions proposed by state resource management agencies in response to extreme drought conditions [CDFW -@CDFW2021c]. The mean ET values of scenarios in these two categories are `r round(alf_curts_et_range[1])` to `r round(alf_curts_et_range[2])` million m^3^, or `r round(alf_curts_et_worse[1]/bc_et_mean*100)` to `r round(alf_curts_et_worse[2]/bc_et_mean,3)*100` percent less than basecase; HB gains over basecase are `r round(alf_curts_hbf_improve[1])` to `r round(alf_curts_hbf_improve[2])` coho spf-equivalent.
+Two regulatory management categories, Alfalfa Irrigation and Curtailment, involve irrigation schedule changes, and result in a range of reductions in applied irrigation volume, depending on the date of intervention. The scenarios in these categories trace two trade-off arcs in average HB-ET space (\autoref{fig:farmerFishTradeoffFigure}). The first category, early cessation of alfalfa irrigation (during all or only dry water years), is intended to simulate growers harvesting two cuttings only (i.e., one or two fewer cuttings than current) in a given year. This was simulated by ceasing alfalfa irrigation earlier in the growing season (with cutoff dates on July 10, August 1 and August 15) than the basecase default date of Sept. 1. (The Sept. 1 cutoff date assumes that growers obtain three cuttings, but does not incorporate the known small number of growers which occasionally irrigate longer to obtain a fourth cutting.) Alfalfa acreage is concentrated near the Scott River channel, much of it in the Adjudicated Zone (\autoref{fig:scott_landuse_map}), with predominately groundwater irrigation sources. The second regulatory category, Curtailment of all irrigation starting on a range of dates (June 1st through August 15th), represent book-end scenario simulations to approximate regulatory actions proposed by state resource management agencies in response to extreme drought conditions [CDFW -@CDFW2021c]. The mean ET values of scenarios in these two categories are `r round(alf_curts_et_range[1])` to `r round(alf_curts_et_range[2])` million m^3^, or `r round(alf_curts_et_worse[1]/bc_et_mean*100)` to `r round(alf_curts_et_worse[2]/bc_et_mean,3)*100` percent less than basecase; HB gains over basecase are `r round(alf_curts_hbf_improve[1])` to `r round(alf_curts_hbf_improve[2])` coho spf-equivalent.
 
-The third regulatory category, Low Flow Diversion Limits, regulates surface water diversion for irrigation, and contains only one scenario (\autoref{fig:farmer_fish_tradeoff_figure}). Among all scenarios, it is the only scenario that focuses solely on management of surface water diversions for irrigation. It assumes the FJ Gauge flowrate is representative of watershed conditions, and limits diversions of surface water from all tributaries on days when the FJ Gauge flowrate falls below a recently proposed instream flow regime that is considered to be protective of anadromous fish in the Scott River [CDFW -@CDFW2017]. Under this Low Flow Diversion Limits scenario, the mean crop ET volume is `r round(flowlims_et_worse)` million m^3^ (~`r round(flowlims_et_worse/bc_et_mean*100)`%) less than basecase, while the mean HB value is `r round(flowlims_hb_better)` coho spf-equivalent greater than basecase. 
+The third regulatory category, Low Flow Diversion Limits, regulates surface water diversion for irrigation, and contains only one scenario (\autoref{fig:farmerFishTradeoffFigure}). Among all scenarios, it is the only scenario that focuses solely on management of surface water diversions for irrigation. It assumes the FJ Gauge flowrate is representative of watershed conditions, and limits diversions of surface water from all tributaries on days when the FJ Gauge flowrate falls below a recently proposed instream flow regime that is considered to be protective of anadromous fish in the Scott River [CDFW -@CDFW2017]. Under this Low Flow Diversion Limits scenario, the mean crop ET volume is `r round(flowlims_et_worse)` million m^3^ (~`r round(flowlims_et_worse/bc_et_mean*100)`%) less than basecase, while the mean HB value is `r round(flowlims_hb_better)` coho spf-equivalent greater than basecase. 
 
-The remaining two categories, abbreviated as "NatVeg" and "NatVegET", relate to land cover type and are not proposed as management actions. Rather, these provide reference scenarios for conditions in some or all parts of the valley that could be considered to stand in for undefined "pre-historic", "unimpaired", or "conservation" conditions. They involve simulating native vegetation in place of irrigated acreage, and were designed to estimate the streamflow depletion attributable to agricultural water use in different areas of Scott Valley. These scenarios produce substantial HB gains at a high ET cost relative to basecase (\autoref{fig:farmer_fish_tradeoff_figure}).
+The remaining two categories, abbreviated as "NatVeg" and "NatVegET", relate to land cover type and are not proposed as management actions. Rather, these provide reference scenarios for conditions in some or all parts of the valley that could be considered to stand in for undefined "pre-historic", "unimpaired", or "conservation" conditions. They involve simulating native vegetation in place of irrigated acreage, and were designed to estimate the streamflow depletion attributable to agricultural water use in different areas of Scott Valley. These scenarios produce substantial HB gains at a high ET cost relative to basecase (\autoref{fig:farmerFishTradeoffFigure}).
 
 The key geographic feature in the NatVeg and NatVegET scenarios is the "Interconnected Zone" in the 1980 Scott Valley surface water adjudication [@SuperiorCourtofSiskiyouCounty1980], referred to here as the "adjudicated zone" of groundwater pumping (\autoref{fig:scott_landuse_map}), and the six scenarios in each category represent the cessation of all irrigation or the cessation of only groundwater pumping in three spatial configurations: within the adjudicated zone, outside of the adjudicated zone, or in both areas. All areas where irrigation or pumping is turned off are assumed to return to (unirrigated) native vegetation. 
 
@@ -667,7 +666,7 @@ scenario_tab_lc = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab_lc)
 
 \blandscape
 
-```{r scenario_results_tab, echo = FALSE, results = 'asis'}
+```{r scenarioResultsTab, echo = FALSE, results = 'asis'}
 # attach low-coho year numbers to scenario table
 
 
@@ -727,7 +726,7 @@ scen_tab_for_ft = scen_tab
 colnames(scen_tab_for_ft) = column_labels
 
 # #declare xtable object, assign formatted column labels, and print to latex object
-# scen_xtable = xtable(scen_tab, label = "tab:scenario_results_tab",
+# scen_xtable = xtable(scen_tab, label = "tab:scenarioResultsTab",
 #                  caption = caption_text, digits = c(NA, NA, NA, 0, 1, 1, NA, 1, 1))
 # names(scen_xtable) = column_labels
 # print.xtable(scen_xtable, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F, size="\\fontsize{9pt}{10pt}\\selectfont")
@@ -829,7 +828,7 @@ hb_gain_perc_all_range = round(range(hb_gain_percent_all[et_cost_percent_all>0])
 
 The trade-off efficiency between the environmental and agricultural objective functions is defined as the average HB value gained, relative to HB~basecase~, per ET value lost relative to ET~basecase~ (see formula in Methods). However, six scenarios (the five reservoir scenarios and managed aquifer recharge, or MAR) actually resulted in an average ET volume slightly greater than the basecase, and so avoided any ET cost. These scenarios were excluded from the efficiency calculations because including them would produce nonsensical negative efficiencies. 
 
-For all other scenarios, trade-off efficiencies ranged from `r ef_min` to `r ef_max` when averaged over all years, and were higher (ranging from `r ef_min_lc` to `r ef_max_lc`) in low-coho years (\autoref{tab:scenario_results_tab}). The range covers two orders of magnitude because the denominator of the ratio, lost ET, ranges from  `r et_cost_perc_all_range[1]`% to `r et_cost_perc_all_range[2]`%, while the HB gains fall more narrowly between `r hb_gain_perc_all_range[1]`% to `r hb_gain_perc_all_range[2]`%. Efficiencies greater than 1 indicate that a scenario produces more than a 1% increase in HB value per 1% loss in ET value. However, because the HB and ET units are non-commensurable, the absolute value of the trade-off efficiency is not of great significance; the trade-off efficiency metric is most useful for scenario comparisons.
+For all other scenarios, trade-off efficiencies ranged from `r ef_min` to `r ef_max` when averaged over all years, and were higher (ranging from `r ef_min_lc` to `r ef_max_lc`) in low-coho years (\autoref{tab:scenarioResultsTab}). The range covers two orders of magnitude because the denominator of the ratio, lost ET, ranges from  `r et_cost_perc_all_range[1]`% to `r et_cost_perc_all_range[2]`%, while the HB gains fall more narrowly between `r hb_gain_perc_all_range[1]`% to `r hb_gain_perc_all_range[2]`%. Efficiencies greater than 1 indicate that a scenario produces more than a 1% increase in HB value per 1% loss in ET value. However, because the HB and ET units are non-commensurable, the absolute value of the trade-off efficiency is not of great significance; the trade-off efficiency metric is most useful for scenario comparisons.
 
 Four scenario categories form a "low-efficiency" cluster, with all-years efficiencies of less than 1: Crop Change, Curtailment, and the two Natural Vegetation categories (\autoref{fig:efficiency}). These scenarios can produce substantial HB gains (ranging from `r hb_gain_range_low_eff[1]` to `r hb_gain_range_low_eff[2]`) coho spf-equiv., but result in severe agricultural productivity reductions  (`r et_cost_range_low_eff_percent[1]`% to `r et_cost_range_low_eff_percent[2]`%). The "high-efficiency" scenarios, which have an all-years trade-off efficiency greater than 1 (the Enhanced Recharge, Low Flow Diversion Limits, Irrigation Efficiency and Alfalfa Irrigation scenarios), tend to be associated with a small ET cost relative to basecase (`r et_cost_range_high_eff[1]` to `r et_cost_range_high_eff[2]` million m^3^, or `r et_cost_range_high_eff_percent[1]` to `r et_cost_range_high_eff_percent[2]` percent of basecase crop ET). 
 
@@ -846,11 +845,11 @@ tradeoff_efficiency_fig(scenario_tab = scenario_tab)
 <!-- ## 4.3 Infrastructure objective, Pareto-optimal set and GSP priorities -->
 ### Infrastructure objective, Pareto-optimal set and GSP priorities
 
-By plotting the environmental, agricultural, and infrastructure objectives in a three-dimensional scatterplot, it is possible to visualize the combined set of management scenarios as four different trade-off arcs in different infrastructure categories (\autoref{fig:farmer_fish_infra_figure_3d}). 
+By plotting the environmental, agricultural, and infrastructure objectives in a three-dimensional scatterplot, it is possible to visualize the combined set of management scenarios as four different trade-off arcs in different infrastructure categories (\autoref{fig:farmerFishInfraFigure3D}). 
 
-The Pareto-optimal set of management actions include more than half (25) of the simulated scenarios (\autoref{tab:scenario_results_tab}; \autoref{fig:farmer_fish_infra_figure_3d}). All the suboptimal scenarios are in infrastructure category 2 (infrastructure timeline of 1-2 years). The suboptimal set are either related to land use change (Crop Change, NatVeg, and NatVegET), which reduce crop ET demand or irrigated acreage, or they involve deployment of more efficient irrigation (Irrigation Efficiency), which has little impact on either HB or ET values. 
+The Pareto-optimal set of management actions include more than half (25) of the simulated scenarios (\autoref{tab:scenarioResultsTab}; \autoref{fig:farmerFishInfraFigure3D}). All the suboptimal scenarios are in infrastructure category 2 (infrastructure timeline of 1-2 years). The suboptimal set are either related to land use change (Crop Change, NatVeg, and NatVegET), which reduce crop ET demand or irrigated acreage, or they involve deployment of more efficient irrigation (Irrigation Efficiency), which has little impact on either HB or ET values. 
 
-Infrastructure category 1 (no infrastructure investment needed) contains all the Regulation-type scenarios. In the Alfalfa Irrigation and Curtailment scenario categories, the trade-off arcs show the effect of intervention date: an earlier date of intervention (irrigation cutoff) produces a greater HB value at a higher ET cost, compared to a later date of intervention. The scenarios in infrastructure categories 3 and 4 (infrastructure timeline of 3-5 and 5+ years) involve no or minimal ET cost, and a range of HB gains on the middle-to-lower end of the HB gain spectrum (Reservoirs, Enhanced Recharge, and Expanded Enhanced Recharge; \autoref{fig:farmer_fish_tradeoff_figure}). 
+Infrastructure category 1 (no infrastructure investment needed) contains all the Regulation-type scenarios. In the Alfalfa Irrigation and Curtailment scenario categories, the trade-off arcs show the effect of intervention date: an earlier date of intervention (irrigation cutoff) produces a greater HB value at a higher ET cost, compared to a later date of intervention. The scenarios in infrastructure categories 3 and 4 (infrastructure timeline of 3-5 and 5+ years) involve no or minimal ET cost, and a range of HB gains on the middle-to-lower end of the HB gain spectrum (Reservoirs, Enhanced Recharge, and Expanded Enhanced Recharge; \autoref{fig:farmerFishTradeoffFigure}). 
 
 To determine if the strict application of objective functions would produce different management priorities than the public policy development process that took place 2018-2021, we made a high-level, conceptual comparison of the Pareto-optimal set of management actions and the management actions and projects listed for consideration in the GSP [Siskiyou County -@SiskiyouCounty2021]. Management actions considered in the GSP have some analogs in the set of 40 simulated scenarios. 
 
@@ -861,7 +860,7 @@ The final high-efficiency scenario category, Alfalfa Irrigation, is not included
 Notably, direct comparisons between the set of simulated scenarios and the management actions listed in the GSP are somewhat limited. The primary reason for this is that the simulated scenarios assume that all water users in the valley are acting in concert. Conversely, management actions included in the GSP generally assumed voluntary/incentivized participation by individual landowners in scenarios involving land use change, and in some cases are located only in specific sub-areas of the watershed.
 
 
-```{r farmer_fish_infra_figure_3d, echo = F, fig.cap="\\label{fig:farmer_fish_infra_figure_3d} A three-dimensional scatter plot of the objective function values for basecase and 39 management scenarios, averaged over 28 water years (1991-2018). Larger spheres are shown for the Pareto-optimal set of scenarios. Scenario colors correspond to legend in Figures 6 and 7." , out.width="80%", warning=F, fig.align = "center"}
+```{r farmerFishInfraFigure3D, echo = F, fig.cap="\\label{fig:farmerFishInfraFigure3D} A three-dimensional scatter plot of the objective function values for basecase and 39 management scenarios, averaged over 28 water years (1991-2018). Larger spheres are shown for the Pareto-optimal set of scenarios. Scenario colors correspond to legend in Figures 6 and 7." , out.width="80%", warning=F, fig.align = "center"}
 
 
 save_3d_plot = F

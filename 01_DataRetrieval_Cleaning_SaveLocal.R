@@ -2401,7 +2401,7 @@ station_table = station_info[[2]]
 ghcnd_stations = station_table$station.id[station_table$results.type == "GHCND"]
 noaa_updated_dataset = get_noaa_data(station_list = ghcnd_stations)
 
-archive_noaa_data(noaa_data = noaa_updated_dataset)
+# archive_noaa_data(noaa_data = noaa_updated_dataset)
 
 noaa = noaa_updated_dataset
 noaa_stations = station_table[station_table$results.type == "GHCND",]
@@ -2566,7 +2566,7 @@ landuse_dwr_2016 = st_transform(lu_all, st_crs("+init=epsg:3310"))
 
 #Copy to the box DMS archive
 if(!file.exists(file.path(dms_archive_dir, "landuse_siskiyou_county_dwr2016.shp"))){
-  st_write(obj = landuse_dwr_2016, dsn = dms_archive_dir, layer = "landuse_siskiyou_county_dwr2016", driver = "ESRI Shapefile")
+  st_write(obj = landuse_dwr_2016, dsn = data_dir, layer = "landuse_siskiyou_county_dwr2016", driver = "ESRI Shapefile")
 }
   #remove files from scratch drive
 file.remove(file.path(scratch_dir, zipname))
