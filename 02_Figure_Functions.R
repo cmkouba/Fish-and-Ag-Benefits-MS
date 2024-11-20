@@ -1365,22 +1365,127 @@ get_scenario_tab_init = function(){
   return(scenario_tab_init)
 }
 
+re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100), 
+                                    fj_flow, last_wy = 2018){
+  
+  
+  calc_discon_days_since_aug_31 = function(dates, flow, discon_threshold){
+    dates_since_aug_31 = as.numeric(dates - as.Date(paste0(year(min(dates))-1, "-08-31")))
+    if(sum(flow < discon_threshold) > 0){ #if it does disconnect, calculate discon day
+      discon_day = min(dates_since_aug_31[ flow < discon_threshold], na.rm=T)
+    }
+    
+    if(sum(flow < discon_threshold) < 1){ # if it does not disconnect, return the end of the analysis period
+      return(max(dates_since_aug_31))
+    } else {
+      return(discon_day)
+    }
+  }
+  
+  calc_recon_days_since_aug_31 = function(dates, flow, recon_threshold){
+    dates_since_aug_31 = as.numeric(dates - as.Date(paste0(year(min(dates)), "-08-31")))
+    recon_day = min(dates_since_aug_31[ flow > recon_threshold], na.rm=T)
+    return(recon_day)
+  }
+  
+  
+  wat_years = unique(fj_flow$wy)
+  wat_years = wat_years[wat_years<=last_wy]
+  # output_tab = data.frame(year = wat_years, min_flow = NA,
+  #                         recon_date_10 = NA, recon_date_20 = NA,
+  #                         recon_date_30 = NA, recon_date_40 = NA,
+  #                         recon_date_60 = NA, recon_date_100 = NA,
+  #                         discon_date_10 = NA, discon_date_20 = NA,
+  #                         discon_date_30 = NA, discon_date_40 = NA,
+  #                         discon_date_60 = NA, discon_date_100 = NA)
+  output_tab = data.frame(matrix(data = NA, nrow = length(wat_years),
+                                 ncol = length(thresholds) * 2 + 3))
+  colnames(output_tab) = c('water_year', "min_flow", "tot_flow",paste0("recon_date_",thresholds),
+                           paste0("discon_date_",thresholds))
+  output_tab$water_year = wat_years
+  
+  
+  for(i in 1:length(wat_years)){
+    year = wat_years[i]
+    
+    date1_discon = as.Date(paste0(year,"-03-01"))
+    date2_discon = as.Date(paste0(year,"-08-31"))
+    dates_discon = seq.Date(from=date1_discon, to = date2_discon, by="day")
+    
+    date1_recon = as.Date(paste0(year-1,"-09-01"))
+    date2_recon = as.Date(paste0(year,"-03-15")) # extend for wy 2001
+    dates_recon = seq.Date(from=date1_recon, to = date2_recon, by="day")
+    
+    discon_flows = fj_flow$Flow[fj_flow$Date %in% dates_discon]
+    recon_flows = fj_flow$Flow[fj_flow$Date %in% dates_recon]
+    
+    output_tab$min_flow[i] = min(fj_flow$Flow[fj_flow$wy==year])
+    output_tab$tot_flow[i] = sum(fj_flow$Flow[fj_flow$wy==year] * cfs_to_m3day) / (10^6) #million cubic m
+    
+    
+    for(thresh in thresholds){
+      output_tab[i, paste0("discon_date_", thresh)] = calc_discon_days_since_aug_31(dates=dates_discon,
+                                                                                    flow = discon_flows,
+                                                                                    discon_threshold = thresh)
+      output_tab[i, paste0("recon_date_", thresh)] = calc_recon_days_since_aug_31(dates=dates_recon,
+                                                                                  flow = recon_flows,
+                                                                                  recon_threshold = thresh)
+    }
+    #
+    # output_tab$recon_date_10[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 10)
+    # output_tab$discon_date_10[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 10)
+    #
+    # output_tab$recon_date_20[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 20)
+    # output_tab$discon_date_20[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 20)
+    #
+    # output_tab$recon_date_30[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 30)
+    # output_tab$discon_date_30[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 30)
+    #
+    # output_tab$recon_date_40[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 40)
+    # output_tab$discon_date_40[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 40)
+    #
+    # output_tab$recon_date_60[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 60)
+    # output_tab$discon_date_60[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 60)
+    #
+    # output_tab$recon_date_100[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 100)
+    # output_tab$discon_date_100[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 100)
+    
+    
+  }
+  
+  return(output_tab)
+  
+}
+
+
 add_func_flows_to_hbf_tab=function(pre_hbf_tab, ffs, scen_id){
   
   csv_name = paste0(scen_id, " func flow metrics.csv")
   ff_dir = file.path(data_dir, "SVIHM Model Results", "tables for func flows")
   ff_scen = read.csv(file.path(ff_dir, csv_name))
+  colnames(ff_scen)[colnames(ff_scen)=="Year"] = "func_flow"
+  ff_desc = ff_scen$func_flow
+  ff_scen$func_flow= NULL; row.names(ff_scen) = ff_desc
+  
   
   #initialize hbf_tab
   hbf_tab = data.frame("brood_year" = pre_hbf_tab[,"water_year"])
   # add brood year column to hbf_tab
-  # hbf_tab[,"brood_year"] = hbf_tab$water_year
   hbf_tab[,ffs]=NA
   for(i in 1:length(ffs)){
     ff = ffs[i]
-    brood_year_correction = 0
-    if(grepl(pattern = "RY", x = ff)){brood_year_correction = 1}
-    if(grepl(pattern = "SY", x = ff)){brood_year_correction = 2}
+    BY_correction = 0
+    # for fall season metrics, like reconnection dates, we need to use metrics from the following water year to correspond to the right salmon cohort. correction of 1 (or 2 for Smolt Year)
+    if(grepl(pattern = "RY", x = ff)){BY_correction = BY_correction + 1}
+    if(grepl(pattern = "SY", x = ff)){BY_correction = BY_correction + 2}
+    # for wet season, spring and summer season metrics, like disconnection dates, we should use metrics from the same water year as the brood year. So, un-correct the correction factor
+    if(grepl(pattern = "discon", x = ff) |
+       grepl(pattern = "Wet", x = ff) |
+       grepl(pattern = "Peak", x = ff) |
+       grepl(pattern = "90_pctile", x = ff) |
+       grepl(pattern = "SP", x = ff) |
+       grepl(pattern = "DS", x = ff)){BY_correction = BY_correction - 1} 
+    # There should be no Brood Year disconnection dates, so we will not have a -1 correction factor
     
     #for recon and discon dates
     if(grepl(pattern = "recon",x=ff) | grepl(pattern = "discon",x=ff)){
@@ -1389,21 +1494,36 @@ add_func_flows_to_hbf_tab=function(pre_hbf_tab, ffs, scen_id){
       # find which column has the correct recon or discon dates
       matching_column_index = which(grepl(pattern = which_con, x = colnames(pre_hbf_tab)) & 
                                       grepl(pattern = thresh, x = colnames(pre_hbf_tab)))
-      ff_vals = pre_hbf_tab[, matching_column_index]
-      
-      corrected_year_indices = (1):(nrow(hbf_tab)-brood_correction) 
-      # CURRENTLY HERE
-      hbf_tab[(1+brood_correction):nrow(hbf_tab-brood_correction),ff] = ff_vals[corrected_year_indices]
+      ff_vals = pre_hbf_tab[(1+BY_correction):(nrow(hbf_tab)), 
+                            matching_column_index]
+      ff_vals = c(ff_vals, rep(NA, BY_correction))
+
+      hbf_tab[,ff] = ff_vals
     }
       
     
     
     if(!(grepl(pattern = "recon",x=ff) | 
          grepl(pattern = "discon",x=ff))){
-      ff_vals = ff_scen[ff,]
       
+      # remove year notations to match functional flow IDs
+      ff_short = gsub(pattern="BY_",replacement="",x=ff)
+      ff_short = gsub(pattern="RY_",replacement="",x=ff_short)
+      ff_short = gsub(pattern="SY_",replacement="",x=ff_short)
+      # find row in table of functional flows for each scenario
+      matching_row_index = which(row.names(ff_scen)==ff_short)
+      
+      ff_vals = as.matrix(ff_scen[matching_row_index, 
+                        1:(nrow(hbf_tab)-BY_correction)])
+      ff_vals = c(rep(NA, BY_correction), ff_vals)
+      hbf_tab[,ff] = ff_vals
+
     }
   }
+  
+  hbf_tab[!is.finite(as.matrix(hbf_tab))]=NA # clean up infinites
+  
+  return(hbf_tab)
 }
 
 calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
@@ -1412,48 +1532,46 @@ calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
   
   pre_hbf_tab = re_and_disconnect_date_tab(thresholds = thresholds_hbf,
                                        fj_flow = flow_tab_for_hbf)
-  func_flows_for_hbf = colnames(weights)[colnames(weights) !="Intercept"] 
-  # & 
-  #                                  !grepl(pattern = "recon",x=colnames(weights)) &
-  #                                  !grepl(pattern = "discon",x=colnames(weights)) ]
-  hbf_tab = add_func_flows_to_hbf_tab(pre_hbf_tab = pre_hbf_tab, ffs = func_flows_for_hbf)
-  hbf_tab = hbf_tab[hbf_tab$water_year <= last_wy,]
-  # hbf_tab = hbf_tab[,c("water_year","recon_date_10","recon_date_100")]
+  # fill in missing values with averages
+  ffs = colnames(weights)[colnames(weights) !="Intercept"] 
   
-  fflows = read_fflows_csv(scen_id = scen_id)
+  hbf_tab = add_func_flows_to_hbf_tab(pre_hbf_tab = pre_hbf_tab, 
+                                      ffs = ffs,
+                                      scen_id = scen_id)
+  hbf_tab = hbf_tab[hbf_tab$brood_year <= last_wy,]
+
+  write.csv(x = hbf_tab, quote = F, row.names = T,
+            file = file.path(ms_dir, "Graphics and Supplements",
+                             "Supplemental Table 2 - Flow Metrics by Water Year, 1942-2021.csv"))
   
-  hbf_tab$Wet_Tim = fflows$Wet_Tim[match(hbf_tab$water_year,fflows$Water_Year)]
-  hbf_tab$Wet_BFL_Dur = fflows$Wet_BFL_Dur[match(hbf_tab$water_year,fflows$Water_Year)]
-  
-  
-  if(ch1_hbftab ==T){
-    write.csv(x = hbf_tab, quote = F, row.names = T,
-              file = file.path(ms_dir, "Graphics and Supplements",
-                               "Supplemental Table 2 - Flow Metrics by Water Year, 1942-2021.csv"))
+  # fill gaps with averages
+  col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
+  col_avgs_no_na = apply(X=hbf_tab, MARGIN = 2, FUN = median, na.rm=T)
+  for(j in 1:ncol(hbf_tab)){
+    if(is.na(col_avgs[j])){
+      hbf_tab[is.na(hbf_tab[,j]),j] = col_avgs_no_na[j]
+    }
+    
   }
   
   # Calculate HBF component parts and add together
-  hbf_comp = weights
+  hbf_tab$Int = as.numeric(weights[1])# add intercept term
   
-  # hbf_tab$Int = hbf_comp[rownames(hbf_comp) == "Intercept" | names(hbf_comp) == "Intercept" ]
-  # hbf_tab$comp1 = hbf_comp[rownames(hbf_comp) == "BY_recon_10"] * hbf_tab$recon_date_10
-  # hbf_tab$comp2 = hbf_comp[rownames(hbf_comp) == "BY_recon_100"] * hbf_tab$recon_date_100
-  # hbf_tab$comp3 = hbf_comp[rownames(hbf_comp) == "RY_Wet_Tim"] * hbf_tab$Wet_Tim
-  # hbf_tab$comp4 = hbf_comp[rownames(hbf_comp) == "RY_Wet_BFL_Dur"] * hbf_tab$Wet_BFL_Dur
-  
-  hbf_tab$Int = hbf_comp[1]
-  hbf_tab$comp1 = hbf_comp[2] * hbf_tab$recon_date_10
-  hbf_tab$comp2 = hbf_comp[3] * hbf_tab$recon_date_100
-  hbf_tab$comp3 = hbf_comp[4] * hbf_tab$Wet_Tim
-  hbf_tab$comp4 = hbf_comp[5] * hbf_tab$Wet_BFL_Dur
-  
-  hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
-    hbf_tab$comp3 + hbf_tab$comp4
+  for(i in 1:length(ffs)){
+    hbf_colname_i = paste0("comp",i)
+    ff_colname = colnames(weights)[i+1]
+    # multiply metric values by coefficient
+    hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights[i+1])
+  }
+
+  hbf_tab$hbf_total = hbf_tab$Int + 
+    rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
   
   return(hbf_tab)
 }
 
-calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights, include_years = "all",
+calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights, 
+                                   include_years = "all",
                                            start_wy = 1991, end_wy = 2018){
   
   scenarios = scenario_tab$scenario_id
@@ -1752,95 +1870,6 @@ calc_hbf_tab_mar2022 = function(thresholds_hbf = c(10,100), last_wy = 2021,
     hbf_tab$comp3 + hbf_tab$comp4
 
   return(hbf_tab)
-}
-
-re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100), fj_flow, last_wy = 2018){
-
-  wat_years = unique(fj_flow$wy)
-  wat_years = wat_years[wat_years<=last_wy]
-  # output_tab = data.frame(year = wat_years, min_flow = NA,
-  #                         recon_date_10 = NA, recon_date_20 = NA,
-  #                         recon_date_30 = NA, recon_date_40 = NA,
-  #                         recon_date_60 = NA, recon_date_100 = NA,
-  #                         discon_date_10 = NA, discon_date_20 = NA,
-  #                         discon_date_30 = NA, discon_date_40 = NA,
-  #                         discon_date_60 = NA, discon_date_100 = NA)
-  output_tab = data.frame(matrix(data = NA, nrow = length(wat_years),
-                                 ncol = length(thresholds) * 2 + 3))
-  colnames(output_tab) = c('water_year', "min_flow", "tot_flow",paste0("recon_date_",thresholds),
-                           paste0("discon_date_",thresholds))
-  output_tab$water_year = wat_years
-
-
-  for(i in 1:length(wat_years)){
-    year = wat_years[i]
-
-    date1_discon = as.Date(paste0(year,"-03-01"))
-    date2_discon = as.Date(paste0(year,"-08-31"))
-    dates_discon = seq.Date(from=date1_discon, to = date2_discon, by="day")
-
-    date1_recon = as.Date(paste0(year-1,"-09-01"))
-    date2_recon = as.Date(paste0(year,"-02-28"))
-    dates_recon = seq.Date(from=date1_recon, to = date2_recon, by="day")
-
-    discon_flows = fj_flow$Flow[fj_flow$Date %in% dates_discon]
-    recon_flows = fj_flow$Flow[fj_flow$Date %in% dates_recon]
-
-    output_tab$min_flow[i] = min(fj_flow$Flow[fj_flow$wy==year])
-    output_tab$tot_flow[i] = sum(fj_flow$Flow[fj_flow$wy==year] * cfs_to_m3day) / (10^6) #million cubic m
-
-
-    for(thresh in thresholds){
-      output_tab[i, paste0("recon_date_", thresh)] = calc_recon_days_since_aug_31(dates=dates_recon,
-                                                                                  flow = recon_flows,
-                                                                                  recon_threshold = thresh)
-      output_tab[i, paste0("discon_date_", thresh)] = calc_discon_days_since_aug_31(dates=dates_discon,
-                                                                                    flow = discon_flows,
-                                                                                    discon_threshold = thresh)
-    }
-    #
-    # output_tab$recon_date_10[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 10)
-    # output_tab$discon_date_10[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 10)
-    #
-    # output_tab$recon_date_20[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 20)
-    # output_tab$discon_date_20[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 20)
-    #
-    # output_tab$recon_date_30[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 30)
-    # output_tab$discon_date_30[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 30)
-    #
-    # output_tab$recon_date_40[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 40)
-    # output_tab$discon_date_40[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 40)
-    #
-    # output_tab$recon_date_60[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 60)
-    # output_tab$discon_date_60[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 60)
-    #
-    # output_tab$recon_date_100[i] = calc_recon_days_since_aug_31(dates=yr_dates, flow = recon_flows, recon_threshold = 100)
-    # output_tab$discon_date_100[i] = calc_discon_days_since_aug_31(dates=yr_dates, flow = discon_flows, discon_threshold = 100)
-
-
-  }
-
-  return(output_tab)
-
-}
-
-calc_recon_days_since_aug_31 = function(dates, flow, recon_threshold){
-  dates_since_aug_31 = as.numeric(dates - as.Date(paste0(year(min(dates)), "-08-31")))
-  recon_day = min(dates_since_aug_31[ flow > recon_threshold], na.rm=T)
-  return(recon_day)
-}
-
-calc_discon_days_since_aug_31 = function(dates, flow, discon_threshold){
-  dates_since_aug_31 = as.numeric(dates - as.Date(paste0(year(min(dates))-1, "-08-31")))
-  if(sum(flow < discon_threshold) > 0){ #if it does disconnect, calculate discon day
-    discon_day = min(dates_since_aug_31[ flow < discon_threshold], na.rm=T)
-  }
-
-  if(sum(flow < discon_threshold) < 1){ # if it does not disconnect, return the end of the analysis period
-    return(max(dates_since_aug_31))
-  } else {
-    return(discon_day)
-  }
 }
 
 
