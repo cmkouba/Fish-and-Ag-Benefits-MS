@@ -1031,6 +1031,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   # panel 1, hbv
   par(mar = c(3,4,1,2))
   y_range_hb = range(obj_fn_wy$hb_val, na.rm=T)
+  dy = diff(y_range_hb)
   plot(x = NA, y = NA,
        ylim = y_range_hb,
        xlim = range(wys),
@@ -1042,9 +1043,9 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   for(dry_yr in dry_years){
     xes = c(dry_yr + rec_wid, dry_yr - rec_wid,
             dry_yr - rec_wid, dry_yr + rec_wid, dry_yr + rec_wid)
-    ys = c(y_range_hb[1], y_range_hb[1],
-           y_range_hb[2], y_range_hb[2],
-           y_range_hb[1]) * 1.5
+    ys = c(y_range_hb[1]+dy, y_range_hb[1]+dy,
+           y_range_hb[2]-dy, y_range_hb[2]-dy,
+           y_range_hb[1]+dy) 
     polygon(x = xes, y = ys, col = dry_yr_col, border = NA)
   }
   # add scenario data
@@ -1141,14 +1142,14 @@ farm_fish_tradeoff_blank = function(scenario_tab){
 
 
 farm_fish_tradeoff_fig = function(scenario_tab, n_years = 28,
-                                  legend_position = "bottomleft",
+                                  legend_position = "topright",
                                   plot_title){
   par(mar = c(5,4,5,2))
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1, # convert to + number in mill. m^3
        pch = scenario_tab$symbol,# pch = 21,
        cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        bg = scenario_tab$color,
-       ylim = c(0,113), xlim = c(68, 95),
+       ylim = c(0,113), xlim = c(55, 67),
        xlab = "Hydrologic Benefit Function (coho spf-equiv)",
        ylab = "Mean Annual Crop ET (million cubic m)",
        # main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values"
@@ -1179,6 +1180,10 @@ farm_fish_tradeoff_fig = function(scenario_tab, n_years = 28,
   # Add points on top to make the error bars look less messy
   points(scenario_tab$HBF_mean, scenario_tab$et_mean/ 1E6 * -1,
          pch = scenario_tab$symbol, cex = 2, bg = scenario_tab$color)
+  # overplot Basecase so it is visible
+  bc_tab = scenario_tab[scenario_tab$scenario_id=="basecase",]
+  points(bc_tab$HBF_mean, bc_tab$et_mean / 1E6 * -1, # convert to + number in mill. m^3
+         pch = bc_tab$symbol, cex = 2)
   # add legend
   legend(x = legend_position, pch=scen_cat_tab$symbol, cex = .8, pt.cex = 1.5,
          title = "Mgmt. Action Category",# (# of scenarios)",
@@ -1469,7 +1474,8 @@ add_func_flows_to_hbf_tab=function(pre_hbf_tab, ffs, scen_id){
   
   
   #initialize hbf_tab
-  hbf_tab = data.frame("brood_year" = pre_hbf_tab[,"water_year"])
+  # hbf_tab = data.frame("brood_year" = pre_hbf_tab[,"water_year"])
+  hbf_tab = data.frame("water_year" = pre_hbf_tab[,"water_year"])
   # add brood year column to hbf_tab
   hbf_tab[,ffs]=NA
   for(i in 1:length(ffs)){
@@ -1538,7 +1544,7 @@ calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
   hbf_tab = add_func_flows_to_hbf_tab(pre_hbf_tab = pre_hbf_tab, 
                                       ffs = ffs,
                                       scen_id = scen_id)
-  hbf_tab = hbf_tab[hbf_tab$brood_year <= last_wy,]
+  hbf_tab = hbf_tab[hbf_tab$water_year <= last_wy,]
 
   write.csv(x = hbf_tab, quote = F, row.names = T,
             file = file.path(ms_dir, "Graphics and Supplements",
@@ -1572,7 +1578,8 @@ calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
 
 calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights, 
                                    include_years = "all",
-                                           start_wy = 1991, end_wy = 2018){
+                                   start_wy = 1991, 
+                                   end_wy = 2018){
   
   scenarios = scenario_tab$scenario_id
   # Initialize tables for results with full water years
@@ -1617,16 +1624,16 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
     
     # 1b) Clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
     if(scenario_id == "curtail_start_aug15"){
-      problem_wy = 2011; wy_selector = hbf_tab$water_year==problem_wy
-      wet_tim_prob = 57 # replace with wet season onset from hist_obs
-      hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
-      sp_tim_prob = 199
-      hbf_tab$Wet_BFL_Dur[wy_selector] = sp_tim_prob - wet_tim_prob
-      # recalc HBF components
-      hbf_tab$comp3[wy_selector] = weights[rownames(weights) == "RY_Wet_Tim"] * hbf_tab$Wet_Tim[wy_selector]
-      hbf_tab$comp4[wy_selector] = weights[rownames(weights) == "RY_Wet_BFL_Dur"] * hbf_tab$Wet_BFL_Dur[wy_selector]
-      hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
-        hbf_tab$comp3 + hbf_tab$comp4
+      # problem_wy = 2011; wy_selector = hbf_tab$water_year==problem_wy
+      # wet_tim_prob = 57 # replace with wet season onset from hist_obs
+      # hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
+      # sp_tim_prob = 199
+      # hbf_tab$Wet_BFL_Dur[wy_selector] = sp_tim_prob - wet_tim_prob
+      # # recalc HBF components
+      # hbf_tab$comp3[wy_selector] = weights[rownames(weights) == "RY_Wet_Tim"] * hbf_tab$Wet_Tim[wy_selector]
+      # hbf_tab$comp4[wy_selector] = weights[rownames(weights) == "RY_Wet_BFL_Dur"] * hbf_tab$Wet_BFL_Dur[wy_selector]
+      # hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
+      #   hbf_tab$comp3 + hbf_tab$comp4
     }
     # if(scenario_id == "mar_ilr_flowlims"){
     #   problem_wy = 2001; wy_selector = hbf_tab$water_year==problem_wy

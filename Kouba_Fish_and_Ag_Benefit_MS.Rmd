@@ -648,7 +648,7 @@ lc_years = low_bc_hb_yrs
 
 # Calculate mean of 28 years of hydrologic benefit value and ET
 lc_wy_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
-                                        weights = metric_weights,
+                                        weights = coef_tab,
                                         include_years = lc_years)
 
 scenario_tab_lc = lc_wy_results$scenario_tab
@@ -878,7 +878,7 @@ plot3d(x = scenario_tab$HBF_mean,
 }
 #This only works to manually orient it and take a screen shot; do this if you need to redo this graph
 
-scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d.png")
+scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2024.11.png")
 knitr::include_graphics(scatter3d_filename)
 
 ```
@@ -932,6 +932,8 @@ gsp_ft
 ``` 
 
 \newpage
+
+# Discussion
 
 
 \newpage # Reference section
