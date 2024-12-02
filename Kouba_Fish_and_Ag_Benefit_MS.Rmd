@@ -96,7 +96,7 @@ source(file.path(ms_dir,"02_Figure_Functions.R"))   # Load figure functions
 
 # print figures for slides, yes or no?
 save_figs_here = fig_dir#"C:/Users/Claire/Dropbox/Documents/UCD/Presentations_Talks_Workshops_miniprojects/2022.02.17 Peer Group presentation Ch. 1/figs"
-print_for_slides=F; fig_i = 1
+print_for_slides=T; fig_i = 1
 save_landuse_figure = F
 
 ```
