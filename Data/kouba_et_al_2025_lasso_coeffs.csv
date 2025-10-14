@@ -1,0 +1,23 @@
+stats_tool,predicted,predictors,method,species,Predictor,Value,Greater Hydrologic Benefit value associated with
+lasso,jps,hydro,lasso_jps_on_hydro,coho,Intercept,1.592,(Intercept)
+lasso,jps,hydro,lasso_jps_on_hydro,coho,f1_recon_120,-0.155,Earlier fall reconnection (during parents' spawning)
+lasso,jps,hydro,lasso_jps_on_hydro,coho,f2_FA_Dif_num,-0.012,Smaller fall pulse (as juvenile fish)
+lasso,jps,hydro,lasso_jps_on_hydro,coho,w1_Wet_Tim,-0.007,Earlier wet season onset (as eggs and fry)
+lasso,jps,hydro,lasso_jps_on_hydro,chinook,Intercept,1.944,(Intercept)
+lasso,jps,hydro,lasso_jps_on_hydro,chinook,w1_Wet_BFL_Mag_50,-0.181,Smaller wet season baseflows (as eggs and hatchlings)
+lasso,jps,hydro,lasso_jps_on_hydro,chinook,s1_SP_ROC_Max,-0.041,"Slower max. rate of change, spring recession (as outmigrating smolt)"
+lasso,juv,hydro,lasso_juv_on_hydro,coho,Intercept,3.872,(Intercept)
+lasso,juv,hydro,lasso_juv_on_hydro,coho,f1_FA_Dif_num,0.162,Larger fall flow increase (during parents' spawning)
+lasso,juv,hydro,lasso_juv_on_hydro,coho,f2_FA_Dif_num,-0.13,Smaller fall flow increase (as juvenile fish)
+lasso,juv,hydro,lasso_juv_on_hydro,coho,s1_SP_ROC,-0.02,"Slower rate of change, spring recession (as recent hatchlings)"
+lasso,juv,hydro,lasso_juv_on_hydro,chinook,Intercept,5.45,(Intercept)
+lasso,juv,hydro,lasso_juv_on_hydro,chinook,w1_Wet_BFL_Mag_50,-0.309,Lower wet season baseflows (as eggs and hatchlings)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,coho,Intercept,3.872,(Intercept)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,coho,f1_FA_Dif_num,0.162,Larger fall flow increase (during parents' spawning)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,coho,f2_FA_Dif_num,-0.13,Smaller fall flow increase (as juvenile fish)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,coho,s1_SP_ROC,-0.02,"Slower rate of change, spring recession (as recent hatchlings)"
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,chinook,Intercept,5.442,(Intercept)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,chinook,w1_Wet_BFL_Mag_50,-0.314,Lower wet season baseflows (as eggs and hatchlings)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,chinook,chinook_spawners_zscored,0.139,Abundance of spawners (parents of designated cohort)
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,chinook,s1_SP_ROC_Max,-0.062,"Slower max. rate of change, spring recession (as outmigrating smolt)"
+lasso,juv,hydro_and_spawner,lasso_juv_on_hydro_and_spawners,chinook,w1_Wet_Tim,-0.012,Earlier wet season onset (as eggs and hatchlings)
