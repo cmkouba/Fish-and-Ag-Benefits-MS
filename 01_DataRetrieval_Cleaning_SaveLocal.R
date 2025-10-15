@@ -616,6 +616,12 @@ get_svihm_budget_tabs = function(budget_dir){
   swbm_filenames = allfiles[grep(pattern = "SWBM", x = allfiles)]
   swbm_scen_names = gsub(x=swbm_filenames, pattern = "_SWBM_monthly_Budget.csv",
                          replacement="")
+  
+  aet_by_lu_filenames = allfiles[grep(pattern = "monthly_vol_aET_by_landcover",
+                                      x = allfiles)]
+  aet_by_lu_scen_names = gsub(x=swbm_filenames, pattern = "_monthly_vol_aET_by_landcover.dat",
+                         replacement="")
+  
   mf_filenames = allfiles[grep(pattern = "MODFLOW", x = allfiles)]
   mf_scen_names = gsub(x=mf_filenames, 
                        pattern = "_MODFLOW Budget m3 per month.csv",
@@ -623,6 +629,7 @@ get_svihm_budget_tabs = function(budget_dir){
   if(length(setdiff(swbm_scen_names, mf_scen_names))>0 ){print("Different number of SWBM vs Modflow scenario budgets in available files")}
   swbm_bud = vector("list", length = length(swbm_scen_names))
   mf_bud = vector("list", length = length(mf_scen_names))
+  aet_by_lu_bud = vector("list", length = length(aet_by_lu_scen_names))
   for(i in 1:length(swbm_scen_names)){
     # read swbm budget file and add to list
     swbm_file = swbm_filenames[i]
@@ -630,6 +637,14 @@ get_svihm_budget_tabs = function(budget_dir){
                    replacement="")
     swbm_bud[[i]] = read.csv(file.path(budget_dir,swbm_file))
     names(swbm_bud)[i] = scen_id
+    
+    # read monthly ET-by-landuse budget file and add to list
+    aet_by_lu_file = aet_by_lu_filenames[i]
+    scen_id = gsub(x=aet_by_lu_file, pattern = "_monthly_vol_aET_by_landcover.dat",
+                   replacement="")
+    aet_by_lu_bud[[i]] = read.table(file.path(budget_dir,aet_by_lu_file), header=T)
+    names(aet_by_lu_bud)[i] = scen_id
+    
     #read modflow budget file and add to list
     mf_file = mf_filenames[i]
     scen_id = gsub(x=mf_file, 
@@ -638,7 +653,7 @@ get_svihm_budget_tabs = function(budget_dir){
     mf_bud[[i]]=read.csv(file.path(budget_dir, mf_file))
     names(mf_bud[i])=scen_id
   }
-  return(list(swbm = swbm_bud, mf= mf_bud))
+  return(list(swbm = swbm_bud, mf= mf_bud, aet_by_lu = aet_by_lu_bud))
 }
 
 
@@ -646,7 +661,7 @@ budgets = get_svihm_budget_tabs(budget_dir = file.path(svihm_dir, "Budgets"))
 
 swbm_budgets = budgets$swbm
 mf_budgets = budgets$mf
-  
+aet_by_lu_budgets = budgets$aet_by_lu  
 
 # read_modflow_heads = function(scenario_directory, num_stress_periods = 336){
 #   start_time <- Sys.time()
