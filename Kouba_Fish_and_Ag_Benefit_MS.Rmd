@@ -122,6 +122,8 @@ Differences between stakeholders in what is considered an acceptable trade-off a
 
 To investigate whether an explicit optimization framework would yield different prioritization of management actions than the set agreed upon in public meetings, we developed numerical representations of three objectives: 1) maximizing specific environmental flows, 2) minimizing reduction in agricultural water supplies, and 3) minimizing new infrastructure costs. With these, we quantitatively summarized the management benefits and trade-offs within the existing suite of several dozen stakeholder-proposed management scenarios.
 
+**TO DO: MOVE city labels on map in fig 1**
+
 ```{r scottLanduseMap, echo = FALSE, fig.cap = "The Scott River flows south to north through Scott Valley before flowing through a canyon and joining the Klamath River. Land uses in the cultivated areas of the Scott River watershed are shown (adapted from the 2016 DWR Land Use Survey), as well as the location of several communities and the Fort Jones streamflow gauge (USGS Station ID 11519500). \\label{fig:scottLanduseMap}" , fig.height = 8.5, warning = F}
 
 lu_graphic_filename = file.path(fig_dir,
@@ -151,9 +153,12 @@ Scott Valley has a Mediterranean precipitation regime with distinctive seasons o
 Streams and groundwater are highly interconnected in the Scott River watershed. Tributary streams and the Scott River are a source of recharge to the aquifer, and groundwater discharge sustains streamflow in some areas, especially during the dry season of August-October or November. In the past two decades, in most dry-to-average type water years, the water table elevation has fallen below the stream bed and reaches of the Scott River have gone dry [@Tolley2019].
 
 
+**TO DO: ADD 2ND y axes with degrees F and inches on fig 2**
+
 ```{r precipAndTempFigure, echo=FALSE, fig.cap="\\label{fig:precipAndTempFigure} Summary of temperature (Panel A), rainfall and reference evapotranspiration (Panel B), and daily streamflow values (Panel C) in Scott Valley. For precipitation, regression relationships between the Callahan and Fort Jones weather station records and the records of NOAA stations in Greenview, Etna, and Yreka (USC00042899, USC00043614, USC00049866, and US1CASK0005) were used to predict missing values (i.e., fill gaps) in the Callahan and Fort Jones records; the daily mean of the two stations was used as the final precipitation record for purposes of this figure and the SVIHM precipitation input." , fig.height=8.4, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+
 
 if(print_for_slides==T){
   png(filename = fig_path, width = 8.4, height = 7, units = "in", res = 300)
@@ -279,18 +284,14 @@ fig_i = fig_i +1
 nv_area = sum(st_area(svihm_fields[svihm_fields$landuse_desc=="ET/No Irrigation",]))
 
 crop_area = sum(st_area(svihm_fields[svihm_fields$landuse_desc %in%
-                                    c("Pasture","Alfalfa/Grain"),]))
+                                       c("Pasture","Alfalfa/Grain"),]))
 
 # pull water budget values
-swbm_monthly = get_swbm_budget_table(scenario_id = "basecase")
+
+
+swbm_monthly = get_swbm_tab_with_separated_et(scen_id = "basecase")
 swbm_monthly$Month=NULL
 
-#Break out ET by land use type
-aet_monthly = get_aet_by_landuse_table(scenario_id = "basecase")
-et_crop = aet_monthly$Alfalfa + aet_monthly$Grain + aet_monthly$Pasture
-et_natveg = aet_monthly$ET_NoIrr 
-swbm_monthly$`Crop ET` = et_crop * -1 # negative for swbm outflow
-swbm_monthly$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
 # # check sums
 # swbm_monthly$et_crop_plus_nv = swbm_monthly$et_crop + swbm_monthly$et_natveg
 # swbm_monthly$diff = swbm_monthly$ET + swbm_monthly$et_crop_plus_nv
@@ -369,6 +370,30 @@ mo_tab_ft
 
 ### Hydrologic Benefit function
 
+```{r read_HB_coefs, echo = F}
+
+coefs_tab = read.csv(file.path(data_dir,"kouba_et_al_2025_lasso_coeffs.csv"))
+
+
+cols_for_expl = c("Predictor", "Value", "Greater.Hydrologic.Benefit.value.associated.with")
+coefs_hb_co = coefs_tab[coefs_tab$species == "coho" & 
+                            coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
+coefs_hb_co_2 = coefs_tab[coefs_tab$species == "coho" & 
+                            coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
+coefs_hb_co_3 = coefs_tab[coefs_tab$species == "coho" & 
+                            coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
+                          cols_for_expl]
+
+coefs_hb_ch = coefs_tab[coefs_tab$species == "chinook" & 
+                            coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
+
+coefs_hb_ch_2 = coefs_tab[coefs_tab$species == "chinook" & 
+                            coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
+coefs_hb_ch_3 = coefs_tab[coefs_tab$species == "chinook" & 
+                            coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
+                          cols_for_expl]
+```
+
 In Chapter 1 of this dissertation, we showed that the degree to which the water year provided ecological services needed by coho salmon can be estimated using a Hydrologic Benefit (HB) function, which summarizes environmental flows in a single index value for a given water year. A set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena were weighted according to their power to predict salmon coho smolt production per female spawner. These weighted metrics are combined linearly to predict a value for coho salmon reproduction. See Chapter 1 for more details on these calculations. Specifically, the HB function predicts a higher number of coho salmon produced per female spawner (coho smolts per female, or coho spf-equivalent) when fall flows rise above 10 and 100 cfs earlier in the fall, when the wet season onset is earlier, and when the wet season duration is longer. The equation to calculate the HB value for a given water year is as follows:
 
 $$
@@ -376,6 +401,38 @@ HB_{wy} = b + m_{1}*metric_{1,~wy} + ... + m_{4}*metric_{4,~wy}
 $$
 
 Where:
+
+**TO DO: ADD MATH TERMS IN TABLE**
+
+```{r coef_tab, echo = FALSE, results = 'asis'}
+
+coef_tab = coefs_hb_co# coefs_hb_co
+
+#Create caption and column labels
+caption_text = "REPLACE CAPTION. "
+column_labels = c("Predictor", "Value", "Greater Hydrologic Benefit value associated with")
+
+colnames(coef_tab) = column_labels
+
+#declare xtable object, assign formatted column labels, and print to latex object
+# mo_xtab = xtable(mo_tab, label = "tab:objFunctionTable",
+#                  caption = caption_text,align = "lp{6cm}p{6cm}")#, digits = c(NA, NA, NA))
+# names(mo_xtab) = column_labels
+# print.xtable(mo_xtab, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F, hline.after = 0:3)
+# #caption.placement = "top",
+
+
+hb_ft = flextable(data = coef_tab)
+hb_ft = set_caption(hb_ft, caption = caption_text)
+hb_ft = flextable::width(hb_ft, j = 1,  width = 1.5)
+hb_ft = flextable::width(hb_ft, j= 2,  width = 1)
+hb_ft = flextable::width(hb_ft, j=3,  width = 3)
+hb_ft
+
+```
+
+
+
 
 $HB_{wy}$ is the Hydrologic Benefit value for a given water year (predicted coho spf or coho spf equivalent)
 
@@ -479,6 +536,7 @@ scen_cat_tab_ft
 
 ## Results
 
+
 ```{r farmerFishTradeoffTable, echo = F, warning =F}
 
 
@@ -487,8 +545,10 @@ scenario_tab_init = get_scenario_tab_init()
 # Calculate weights based on best models
 
 # Read in slopes table for all predictors
-coef_tab = read.csv(file.path(fig_dir,
-                              "Hydrologic Benefit model coefficients table_2024 nov.csv"))
+# coef_tab = read.csv(file.path(fig_dir,
+#                               "Hydrologic Benefit model coefficients table_2024 nov.csv"))
+
+coef_tab = coefs_hb_co[, c("Predictor", "Value")]
 
 # Calculate mean of 28 years of hydrologic benefit value and ET 
 obj_fn_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
@@ -507,46 +567,46 @@ As described above, objective functions were used to quantitatively summarize th
 ```{r calc_num_4.1, echo = F, warning =F}
 
 # calculate numbers for results discussion
-top_4_cat = c("EnhRch", "EnhRchEx", "IrrEff", "Res")
-top_4_selector = scenario_tab$scenario_category %in% top_4_cat
-top_4_et_range = rev(range(scenario_tab$et_mean[top_4_selector]) / 10^6 * -1)
-top_4_hbf_improve = range(scenario_tab$HBF_mean[top_4_selector] -
-                            scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"])
-top_4_et_worse = -1 / 10^6 * range(
-  scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
-    scenario_tab$et_mean[top_4_selector] ) 
-
-flowlims_et_worse = -1 / 10^6 * 
-  (scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
-    scenario_tab$et_mean[scenario_tab$scenario_id=="flowlims"])
-flowlims_hb_better = (scenario_tab$HBF_mean[scenario_tab$scenario_id=="flowlims"]) -
-  scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"] 
-
-alf_curts_cat = c("Curtail", "AlfIrr")
-alf_curts_selector = scenario_tab$scenario_category %in% alf_curts_cat
-alf_curts_et_range = rev(range(scenario_tab$et_mean[alf_curts_selector]) / 10^6 * -1)
-alf_curts_hbf_improve = range(scenario_tab$HBF_mean[alf_curts_selector] -
-                            scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"])
-alf_curts_et_worse = -1 / 10^6 * range(
-  scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
-    scenario_tab$et_mean[alf_curts_selector] ) 
-
-bc_et_mean = scenario_tab$et_mean[scenario_tab$scenario_id == "basecase"] *-1 / 10^6
-bc_hb_mean = scenario_tab$HBF_mean[scenario_tab$scenario_id == "basecase"]
-
-scen_et_range = range(scenario_tab$et_mean[scenario_tab$scenario_id != "basecase"] *-1 / 10^6)
-scen_hb_range = range(scenario_tab$HBF_mean[scenario_tab$scenario_id != "basecase"])
-
-swbm_bc = get_swbm_tab_with_separated_et(scen_id="basecase")
-swbm_nv = get_swbm_tab_with_separated_et(scen_id="natveg_all")
-swbm_nvet = get_swbm_tab_with_separated_et(scen_id="natveg_all_et_check_1.0nvkc_4.5m_ext")
-
-# mean(swbm_nv$`Nat. Veg. ET`)/mean(swbm_bc$`Nat. Veg. ET`)
-# mean(swbm_nvet$`Nat. Veg. ET`)/mean(swbm_nv$`Nat. Veg. ET`)
-
-
-natveg_et_percent = scenario_tab$et_mean[grep(pattern = "natveg", 
-                                              x = scenario_tab$scenario_id)] *-1 / 10^6
+# top_4_cat = c("EnhRch", "EnhRchEx", "IrrEff", "Res")
+# top_4_selector = scenario_tab$scenario_category %in% top_4_cat
+# top_4_et_range = rev(range(scenario_tab$et_mean[top_4_selector]) / 10^6 * -1)
+# top_4_hbf_improve = range(scenario_tab$HBF_mean[top_4_selector] -
+#                             scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"])
+# top_4_et_worse = -1 / 10^6 * range(
+#   scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
+#     scenario_tab$et_mean[top_4_selector] ) 
+# 
+# flowlims_et_worse = -1 / 10^6 * 
+#   (scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
+#     scenario_tab$et_mean[scenario_tab$scenario_id=="flowlims"])
+# flowlims_hb_better = (scenario_tab$HBF_mean[scenario_tab$scenario_id=="flowlims"]) -
+#   scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"] 
+# 
+# alf_curts_cat = c("Curtail", "AlfIrr")
+# alf_curts_selector = scenario_tab$scenario_category %in% alf_curts_cat
+# alf_curts_et_range = rev(range(scenario_tab$et_mean[alf_curts_selector]) / 10^6 * -1)
+# alf_curts_hbf_improve = range(scenario_tab$HBF_mean[alf_curts_selector] -
+#                             scenario_tab$HBF_mean[scenario_tab$scenario_id=="basecase"])
+# alf_curts_et_worse = -1 / 10^6 * range(
+#   scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"] -
+#     scenario_tab$et_mean[alf_curts_selector] ) 
+# 
+# bc_et_mean = scenario_tab$et_mean[scenario_tab$scenario_id == "basecase"] *-1 / 10^6
+# bc_hb_mean = scenario_tab$HBF_mean[scenario_tab$scenario_id == "basecase"]
+# 
+# scen_et_range = range(scenario_tab$et_mean[scenario_tab$scenario_id != "basecase"] *-1 / 10^6)
+# scen_hb_range = range(scenario_tab$HBF_mean[scenario_tab$scenario_id != "basecase"])
+# 
+# swbm_bc = get_swbm_tab_with_separated_et(scen_id="basecase")
+# swbm_nv = get_swbm_tab_with_separated_et(scen_id="natveg_all")
+# swbm_nvet = get_swbm_tab_with_separated_et(scen_id="natveg_all_et_check_1.0nvkc_4.5m_ext")
+# 
+# # mean(swbm_nv$`Nat. Veg. ET`)/mean(swbm_bc$`Nat. Veg. ET`)
+# # mean(swbm_nvet$`Nat. Veg. ET`)/mean(swbm_nv$`Nat. Veg. ET`)
+# 
+# 
+# natveg_et_percent = scenario_tab$et_mean[grep(pattern = "natveg", 
+                                              # x = scenario_tab$scenario_id)] *-1 / 10^6
 
 
 ```
@@ -579,9 +639,10 @@ if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
   
   # plot_scenarios = scenario_tab$scenario_id
-  plot_scenarios1 = c("basecase", "alf_irr_stop_aug15", "alf_irr_stop_aug01", 
-                      "alf_irr_stop_jul10")
-  plot_scenarios2 = c("basecase", "mar_ilr", "flowlims", "curtail_start_aug01")
+  plot_scenarios1 = c("basecase", "alf_curtail_08.15", "alf_curtail_07.31", 
+                      "alf_curtail_07.15")
+  plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
+                      "grain_12k")
   
   par(mfcol = c(4,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1, 
@@ -607,7 +668,7 @@ fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
   farm_fish_tradeoff_fig(scenario_tab = scenario_tab, 
-                         plot_title = "Environmental vs Agricultural Benefit \n Mean and Std. Error for annual values, 1991-2018")
+                         plot_title = "Environmental vs Agricultural Benefit \n Mean and Std. Error for annual values, 1991-2025")
   dev.off()
 }
 knitr::include_graphics(fig_path)

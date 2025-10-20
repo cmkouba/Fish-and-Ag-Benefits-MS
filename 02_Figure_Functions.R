@@ -221,18 +221,25 @@ get_aet_by_landuse_table = function(scenario_id = "basecase",
   return(aet_monthly)
 }
 
-get_swbm_tab_with_separated_et = function(scen_id = "basecase"){
-  swbm = get_swbm_budget_table(scenario_id = scen_id)
-  # Replace ET with crop ET and natveg ET
-  aet_monthly = get_aet_by_landuse_table(scenario_id = scen_id)
-  et_crop = aet_monthly$Alfalfa + aet_monthly$Grain + aet_monthly$Pasture
-  et_natveg = aet_monthly$ET_NoIrr
-  swbm$`Crop ET` = et_crop * -1 # negative for swbm outflow
-  swbm$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
-  swbm$ET = NULL
-  return(swbm)
+get_swbm_tab_with_separated_et = function(scen_id,
+                                          start_date = as.Date("1990-10-01")){
+  swbm_monthly = swbm_budgets[[scen_id]]
+  # convert stress period to dates
+  swbm_monthly$Month = seq.Date(from = start_date, by = "month",
+                                length.out = nrow(swbm_monthly))
+  swbm_monthly$Water_Year = wtr_yr(swbm_monthly$Month)
+  
+  aet_monthly = aet_by_lu_budgets[[scen_id]]
+  et_crop = aet_monthly$Alfalfa_Irrigated + 
+    aet_monthly$Grain_Irrigated + 
+    aet_monthly$Pasture_Irrigated
+  et_natveg = aet_monthly$Native_Vegetation
+  
+  swbm_monthly$`Crop ET` = et_crop * -1 # negative for swbm outflow
+  swbm_monthly$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
+  
+  return(swbm_monthly)
 }
-
 get_simulated_fj_outflow = function(scenario_id = "basecase",
                                     start_date = as.Date("1990-10-01"), end_date = as.Date("2018-09-30"),
                                     start_wy = 1991, end_wy = 2018){
@@ -920,14 +927,7 @@ precip_temp_flow_figure = function(plot_panel = NA){
 
 avg_swbm_budget_fig=function(scen_id = "basecase"){
 
-  swbm = get_swbm_budget_table(scenario_id = scen_id)
-  # Replace ET with crop ET and natveg ET
-  aet_monthly = get_aet_by_landuse_table(scenario_id = scen_id)
-  et_crop = aet_monthly$Alfalfa + aet_monthly$Grain + aet_monthly$Pasture
-  et_natveg = aet_monthly$ET_NoIrr
-  swbm$`Crop ET` = et_crop * -1 # negative for swbm outflow
-  swbm$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
-  swbm$ET = NULL
+  swbm = get_swbm_tab_with_separated_et(scen_id = scen_id)
 
   # Clean colnames
   colnames(swbm)[colnames(swbm) == "SW.Irrigation"] = "SW Irrigation"
@@ -967,17 +967,11 @@ avg_swbm_budget_fig=function(scen_id = "basecase"){
 
 }
 
-annual_swbm_budget_fig = function(scen_id = "basecase"){
-  # pull water budget values
-  swbm_monthly = get_swbm_budget_table(scenario_id = scen_id)
+annual_swbm_budget_fig = function(scen_id = "basecase", 
+                                  start_date = as.Date("1990-10-01")){
+  swbm_monthly = get_swbm_tab_with_separated_et(scen_id = scen_id)
   swbm_monthly$Month=NULL
 
-  #Break out ET by land use type
-  aet_monthly = get_aet_by_landuse_table(scenario_id = scen_id)
-  et_crop = aet_monthly$Alfalfa + aet_monthly$Grain + aet_monthly$Pasture
-  et_natveg = aet_monthly$ET_NoIrr
-  swbm_monthly$`Crop ET` = et_crop * -1 # negative for swbm outflow
-  swbm_monthly$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
   # # check sums
   # swbm_monthly$et_crop_plus_nv = swbm_monthly$et_crop + swbm_monthly$et_natveg
   # swbm_monthly$diff = swbm_monthly$ET + swbm_monthly$et_crop_plus_nv
@@ -1129,7 +1123,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
 
 
 
-farm_fish_tradeoff_blank = function(scenario_tab){
+farm_fish_tradeoff_blank = function(scenario_tab, add_st_dev_bars = F){
   par(mar = c(5,4,5,2))
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1,
        pch = 19, cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
@@ -1141,42 +1135,46 @@ farm_fish_tradeoff_blank = function(scenario_tab){
 }
 
 
-farm_fish_tradeoff_fig = function(scenario_tab, n_years = 28,
-                                  legend_position = "topright",
+farm_fish_tradeoff_fig = function(scenario_tab, n_years = 35,
+                                  add_st_dev_bars = F,
+                                  legend_position = "bottomleft",#"topright",
                                   plot_title){
   par(mar = c(5,4,5,2))
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1, # convert to + number in mill. m^3
        pch = scenario_tab$symbol,# pch = 21,
        cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        bg = scenario_tab$color,
-       ylim = c(0,113), xlim = c(55, 67),
+       ylim = c(0,125),# xlim = c(3.5, 4.5), # ylim = c(0,113), xlim = c(55, 67),
        xlab = "Hydrologic Benefit Function (coho spf-equiv)",
        ylab = "Mean Annual Crop ET (million cubic m)",
        # main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values"
        main = plot_title)
   grid()
   # add st dev bars
-  for(i in 1:nrow(scenario_tab)){
-    # print(i)
-    x_mean = scenario_tab$HBF_mean[i]
-    x_se = scenario_tab$HBF_stdev[i] / n_years #x_mean
-    y_mean = scenario_tab$et_mean[i] / 1E6 * -1
-    y_se = scenario_tab$et_stdev[i] / 1E6 * -1 / n_years #y_mean
-    if(x_se>0){
-      # horiz. error bar
-      arrows(x0 = x_mean - x_se, x1 = x_mean + x_se,
-             y0 = y_mean, y1 = y_mean,
-             # col = scenario_tab$color[i],
-             angle = 90, code =3, length = 0.05)#,lwd = 2)
-    }
-    if(abs(y_se)>0){
-      #vertical error bar
-      arrows(x0 = x_mean, x1 = x_mean,
-             y0 = y_mean - y_se, y1 = y_mean + y_se,
-             # col = scenario_tab$color[i],
-             angle = 90, code =3, length = 0.05)#,lwd = 2)
+  if(add_st_dev_bars == T){
+    for(i in 1:nrow(scenario_tab)){
+      # print(i)
+      x_mean = scenario_tab$HBF_mean[i]
+      x_se = scenario_tab$HBF_stdev[i] / n_years #x_mean
+      y_mean = scenario_tab$et_mean[i] / 1E6 * -1
+      y_se = scenario_tab$et_stdev[i] / 1E6 * -1 / n_years #y_mean
+      if(x_se>0){
+        # horiz. error bar
+        arrows(x0 = x_mean - x_se, x1 = x_mean + x_se,
+               y0 = y_mean, y1 = y_mean,
+               # col = scenario_tab$color[i],
+               angle = 90, code =3, length = 0.05)#,lwd = 2)
+      }
+      if(abs(y_se)>0){
+        #vertical error bar
+        arrows(x0 = x_mean, x1 = x_mean,
+               y0 = y_mean - y_se, y1 = y_mean + y_se,
+               # col = scenario_tab$color[i],
+               angle = 90, code =3, length = 0.05)#,lwd = 2)
+      }
     }
   }
+
   # Add points on top to make the error bars look less messy
   points(scenario_tab$HBF_mean, scenario_tab$et_mean/ 1E6 * -1,
          pch = scenario_tab$symbol, cex = 2, bg = scenario_tab$color)
@@ -1284,36 +1282,74 @@ landuse_table_2016 = function(){
 
 
 get_scen_cat_tab = function(){
-  scen_cat_tab = data.frame(category = c("Basecase","EnhRch", "EnhRchEx",
+  scen_cat_tab = data.frame(category = c("Basecase","EnhRch", 
                                          "IrrEff", "Res", "CropCh",
-                                         "AlfIrr", "Curtail", "FlowLims",
-                                         "NatVeg", "NatVegET"),
+                                         "AlfIrr", #"Curtail",
+                                         "FlowLims",
+                                         "NatVegH", "NatVegL"),
                             category_long = c("Basecase", "Enhanced Recharge",
-                                              "Expanded Enhanced Recharge",
                                               "Improved Irrigation Efficiency",
                                               "Small Reservoir",
-                                              "Crop Change (lower ET)",
+                                              "Crop Change (Alfalfa Rot. to Perm. Grain)",
                                               "Cease Alfalfa Irrigation Early",
-                                              "Cease (Curtail) All Irrigation Early",
+                                              # "Cease (Curtail) All Irrigation Early",
                                               "Low Flow Diversion Limits",
-                                              "Some Nat. Veg. Land Use",
-                                              "Some Nat. Veg. (higher ET)"),
-                            num_scenario = c(1,3,3,
-                                             2,5,2,
-                                             5,6,1,
-                                             6,6),
-                            feas_cat = c(0, 3, 3,
+                                              "Some Nat. Veg. Land Use (high ET)",
+                                              "Some Nat. Veg. Land Use (low ET)"),
+                            num_scenario = c(1,1,
+                                             2,3,3,
+                                             3,1,
+                                             4,4),
+                            feas_cat = c(0, 3, 
                                          2, 4, 2,
-                                         1, 1, 1,
+                                         1, 1, #1,
                                          2, 2),
                             mgmt_cat = c("Basecase",
-                                         rep("Infrastructure", 5),
-                                         rep("Regulatory", 3),
+                                         rep("Infrastructure", 4),
+                                         rep("Regulatory", 2),
                                          rep("Nat. Veg.", 2)))
   return(scen_cat_tab)
 }
 
 get_scenario_tab_init = function(){
+
+  # Build scenario table
+  scen_ids_for_tab = c("basecase",
+                       "alf_curtail_07.15", "alf_curtail_07.31","alf_curtail_08.15",
+                       "basecase_0_curtail","basecase_0_mar_0_curt", "basecase_0_mar", 
+                       "eflows25_div_lims",
+                       "grain_12k", "grain_14k", "grain_6k",
+                       "irr_eff_0.1",  "irr_eff_0.2", #"irr_eff_minus_0.1",
+                       "maxMAR_fields2024", 
+                       "natveg_high_12k", "natveg_high_4k", "natveg_high_8k", "natveg_high_all",
+                       "natveg_low_12k", "natveg_low_4k", "natveg_low_8k", "natveg_low_all",
+                       "reservoir_etna", "reservoir_french", "reservoir_shackleford"
+  )
+  
+  scen_id_cat = c("basecase",
+                  "AlfIrr","AlfIrr","AlfIrr",
+                  "Attr", "Attr", "Attr",
+                  "FlowLims",
+                  "CropCh", "CropCh", "CropCh",
+                  "IrrEff","IrrEff", #"IrrEff",
+                  "EnhRch",
+                  "NatVegH","NatVegH","NatVegH","NatVegH",
+                  "NatVegL","NatVegL","NatVegL","NatVegL",
+                  "Res","Res","Res"
+                  # "Curtail","Curtail","Curtail","Curtail","Curtail","Curtail",
+  )
+
+  scenario_tab_init = data.frame(scenario_id = scen_ids_for_tab,
+                                 scenario_category = scen_id_cat,
+                                 HBF_mean = 0.0,
+                                 HBF_stdev = 0.0,
+                                 et_mean = 0.0,
+                                 et_stdev = 0.0)
+
+  return(scenario_tab_init)
+  
+  
+  # old names and order
   # Build scenario table
   scen_ids_for_tab = c("basecase",
                        "mar","ilr","mar_ilr",
@@ -1346,7 +1382,7 @@ get_scenario_tab_init = function(){
                        "natveg_outside_adj_et_check_1.0nvkc_4.5m_ext",
                        "natveg_gwmixed_outside_adj_et_check_1.0nvkc_4.5m_ext"
   )
-
+  
   scen_id_cat = c("basecase",
                   "EnhRch","EnhRch","EnhRch","EnhRchEx","EnhRchEx","EnhRchEx",
                   "IrrEff","IrrEff", #"IrrEff",
@@ -1359,19 +1395,10 @@ get_scenario_tab_init = function(){
                   # "NatVegAllET","NatVegAllET","NatVegAllET",
                   "NatVegET","NatVegET","NatVegET","NatVegET","NatVegET","NatVegET"
   )
-
-  scenario_tab_init = data.frame(scenario_id = scen_ids_for_tab,
-                                 scenario_category = scen_id_cat,
-                                 HBF_mean = 0.0,
-                                 HBF_stdev = 0.0,
-                                 et_mean = 0.0,
-                                 et_stdev = 0.0)
-
-  return(scenario_tab_init)
 }
 
 re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100), 
-                                    fj_flow, last_wy = 2018){
+                                    fj_flow, last_wy = 2025){
   
   
   calc_discon_days_since_aug_31 = function(dates, flow, discon_threshold){
@@ -1393,7 +1420,7 @@ re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100),
     return(recon_day)
   }
   
-  
+  if(!("wy" %in% colnames(fj_flow))){fj_flow$wy = wtr_yr(fj_flow$Date)}
   wat_years = unique(fj_flow$wy)
   wat_years = wat_years[wat_years<=last_wy]
   # output_tab = data.frame(year = wat_years, min_flow = NA,
@@ -1418,7 +1445,7 @@ re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100),
     dates_discon = seq.Date(from=date1_discon, to = date2_discon, by="day")
     
     date1_recon = as.Date(paste0(year-1,"-09-01"))
-    date2_recon = as.Date(paste0(year,"-03-15")) # extend for wy 2001
+    date2_recon = as.Date(paste0(year,"-03-15")) # extend past Mar. 1 for wy 2001
     dates_recon = seq.Date(from=date1_recon, to = date2_recon, by="day")
     
     discon_flows = fj_flow$Flow[fj_flow$Date %in% dates_discon]
@@ -1463,66 +1490,45 @@ re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100),
 }
 
 
-add_func_flows_to_hbf_tab=function(pre_hbf_tab, ffs, scen_id){
-  
-  csv_name = paste0(scen_id, " func flow metrics.csv")
-  ff_dir = file.path(data_dir, "SVIHM Model Results", "tables for func flows")
-  ff_scen = read.csv(file.path(ff_dir, csv_name))
-  colnames(ff_scen)[colnames(ff_scen)=="Year"] = "func_flow"
-  ff_desc = ff_scen$func_flow
-  ff_scen$func_flow= NULL; row.names(ff_scen) = ff_desc
+add_func_flows_to_hbf_tab=function(pre_hbf_tab, ff_ids, 
+                                   ff_aligned_scen, scen_id){
+
+  # csv_name = paste0(scen_id, " func flow metrics.csv")
+  # ff_dir = file.path(data_dir, "SVIHM Model Results", "tables for func flows")
+  # ff_scen = read.csv(file.path(ff_dir, csv_name))
+  # colnames(ff_aligned)[colnames(ff_scen)=="Year"] = "func_flow"
+  # ff_desc = ff_scen$func_flow
+  # ff_scen$func_flow= NULL; row.names(ff_scen) = ff_desc
   
   
   #initialize hbf_tab
   # hbf_tab = data.frame("brood_year" = pre_hbf_tab[,"water_year"])
   hbf_tab = data.frame("water_year" = pre_hbf_tab[,"water_year"])
   # add brood year column to hbf_tab
-  hbf_tab[,ffs]=NA
-  for(i in 1:length(ffs)){
-    ff = ffs[i]
-    BY_correction = 0
-    # for fall season metrics, like reconnection dates, we need to use metrics from the following water year to correspond to the right salmon cohort. correction of 1 (or 2 for Smolt Year)
-    if(grepl(pattern = "RY", x = ff)){BY_correction = BY_correction + 1}
-    if(grepl(pattern = "SY", x = ff)){BY_correction = BY_correction + 2}
-    # for wet season, spring and summer season metrics, like disconnection dates, we should use metrics from the same water year as the brood year. So, un-correct the correction factor
-    if(grepl(pattern = "discon", x = ff) |
-       grepl(pattern = "Wet", x = ff) |
-       grepl(pattern = "Peak", x = ff) |
-       grepl(pattern = "90_pctile", x = ff) |
-       grepl(pattern = "SP", x = ff) |
-       grepl(pattern = "DS", x = ff)){BY_correction = BY_correction - 1} 
-    # There should be no Brood Year disconnection dates, so we will not have a -1 correction factor
+  hbf_tab[,ff_ids]=NA
+  for(i in 1:length(ff_ids)){
+    ff_id = ff_ids[i]
     
     #for recon and discon dates
-    if(grepl(pattern = "recon",x=ff) | grepl(pattern = "discon",x=ff)){
-      thresh = unlist(strsplit(ff, "_"))[3]
-      which_con = unlist(strsplit(ff, "_"))[2]
-      # find which column has the correct recon or discon dates
-      matching_column_index = which(grepl(pattern = which_con, x = colnames(pre_hbf_tab)) & 
-                                      grepl(pattern = thresh, x = colnames(pre_hbf_tab)))
-      ff_vals = pre_hbf_tab[(1+BY_correction):(nrow(hbf_tab)), 
-                            matching_column_index]
-      ff_vals = c(ff_vals, rep(NA, BY_correction))
+    if(grepl(pattern = "recon",x=ff_id) | grepl(pattern = "discon",x=ff_id)){
+      # thresh = unlist(strsplit(ff_id, "_"))[3]
+      # which_con = unlist(strsplit(ff_id, "_"))[2]
+      # # find which column has the correct recon or discon dates
+      # matching_column_index = which(grepl(pattern = which_con, x = colnames(pre_hbf_tab)) & 
+      #                                 grepl(pattern = thresh, x = colnames(pre_hbf_tab)))
+      # ff_vals = pre_hbf_tab[(1+BY_correction):(nrow(hbf_tab)), 
+      #                       matching_column_index]
+      # ff_vals = c(ff_vals, rep(NA, BY_correction))
 
-      hbf_tab[,ff] = ff_vals
+      hbf_tab[,ff_id] = pre_hbf_tab[,ff_id]
     }
       
     
     
-    if(!(grepl(pattern = "recon",x=ff) | 
-         grepl(pattern = "discon",x=ff))){
+    if(!(grepl(pattern = "recon",x=ff_id) | 
+         grepl(pattern = "discon",x=ff_id))){
       
-      # remove year notations to match functional flow IDs
-      ff_short = gsub(pattern="BY_",replacement="",x=ff)
-      ff_short = gsub(pattern="RY_",replacement="",x=ff_short)
-      ff_short = gsub(pattern="SY_",replacement="",x=ff_short)
-      # find row in table of functional flows for each scenario
-      matching_row_index = which(row.names(ff_scen)==ff_short)
-      
-      ff_vals = as.matrix(ff_scen[matching_row_index, 
-                        1:(nrow(hbf_tab)-BY_correction)])
-      ff_vals = c(rep(NA, BY_correction), ff_vals)
-      hbf_tab[,ff] = ff_vals
+      hbf_tab[,ff_id] = ff_aligned_scen[,ff_id]
 
     }
   }
@@ -1576,10 +1582,75 @@ calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
   return(hbf_tab)
 }
 
+calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
+                                func_flows,
+                                flow_tab_for_hbf, weights,
+                                scen_id = "hist_obs"){
+  
+  pre_hbf_tab = re_and_disconnect_date_tab(thresholds = thresholds_hbf,
+                                           fj_flow = flow_tab_for_hbf)
+  # fill in missing values with averages
+  ff_ids = weights$Predictor[weights$Predictor !="Intercept"] 
+  ff_aligned_scen = func_flows
+  
+  hbf_tab = add_func_flows_to_hbf_tab(pre_hbf_tab = pre_hbf_tab, 
+                                      ff_ids = ff_ids,
+                                      ff_aligned_scen = ff_aligned_scen,
+                                      scen_id = scen_id)
+  
+  apply_log10_for_hbf = function(hbf_ff){
+    out = log10(hbf_ff)
+    out[hbf_ff == 0] = 0
+    return(out)
+  }
+
+  for(ff_id in ff_ids){
+    hbf_tab[,paste0(ff_id,"_log10")] = apply_log10_for_hbf(hbf_tab[ff_id])
+  }
+  
+  hbf_tab = hbf_tab[hbf_tab$water_year <= last_wy,]
+  
+  write.csv(x = hbf_tab, quote = F, row.names = T,
+            file = file.path(ms_dir, "Graphics and Supplements",
+                             "Supplemental Table 2 - Flow Metrics by Water Year, 1942-2021.csv"))
+  
+  # fill gaps with averages
+  col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
+  col_avgs_no_na = apply(X=hbf_tab, MARGIN = 2, FUN = median, na.rm=T)
+  for(j in 1:ncol(hbf_tab)){
+    if(is.na(col_avgs[j])){
+      hbf_tab[is.na(hbf_tab[,j]),j] = col_avgs_no_na[j]
+    }
+    
+  }
+  
+  # Calculate HBF component parts and add together
+  hbf_tab$Int = as.numeric(weights$Value[weights$Predictor=="Intercept"])# add intercept term
+  
+  for(i in 1:length(ff_ids)){
+    hbf_colname_i = paste0("comp",i)
+    ff_colname = paste0(weights$Predictor[i+1],"_log10")
+    # multiply metric values by coefficient
+    hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights$Value[i+1])
+  }
+  
+  if(length(ff_ids)>1){ 
+    hbf_tab$hbf_total = hbf_tab$Int + 
+    rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
+  }
+  if(length(ff_ids)==1){
+    hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
+  }
+  
+  return(hbf_tab)
+}
+
+
 calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights, 
                                    include_years = "all",
                                    start_wy = 1991, 
-                                   end_wy = 2018){
+                                   end_wy = 2025
+                                   ){
   
   scenarios = scenario_tab$scenario_id
   # Initialize tables for results with full water years
@@ -1593,28 +1664,28 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
     # print(scenario_id)
     
     # pull SWBM results data
-    swbm = get_swbm_budget_table(scenario_id = scenario_id)
+    swbm = get_swbm_tab_with_separated_et(scen_id = scenario_id)
     swbm$Month=NULL
     
-    #Break out ET by land use type
-    aet_monthly = get_aet_by_landuse_table(scenario_id = scenario_id)
-    et_crop = aet_monthly$Alfalfa + aet_monthly$Grain + aet_monthly$Pasture
-    et_natveg = aet_monthly$ET_NoIrr
-    swbm$`Crop ET` = et_crop * -1 # negative for swbm outflow
-    swbm$`Nat. Veg. ET` = et_natveg * -1 # negative for swbm outflow
-    
     # Pull FJ flow
-    fj_flow_scen = get_simulated_fj_outflow(scenario_id = scenario_id)
+    fj_flow_scen = scen_fj_out[,c("Date",scenario_id)]
+    colnames(fj_flow_scen)[colnames(fj_flow_scen) != "Date"] = "Flow"
+    fj_flow_scen$wy = wtr_yr(fj_flow_scen$Date)
+    # Pull functional flow metrics
+    ff = ffs_scenarios[[scenario_id]]
     
     # pull flow thresholds from weights column names
     re_and_discon_cols = colnames(weights)[c(grep(pattern = "recon", x = colnames(weights)), 
                                              grep(pattern = "discon", x = colnames(weights)))]
-    re_and_discon_cols_matrix = matrix(unlist(strsplit(re_and_discon_cols, split="_")), ncol=3, byrow=T)
-    re_and_discon_thresh = unique(as.numeric(re_and_discon_cols_matrix[,3]))
+    if(length(re_and_discon_cols) > 1){
+      re_and_discon_cols_matrix = matrix(unlist(strsplit(re_and_discon_cols, split="_")), ncol=3, byrow=T)
+      re_and_discon_thresh = unique(as.numeric(re_and_discon_cols_matrix[,3]))
+    } else {re_and_discon_thresh = c(20, 40, 120)}
     
     # 1. calculate benefit value distribution
     
-    hbf_tab = calc_hbf_tab_nov2024(flow_tab_for_hbf = fj_flow_scen, 
+    hbf_tab = calc_hbf_tab_oct2025(flow_tab_for_hbf = fj_flow_scen,
+                                   func_flows = ff,
                                    weights = weights, 
                                    thresholds_hbf = re_and_discon_thresh, 
                                    scen_id = scenario_id)
@@ -1623,7 +1694,7 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
     by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
     
     # 1b) Clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
-    if(scenario_id == "curtail_start_aug15"){
+    # if(scenario_id == "curtail_start_aug15"){
       # problem_wy = 2011; wy_selector = hbf_tab$water_year==problem_wy
       # wet_tim_prob = 57 # replace with wet season onset from hist_obs
       # hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
@@ -1634,7 +1705,7 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
       # hbf_tab$comp4[wy_selector] = weights[rownames(weights) == "RY_Wet_BFL_Dur"] * hbf_tab$Wet_BFL_Dur[wy_selector]
       # hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
       #   hbf_tab$comp3 + hbf_tab$comp4
-    }
+    # }
     # if(scenario_id == "mar_ilr_flowlims"){
     #   problem_wy = 2001; wy_selector = hbf_tab$water_year==problem_wy
     #   wet_tim_prob = 129 # replace with wet season onset from hist_obs
@@ -1687,26 +1758,27 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
 add_plot_cols_to_scen_cat_tab = function(scen_cat_tab_1){
   scen_cat_tab_2 = scen_cat_tab_1
   # add attributes to scenario category table for plotting
-  scen_cat_tab_2$descrip_legend = c("Basecase (1)", "Enhanced Recharge (3)",
-                                    "Exp. Enhanced Recharge (3)",
+  scen_cat_tab_2$descrip_legend = c("Basecase (1)", "Enhanced Recharge (1)",
+                                    # "Exp. Enhanced Recharge (3)",
                                     "Improved Irrigation Efficiency (2)",
-                                    "Small Reservoir (5)",
-                                    "Crop Change (lower ET) (2)",
+                                    "Small Reservoir (3)",
+                                    "Crop Change (Alf. to Gr.) (3)",
                                     "Cease Alfalfa Irrigation Early (5)",
-                                    "Cease (Curtail) All Irr. Early (6)",
+                                    # "Cease (Curtail) All Irr. Early (6)",
                                     "Low Flow Diversion Limits (1)",
-                                    "Some Nat. Veg. Land Cover (6)",
-                                    "Some Nat. Veg. Land Cover (higher ET) (6)")
+                                    "Some Nat. Veg. Land Cover (low ET) (4)",
+                                    "Some Nat. Veg. Land Cover (high ET) (4)")
 
   scen_cat_tab_2$category[scen_cat_tab_2$category == "Basecase"] = "basecase" #to match later scen ids
 
-  scen_cat_tab_2$color = c("black","dodgerblue3","cadetblue1",
+  scen_cat_tab_2$color = c("black","dodgerblue3",#"cadetblue1",
                            "plum2", "springgreen4", "darkorchid",
-                           "darkgoldenrod1","gray", "orangered",
+                           "darkgoldenrod1",#"gray", 
+                           "orangered",
                            "wheat1",  "wheat4")
   scen_cat_tab_2$symbol = c(20,         # small circle
-                            rep(22,5),  #square
-                            rep(23,3),  #diamond
+                            rep(22,4),  #square
+                            rep(23,2),  #diamond
                             rep(21,2))  #circle
 
   return(scen_cat_tab_2)

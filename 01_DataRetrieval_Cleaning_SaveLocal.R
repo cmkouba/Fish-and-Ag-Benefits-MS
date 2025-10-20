@@ -606,8 +606,9 @@ eflow25_tab = read.csv(file.path(data_dir,"Scott River 2025 Drought Emergency Mi
 svihm_dir = file.path(file.path(data_dir, "SVIHM Model Results_2025.10.13"))
 # FJ flow out
 scen_fj_out = read.csv(file.path(svihm_dir, "scen_combined_fj.csv"))
-# Functional flows based on FJ flow out for each scenario
-ff_scen = read.csv(file.path(svihm_dir, "Scenario functional flows from FJ Gauge.csv"))
+colnames(scen_fj_out) = gsub(pattern = "_update_2025.09.30", replacement = "", x = colnames(scen_fj_out))
+
+
 # Scenario parameter summary
 scen_params = read.csv(file.path(svihm_dir, "scenarios_param_summary.csv"))
 
@@ -740,6 +741,145 @@ aet_by_lu_budgets = budgets$aet_by_lu
 #   modflow_heads_bc = read_modflow_heads(scenario_directory = file.path(svihm_scenarios_dir, "basecase"))
 #   ground_elev = read_ground_surface_elev(scenario_directory = file.path(svihm_scenarios_dir, "basecase"))
 # 
+# }
+
+
+
+# Functional Flow Metrics -------------------------------------------------
+
+
+# Functional flows based on FJ flow out for each scenario
+batch_tab = read.csv(file.path(svihm_dir, "Scenario FFs_Carpenter2025", 
+                     "fj_scen_func_flows_batch_2025.10.13.csv"), header = T)
+scenario_list = batch_tab$scen
+scenario_list = scenario_list[nchar(scenario_list)>0] # exclude empty scenario for FJ obs for now
+ffs_scenarios = vector(mode = "list", length = length(scenario_list))
+names(ffs_scenarios) = gsub(pattern = "fj_", replacement = "", x = scenario_list)
+
+season_translator = data.frame(abbrev = c("FA", "Wet", "Peak", "SP", "DS"),
+                               season_indicator = c("f","w", "w","s","d"))
+
+for(i in 1:length(scenario_list)){
+  scen_id = scenario_list[i]
+  ff_scen = read.csv(file.path(svihm_dir, "Scenario FFs_Carpenter2025", 
+                           paste0(scen_id,"_Metrics.csv")), header = T)
+  # align Func Flows with brood year
+  ff_aligned = ff_scen # new copy of table
+  colnames(ff_aligned)[colnames(ff_aligned)=="Year"] = "Brood_Year"
+  
+  # name fall, wet and spring season metrics as f1, w1 and s1
+  for(j in 1:4){
+    ff_season = season_translator$abbrev[j]
+    aligned_season = season_translator$season_indicator[j]
+    change_these = grep(pattern = ff_season, x = colnames(ff_aligned))
+    colnames(ff_aligned)[change_these] = paste0(aligned_season, "1_", 
+                                                colnames(ff_aligned)[change_these])
+  }
+  # name orig. dry season metrics as d2
+  ds_cols = grep(pattern = "DS", x = colnames(ff_aligned))
+  colnames(ff_aligned)[ds_cols] = paste0("d2_", 
+                                         colnames(ff_aligned)[ds_cols])
+  # Add  d1 metrics
+  replicate_ds_cols = colnames(ff_aligned)[grep(pattern = "DS",
+                                                x = colnames(ff_aligned))]
+  replicate_ds_cols = gsub(pattern = "d2_", replacement = "d1_", x= replicate_ds_cols)
+  d1_vals = ff_aligned[ c(NA, 1:(nrow(ff_aligned)-1)), ds_cols] # assign values one year offset
+  colnames(d1_vals) = gsub(pattern = "d2_", replacement = "d1_", x= colnames(d1_vals)) #rename columns to reflect d1
+  ff_aligned = cbind(ff_aligned, d1_vals)
+  # Add f2, w2, and s2 metrics
+  # identify indices for original f, w, s seasons
+  fws_cols_i = grep(pattern = paste(season_translator$abbrev[1:4], collapse = "|"), 
+                    x = colnames(ff_aligned))
+  
+  replicate_these_cols = colnames(ff_aligned)[fws_cols_i]
+
+  # align dry season metrics one year later for the f2, w2, s2 seasons
+  f2w2s2_vals = ff_aligned[ c(2:(nrow(ff_aligned)),NA), fws_cols_i]
+  colnames(f2w2s2_vals) = gsub(pattern = "f1_", replacement = "f2_", x= colnames(f2w2s2_vals))
+  colnames(f2w2s2_vals) = gsub(pattern = "w1_", replacement = "w2_", x= colnames(f2w2s2_vals))
+  colnames(f2w2s2_vals) = gsub(pattern = "s1_", replacement = "s2_", x= colnames(f2w2s2_vals))
+  ff_aligned = cbind(ff_aligned, f2w2s2_vals)
+  
+  scen_id_name =  gsub(pattern = "fj_", replacement = "", x = scen_id)
+  ffs_scenarios[[scen_id_name]] = ff_aligned
+}
+
+
+
+# FUNCTIONAL FLOWS TAKE 1, OLD CALCULATOR
+
+# # Functional flows based on FJ flow out for each scenario
+# ff_scen = read.csv(file.path(svihm_dir, "Scenario functional flows from FJ Gauge.csv"))
+# ff_scen$scenario = gsub(pattern = "_update_2025.09.30", replacement = "", x = ff_scen$Source)
+# ff_scen$scenario = gsub(pattern = "fj_", replacement = "", x = ff_scen$scenario)
+# # align Func Flows with brood year
+# ff_aligned = ff_scen
+# colnames(ff_aligned)[colnames(ff_aligned)=="Year"] = "Brood_Year"
+# # name fall, wet and spring season metrics as f1, w1 and s1
+# season_translator = data.frame(abbrev = c("FA", "Wet", "Peak", "SP", "DS"),
+#                                season_indicator = c("f","w", "w","s","d"))
+# for(i in 1:4){
+#   ff_season = season_translator$abbrev[i]
+#   aligned_season = season_translator$season_indicator[i]
+#   change_these = grep(pattern = ff_season, x = colnames(ff_aligned))
+#   colnames(ff_aligned)[change_these] = paste0(aligned_season, "1_", 
+#                                               colnames(ff_aligned)[change_these])
+# }
+# # name orig. dry season metrics as d2
+# ds_cols = grep(pattern = "DS", x = colnames(ff_aligned))
+# colnames(ff_aligned)[ds_cols] = paste0("d2_", 
+#                                        colnames(ff_aligned)[ds_cols])
+# # initialize new columns to fill out the two-year period (adding  d1 and f2, w2, and s2 metrics)
+# replicate_ds_cols = colnames(ff_aligned)[grep(pattern = "DS", 
+#                                               x = colnames(ff_aligned))]
+# replicate_ds_cols = gsub(pattern = "d2_", replacement = "d1_", x= replicate_ds_cols)
+# ff_aligned[,replicate_ds_cols] = NA
+# 
+# # add d1 columns before f1 columns
+# ff_scens = unique(ff_aligned$scenario)
+# for(i in 1:length(ff_scens)){ 
+#   scen_id = ff_scens[i]
+#   scen_indices = ff_aligned$scenario == scen_id
+#   
+#   ff_aligned_subset = ff_aligned[scen_indices,]
+#   # align dry season metrics one year earlier for the d1 season
+#   d1_cols_i = ff_aligned_subset[ c(NA, 
+#                                    1:(nrow(ff_aligned_subset)-1))
+#                                  ,ds_cols]
+#   colnames(d1_cols_i) = gsub(pattern = "d2_", replacement = "d1_", x= colnames(d1_cols_i))
+#   ff_aligned_subset[, colnames(d1_cols_i)] = d1_cols_i
+#   
+#   ff_aligned[scen_indices,] = ff_aligned_subset
+# }
+# 
+# # identify indices for original f, w, s seasons
+# fws_cols_i = grep(pattern = paste(season_translator$abbrev[1:4], collapse = "|"), 
+#                   x = colnames(ff_aligned))
+# 
+# replicate_these_cols = colnames(ff_aligned)[fws_cols_i]
+# 
+# # add f2, w2 and s2 columns
+# # initialize new columns to fill out the two-year period (adding  d1 and f2, w2, and s2 metrics)
+# replicate_these_cols = gsub(pattern = "f1_", replacement = "f2_", x= replicate_these_cols)
+# replicate_these_cols = gsub(pattern = "w1_", replacement = "w2_", x= replicate_these_cols)
+# replicate_these_cols = gsub(pattern = "s1_", replacement = "s2_", x= replicate_these_cols)
+# ff_aligned[,replicate_these_cols] = NA
+# 
+# for(i in 1:length(ff_scens)){ 
+#   scen_id = ff_scens[i]
+#   scen_indices = ff_aligned$scenario == scen_id
+#   
+#   ff_aligned_subset = ff_aligned[scen_indices,]
+#   # align dry season metrics one year later for the f2, w2, s2 seasons
+#   f2w2s2_cols = ff_aligned_subset[ c(2:(nrow(ff_aligned_subset)),NA), fws_cols_i]
+#   
+#   colnames(f2w2s2_cols) = gsub(pattern = "f1_", replacement = "f2_", x= colnames(f2w2s2_cols))
+#   colnames(f2w2s2_cols) = gsub(pattern = "w1_", replacement = "w2_", x= colnames(f2w2s2_cols))
+#   colnames(f2w2s2_cols) = gsub(pattern = "s1_", replacement = "s2_", x= colnames(f2w2s2_cols))
+#   
+#   ff_aligned_subset[, colnames(f2w2s2_cols)] = f2w2s2_cols
+#   
+#   ff_aligned[scen_indices,] = ff_aligned_subset
 # }
 
 
