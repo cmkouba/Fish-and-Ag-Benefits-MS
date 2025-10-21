@@ -1284,7 +1284,7 @@ landuse_table_2016 = function(){
 get_scen_cat_tab = function(){
   scen_cat_tab = data.frame(category = c("Basecase","EnhRch", 
                                          "IrrEff", "Res", "CropCh",
-                                         "AlfIrr", #"Curtail",
+                                         "AlfIrr", "Curtail",
                                          "FlowLims",
                                          "NatVegH", "NatVegL"),
                             category_long = c("Basecase", "Enhanced Recharge",
@@ -1292,21 +1292,21 @@ get_scen_cat_tab = function(){
                                               "Small Reservoir",
                                               "Crop Change (Alfalfa Rot. to Perm. Grain)",
                                               "Cease Alfalfa Irrigation Early",
-                                              # "Cease (Curtail) All Irrigation Early",
+                                              "Cease (Curtail) All Irrigation Early",
                                               "Low Flow Diversion Limits",
                                               "Some Nat. Veg. Land Use (high ET)",
                                               "Some Nat. Veg. Land Use (low ET)"),
                             num_scenario = c(1,1,
                                              2,3,3,
-                                             3,1,
+                                             3,3,1,
                                              4,4),
                             feas_cat = c(0, 3, 
                                          2, 4, 2,
-                                         1, 1, #1,
+                                         1, 1, 1,
                                          2, 2),
                             mgmt_cat = c("Basecase",
                                          rep("Infrastructure", 4),
-                                         rep("Regulatory", 2),
+                                         rep("Regulatory", 3),
                                          rep("Nat. Veg.", 2)))
   return(scen_cat_tab)
 }
@@ -1316,6 +1316,7 @@ get_scenario_tab_init = function(){
   # Build scenario table
   scen_ids_for_tab = c("basecase",
                        "alf_curtail_07.15", "alf_curtail_07.31","alf_curtail_08.15",
+                       "curtail_all_07.15", "curtail_all_07.31", "curtail_all_08.15",
                        "basecase_0_curtail","basecase_0_mar_0_curt", "basecase_0_mar", 
                        "eflows25_div_lims",
                        "grain_12k", "grain_14k", "grain_6k",
@@ -1328,6 +1329,7 @@ get_scenario_tab_init = function(){
   
   scen_id_cat = c("basecase",
                   "AlfIrr","AlfIrr","AlfIrr",
+                  "Curtail","Curtail", "Curtail",
                   "Attr", "Attr", "Attr",
                   "FlowLims",
                   "CropCh", "CropCh", "CropCh",
@@ -1351,50 +1353,50 @@ get_scenario_tab_init = function(){
   
   # old names and order
   # Build scenario table
-  scen_ids_for_tab = c("basecase",
-                       "mar","ilr","mar_ilr",
-                       "mar_ilr_max_0.003", "mar_ilr_max_0.019", "mar_ilr_max_0.035",
-                       "irr_eff_improve_0.1","irr_eff_improve_0.2", #"irr_eff_worse_0.1",
-                       "reservoir_shackleford", "reservoir_etna",
-                       "reservoir_french", "reservoir_sfork", "reservoir_etna_29kAF",
-                       "irrig_0.8","irrig_0.9",
-                       "alf_irr_stop_jul10",
-                       "alf_irr_stop_aug01", "alf_irr_stop_aug01_dry_yrs_only",
-                       "alf_irr_stop_aug15", "alf_irr_stop_aug15_dry_yrs_only",
-                       "curtail_start_jun01","curtail_start_jun15",
-                       "curtail_start_jul01","curtail_start_jul15",
-                       "curtail_start_aug01","curtail_start_aug15",
-                       "flowlims", #"mar_ilr_flowlims",
-                       "natveg_all", "natveg_gwmixed_all", # dzgwET Only are now in these folders
-                       "natveg_inside_adj","natveg_gwmixed_inside_adj",
-                       "natveg_outside_adj","natveg_gwmixed_outside_adj",
-                       # "natveg_all_dzgwET_only", "natveg_gwmixed_all_dzgwET_only",
-                       # "natveg_inside_adj_dzgwET_only","natveg_gwmixed_inside_adj_dzgwET_only",
-                       # "natveg_outside_adj_dzgwET_only","natveg_gwmixed_outside_adj_dzgwET_only",
-                       # "natveg_all_et_check_0.6nvkc_4.5m_ext",
-                       # "natveg_all_et_check_0.6nvkc_10m_ext",
-                       # "natveg_all_et_check_1.0nvkc_10m_ext",
-                       # exclude these ^ natveg-all scens. b/c no crop ET, so meaningless in revised crop ET farmer benefit fn
-                       "natveg_all_et_check_1.0nvkc_4.5m_ext",
-                       "natveg_gwmixed_all_et_check_1.0nvkc_4.5m_ext",
-                       "natveg_inside_adj_et_check_1.0nvkc_4.5m_ext",
-                       "natveg_gwmixed_inside_adj_et_check_1.0nvkc_4.5m_ext",
-                       "natveg_outside_adj_et_check_1.0nvkc_4.5m_ext",
-                       "natveg_gwmixed_outside_adj_et_check_1.0nvkc_4.5m_ext"
-  )
-  
-  scen_id_cat = c("basecase",
-                  "EnhRch","EnhRch","EnhRch","EnhRchEx","EnhRchEx","EnhRchEx",
-                  "IrrEff","IrrEff", #"IrrEff",
-                  "Res","Res","Res","Res", "Res",
-                  "CropCh", "CropCh",
-                  "AlfIrr","AlfIrr","AlfIrr","AlfIrr","AlfIrr",
-                  "Curtail","Curtail","Curtail","Curtail","Curtail","Curtail",
-                  "FlowLims", #"FlowLims",
-                  "NatVeg","NatVeg","NatVeg","NatVeg","NatVeg","NatVeg",
-                  # "NatVegAllET","NatVegAllET","NatVegAllET",
-                  "NatVegET","NatVegET","NatVegET","NatVegET","NatVegET","NatVegET"
-  )
+  # scen_ids_for_tab = c("basecase",
+  #                      "mar","ilr","mar_ilr",
+  #                      "mar_ilr_max_0.003", "mar_ilr_max_0.019", "mar_ilr_max_0.035",
+  #                      "irr_eff_improve_0.1","irr_eff_improve_0.2", #"irr_eff_worse_0.1",
+  #                      "reservoir_shackleford", "reservoir_etna",
+  #                      "reservoir_french", "reservoir_sfork", "reservoir_etna_29kAF",
+  #                      "irrig_0.8","irrig_0.9",
+  #                      "alf_irr_stop_jul10",
+  #                      "alf_irr_stop_aug01", "alf_irr_stop_aug01_dry_yrs_only",
+  #                      "alf_irr_stop_aug15", "alf_irr_stop_aug15_dry_yrs_only",
+  #                      "curtail_start_jun01","curtail_start_jun15",
+  #                      "curtail_start_jul01","curtail_start_jul15",
+  #                      "curtail_start_aug01","curtail_start_aug15",
+  #                      "flowlims", #"mar_ilr_flowlims",
+  #                      "natveg_all", "natveg_gwmixed_all", # dzgwET Only are now in these folders
+  #                      "natveg_inside_adj","natveg_gwmixed_inside_adj",
+  #                      "natveg_outside_adj","natveg_gwmixed_outside_adj",
+  #                      # "natveg_all_dzgwET_only", "natveg_gwmixed_all_dzgwET_only",
+  #                      # "natveg_inside_adj_dzgwET_only","natveg_gwmixed_inside_adj_dzgwET_only",
+  #                      # "natveg_outside_adj_dzgwET_only","natveg_gwmixed_outside_adj_dzgwET_only",
+  #                      # "natveg_all_et_check_0.6nvkc_4.5m_ext",
+  #                      # "natveg_all_et_check_0.6nvkc_10m_ext",
+  #                      # "natveg_all_et_check_1.0nvkc_10m_ext",
+  #                      # exclude these ^ natveg-all scens. b/c no crop ET, so meaningless in revised crop ET farmer benefit fn
+  #                      "natveg_all_et_check_1.0nvkc_4.5m_ext",
+  #                      "natveg_gwmixed_all_et_check_1.0nvkc_4.5m_ext",
+  #                      "natveg_inside_adj_et_check_1.0nvkc_4.5m_ext",
+  #                      "natveg_gwmixed_inside_adj_et_check_1.0nvkc_4.5m_ext",
+  #                      "natveg_outside_adj_et_check_1.0nvkc_4.5m_ext",
+  #                      "natveg_gwmixed_outside_adj_et_check_1.0nvkc_4.5m_ext"
+  # )
+  # 
+  # scen_id_cat = c("basecase",
+  #                 "EnhRch","EnhRch","EnhRch","EnhRchEx","EnhRchEx","EnhRchEx",
+  #                 "IrrEff","IrrEff", #"IrrEff",
+  #                 "Res","Res","Res","Res", "Res",
+  #                 "CropCh", "CropCh",
+  #                 "AlfIrr","AlfIrr","AlfIrr","AlfIrr","AlfIrr",
+  #                 "Curtail","Curtail","Curtail","Curtail","Curtail","Curtail",
+  #                 "FlowLims", #"FlowLims",
+  #                 "NatVeg","NatVeg","NatVeg","NatVeg","NatVeg","NatVeg",
+  #                 # "NatVegAllET","NatVegAllET","NatVegAllET",
+  #                 "NatVegET","NatVegET","NatVegET","NatVegET","NatVegET","NatVegET"
+  # )
 }
 
 re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100), 
@@ -1764,7 +1766,7 @@ add_plot_cols_to_scen_cat_tab = function(scen_cat_tab_1){
                                     "Small Reservoir (3)",
                                     "Crop Change (Alf. to Gr.) (3)",
                                     "Cease Alfalfa Irrigation Early (5)",
-                                    # "Cease (Curtail) All Irr. Early (6)",
+                                    "Cease (Curtail) All Irr. Early (6)",
                                     "Low Flow Diversion Limits (1)",
                                     "Some Nat. Veg. Land Cover (low ET) (4)",
                                     "Some Nat. Veg. Land Cover (high ET) (4)")
@@ -1773,12 +1775,12 @@ add_plot_cols_to_scen_cat_tab = function(scen_cat_tab_1){
 
   scen_cat_tab_2$color = c("black","dodgerblue3",#"cadetblue1",
                            "plum2", "springgreen4", "darkorchid",
-                           "darkgoldenrod1",#"gray", 
+                           "darkgoldenrod1","gray", 
                            "orangered",
                            "wheat1",  "wheat4")
   scen_cat_tab_2$symbol = c(20,         # small circle
                             rep(22,4),  #square
-                            rep(23,2),  #diamond
+                            rep(23,3),  #diamond
                             rep(21,2))  #circle
 
   return(scen_cat_tab_2)
