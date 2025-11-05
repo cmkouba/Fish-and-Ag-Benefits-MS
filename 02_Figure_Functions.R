@@ -1012,7 +1012,8 @@ annual_swbm_budget_fig = function(scen_id = "basecase",
 
 plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"),
                              dry_years = c(1991, 1992, 1994, 2001,
-                                           2009, 2013, 2014, 2018)) {
+                                           2009, 2013, 2014, 2018,
+                                           2020, 2021, 2022)) {
   n_scen = length(plot_scenarios)
   if(sum(is.na(cols))>1){cols = my_colors = colorblind_pal()(length(plot_scenarios))}
   cols[1] = basecase_col
@@ -1030,7 +1031,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
        ylim = y_range_hb,
        xlim = range(wys),
        # main = scen,
-       ylab = "HB value (coho spf-equiv.)", xlab = "")
+       ylab = "HB value (coho smolt-equiv.)", xlab = "")
   grid()
 
   # add dry year highlights
@@ -1099,7 +1100,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   #   # panel 1, hbv
   #   plot(x = NA, y = NA,
   #        ylim = range(obj_fn_wy$hb_val, na.rm=T),
-  #        main = scen, ylab = "HB value (coho spf-equiv.)", xlab = "Water Year")
+  #        main = scen, ylab = "HB value (coho smolt-equiv.)", xlab = "Water Year")
   #   grid()
   # for(i in 1:length(plot_scenarios)){
   #   scen = plot_scenarios[i]
@@ -1128,9 +1129,9 @@ farm_fish_tradeoff_blank = function(scenario_tab, add_st_dev_bars = F){
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1,
        pch = 19, cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        col =  NA,
-       xlab = "Mean Hydrologic Benefit Value (coho spf-equiv.)",
+       xlab = "Mean Hydrologic Benefit Value (coho smolt-equiv.)",
        ylab = "Mean Annual Crop ET (million cubic m)",
-       main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values, 1991-2018")
+       main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values, 1991-2025")
   grid()
 }
 
@@ -1145,7 +1146,7 @@ farm_fish_tradeoff_fig = function(scenario_tab, n_years = 35,
        cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        bg = scenario_tab$color,
        ylim = c(0,125),# xlim = c(3.5, 4.5), # ylim = c(0,113), xlim = c(55, 67),
-       xlab = "Hydrologic Benefit Function (coho spf-equiv)",
+       xlab = "Hydrologic Benefit Function (coho smolt-equiv)",
        ylab = "Mean Annual Crop ET (million cubic m)",
        # main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values"
        main = plot_title)
@@ -1191,12 +1192,15 @@ farm_fish_tradeoff_fig = function(scenario_tab, n_years = 35,
 
 
 tradeoff_efficiency_fig = function(scenario_tab){
-  low_et_cost = scenario_tab[scenario_tab$scenario_category %in% c("IrrEff", "EnhRch", "EnhRchEx", "Res", "basecase"),]
-  plot_2_scen = scenario_tab[scenario_tab$et_lost>0 ,]
+  low_et_cats = c("EnhRch",  "Res", "basecase")
+  low_et_cost = scenario_tab[scenario_tab$scenario_category %in% low_et_cats,]
+  plot_2_scen = scenario_tab#[scenario_tab$et_lost>0 & scenario_tab$hb_gained>0 &
+                               # scenario_tab$hb_gained_to_et_lost >0 &
+                               # scenario_tab$hb_gained_to_et_lost_lc >0,]
 
   # for the legend
-  scen_cat_tab_low = scen_cat_tab[scen_cat_tab$category %in% c("IrrEff", "EnhRch", "EnhRchEx", "Res", "basecase"),]
-  scen_cat_tab_other = scen_cat_tab[!(scen_cat_tab$category %in% c("IrrEff", "EnhRch", "EnhRchEx", "Res","basecase")),]
+  scen_cat_tab_low = scen_cat_tab[scen_cat_tab$category %in% low_et_cats,]
+  scen_cat_tab_other = scen_cat_tab[!(scen_cat_tab$category %in% low_et_cats),]
 
   # par(mar=c(5,4,4,1))
   lim_vals = range(c(plot_2_scen$hb_gained_to_et_lost,
@@ -1205,7 +1209,8 @@ tradeoff_efficiency_fig = function(scenario_tab){
     #y = (other_scen$hb_gained_to_et_lost_dry),
     x = (plot_2_scen$hb_gained_to_et_lost),
     y =(plot_2_scen$hb_gained_to_et_lost_lc),
-    log="xy", xlim = lim_vals, ylim = lim_vals, xaxt = "n", yaxt = "n",
+    # log="xy",
+    xlim = lim_vals, ylim = lim_vals, xaxt = "n", yaxt = "n",
     main = "Trade-off efficiency: relative HB gained per \n relative ET lost, in all vs. low-coho years",
     xlab = "Avg. efficiency (1991-2018)", ylab = "Avg. efficiency (low-coho years only)",
     bg = plot_2_scen$color, pch = plot_2_scen$symbol, cex = 1.5)
@@ -1216,6 +1221,16 @@ tradeoff_efficiency_fig = function(scenario_tab){
   axis(side = 1, at = rep(1:9,4)*sort(rep(10^(-2:2),9)), labels = NA, tck = -0.01)
   axis(side = 2, at = 10^(-2:2), labels = 10^(-2:2))
   axis(side = 2, at = rep(1:9,4)*sort(rep(10^(-2:2),9)), labels = NA, tck = -0.01)
+  
+  plot(
+    x = (scenario_tab$hb_gained_to_et_lost),
+    y =(scenario_tab$hb_gained_to_et_lost_lc),
+    # log="xy",
+    # xlim = lim_vals, ylim = lim_vals, xaxt = "n", yaxt = "n",
+    main = "Trade-off efficiency: relative HB gained per \n relative ET lost, in all vs. low-coho years",
+    xlab = "Avg. efficiency (1991-2025)", ylab = "Avg. efficiency (low-coho years only)",
+    bg = scenario_tab$color, pch = scenario_tab$symbol, cex = 1.5)
+  
 
   # legend(x = "topleft", pch=scen_cat_tab$symbol[1:6], cex = .8, pt.cex = 1.5, #ncol = 2,
   #        pt.bg = scen_cat_tab$color[1:6],
@@ -1230,6 +1245,51 @@ tradeoff_efficiency_fig = function(scenario_tab){
   #        pt.bg = sct2$color,
   #        legend = sct2$category_long)
 }
+
+tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
+  # low_et_cost_cats = c("EnhRch",  "Res", "basecase")
+  # low_et_cost = scenario_tab[scenario_tab$scenario_category %in% low_et_cost_cats,]
+  
+  exclude_these = c("Attr","basecase")
+  plot_2_scen = scenario_tab[!(scenario_tab$scenario_category %in% exclude_these),]
+  plot_2_scen = scenario_tab[scenario_tab$et_lost>0 & scenario_tab$hb_gained>0,]
+
+  # for the legend
+  # scen_cat_tab_low = scen_cat_tab[scen_cat_tab$category %in% low_et_cost_cats,]
+  # scen_cat_tab_other = scen_cat_tab[!(scen_cat_tab$category %in% low_et_cost_cats),]
+  
+  # # par(mar=c(5,4,4,1))
+  # lim_vals = range(c(plot_2_scen$hb_gained_to_et_lost,
+  #                    plot_2_scen$hb_gained_to_et_lost_lc), na.rm=T)
+  
+  n_scens = max(unique(as.numeric(as.factor(plot_2_scen$scenario_category))))
+  scen_cats = sort(unique(plot_2_scen$scenario_category))
+  plot(
+    x = as.numeric(as.factor(plot_2_scen$scenario_category)), 
+    y = (plot_2_scen$hb_gained_to_et_lost), pch = plot_2_scen$symbol,
+    bg = plot_2_scen$color, cex = 2,
+    main = "Trade-off efficiency: HB gained per ET lost",
+    ylab = "Avg. efficiency (1991-2025)", xlab = "Scenario Category",
+    xaxt = "n"
+  )
+  grid()
+  axis(1, at = 1:n_scens, labels = scen_cats)
+  
+    
+  # legend(x = "topright", pch=scen_cat_tab$symbol[1:6], cex = .8, pt.cex = 1.5, #ncol = 2,
+  #        pt.bg = scen_cat_tab$color[1:6],
+  #        legend = scen_cat_tab$category_long[1:6])
+  # legend(x = "bottomright", pch=scen_cat_tab$symbol[7:11], cex = .8, pt.cex = 1.5, #ncol = 2,
+  #        pt.bg = scen_cat_tab$color[7:11],
+  #        legend = scen_cat_tab$category_long[7:11])
+  
+  sct2 = scen_cat_tab[(scen_cat_tab$category %in% c("basecase",unique(plot_2_scen$scenario_category))),]
+
+  legend(x = "right", pch=sct2$symbol, cex = .8, pt.cex = 1.5, #ncol = 2,
+         pt.bg = sct2$color,
+         legend = sct2$category_long)
+}
+
 
 # Table functions ---------------------------------------------------------
 
@@ -1399,6 +1459,7 @@ get_scenario_tab_init = function(){
   # )
 }
 
+
 re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100), 
                                     fj_flow, last_wy = 2025){
   
@@ -1490,7 +1551,6 @@ re_and_disconnect_date_tab=function(thresholds = c(10,20,30,40,60,100),
   return(output_tab)
   
 }
-
 
 add_func_flows_to_hbf_tab=function(pre_hbf_tab, ff_ids, 
                                    ff_aligned_scen, scen_id){
@@ -1591,6 +1651,17 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
   
   pre_hbf_tab = re_and_disconnect_date_tab(thresholds = thresholds_hbf,
                                            fj_flow = flow_tab_for_hbf)
+  # align for 1st and 2nd years
+  colnames(pre_hbf_tab)=gsub(pattern = "recon_date_", replacement = "f1_recon_",
+                             x = colnames(pre_hbf_tab))
+  colnames(pre_hbf_tab)=gsub(pattern = "discon_date_", replacement = "s1_discon_",
+                             x = colnames(pre_hbf_tab))
+  f1_colnames = colnames(pre_hbf_tab)[grep(pattern = "f1_recon", x = colnames(pre_hbf_tab))]
+  f2_colnames = gsub(pattern = "f1",replacement = 'f2' , x = f1_colnames)
+  s1_colnames =  colnames(pre_hbf_tab)[grep(pattern = "s1_discon", x = colnames(pre_hbf_tab))]
+  s2_colnames = gsub(pattern = "s1", replacement = "s2", x = s1_colnames)
+  pre_hbf_tab[,c(f2_colnames, s2_colnames)] = pre_hbf_tab[c(2:nrow(pre_hbf_tab),NA),
+                                                          c(f1_colnames, s1_colnames)]
   # fill in missing values with averages
   ff_ids = weights$Predictor[weights$Predictor !="Intercept"] 
   ff_aligned_scen = func_flows
@@ -1614,7 +1685,8 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
   
   write.csv(x = hbf_tab, quote = F, row.names = T,
             file = file.path(ms_dir, "Graphics and Supplements",
-                             "Supplemental Table 2 - Flow Metrics by Water Year, 1942-2021.csv"))
+                             paste0("Supplemental Table 2 - Flow Metrics by Water Year, 1942-",
+                                    last_wy,".csv")))
   
   # fill gaps with averages
   col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
@@ -2181,319 +2253,319 @@ fj_streamflow_by_wy_figure= function(show_instream_flow_violations = F,
 
 # One-time calculations ---------------------------------------------------
 
-save_scenario_flow_data_for_ff_calcs = function(){
-  # Gotta go through this scenario by scenario so you can run Spyder in the middle of each.
-
-  # scenario_ids = "basecase"; i=1 # for dev.
-  scenario_ids = scen_ids_for_tab
-  # Directory where tables of scenario daily flow data gets stored
-  for_ff_tab_dir = file.path(data_dir, "SVIHM Model Results","tables for func flows")
-  #weed out ones that already have fflows in the folder
-  filename_list = list.files(for_ff_tab_dir)
-  ff_scenario_filenames = filename_list[grep(filename_list,pattern = "func flow metrics.csv")]
-  existing_scen_ids = trim(unlist(strsplit(x = ff_scenario_filenames, split = "func flow metrics.csv")))
-
-  scenario_ids = scen_ids_for_tab[!(scen_ids_for_tab %in% existing_scen_ids)]
-
-  # Directory in Functional Flows project where raw flow data is stored for processing
-  ff_calc_rawfile_dir = "C:/Users/Claire/Documents/GitHub/func-flow/rawFiles"
-  # Directory in Functional Flows project where processed functional flow metrics matrix is stored
-  ff_calc_postproc_dir = "C:/Users/Claire/Documents/GitHub/func-flow/post_processedFiles/Class-3"
-
-  # File names for template RawFile, RawFile with new scenario data inserted
-  ff_template_file = file.path(for_ff_tab_dir, "orig new_postProcess_4.csv")
-  ff_new_tab_file = file.path(for_ff_tab_dir, "new_postProcess_4.csv")
-  # File name for the postprocessed metric data in the Functional Flows project
-  postproc_file = file.path(ff_calc_postproc_dir,"11413100_annual_result_matrix.csv")
-
-  # Prepare to overwrite template file
-  ff_line_1 = ",3,,3,,2,,9,,2"
-  ff_line_2 = "result_dt,11413100,result_dt,11341400,result_dt,11299000,result_dt,11355500,result_dt,11446220"
-  ff_ncols = 10
-  ff_tab_template = read.csv(file = ff_template_file, skip = 1)
-  i=0 # initialize i index
-
-
-  # Run this block for every scenario
-  # spyder setup block start-----------------------------------------------
-  i= i+1
-    scen_id = scenario_ids[i]
-    ff_scen_tab_filename = file.path(for_ff_tab_dir, paste(scen_id, "func flow metrics.csv")) # output filename
-    scen_fj = get_simulated_fj_outflow(scenario_id = scen_id)
-
-    if(scen_id == "hist_obs"){
-      # Pull, process flow data
-      scen_id = "hist_obs_3"
-      # File name for when FF metric matrixs gets copied over to the dissertation directory
-      ff_scen_tab_filename = file.path(for_ff_tab_dir, paste(scen_id, "func flow metrics.csv"))
-
-      # define flow data
-      # scen_fj = fj_flow[fj_flow$Date>= as.Date("1941-10-01") & fj_flow$Date<= as.Date("1968-09-30"),]
-      # scen_fj = fj_flow[fj_flow$Date>= as.Date("1968-10-01") & fj_flow$Date<= as.Date("1987-09-30"),]
-      # scen_fj = fj_flow[fj_flow$Date>= as.Date("1987-10-01") & fj_flow$Date<= as.Date("1988-09-30"),]
-      scen_fj = fj_flow[fj_flow$Date>= as.Date("1987-10-01") & fj_flow$Date<= as.Date("2021-09-30"),]
-
-    }
-
-    scen_fj = scen_fj[,c("Date", "Flow")] # scen_fj$Date = format(scen_fj$Date, format = "%m/%d%/%Y")
-    scen_fj$Flow=round(scen_fj$Flow)
-
-    row_diff = nrow(scen_fj) - nrow(ff_tab_template)
-    if(row_diff <= 0){ # make filler rows on bottom of scen_fj or ff_tab_template if necessary
-      scen_fj = rbind(scen_fj, data.frame(Date = rep(NA, abs(row_diff)), Flow = rep(NA, abs(row_diff))) )
-    } else {
-      temp_tab = ff_tab_template[1:row_diff,] ; ff_tab_template = rbind(ff_tab_template, temp_tab)
-    }
-
-    #transpose so it writes properly in the file
-    ff_tab_new = t(as.matrix(cbind(scen_fj, ff_tab_template[,c(-1,-2)])))
-    # Write the scenario flow data into the template file
-    writeLines(ff_line_1, con = ff_new_tab_file)
-    write(ff_line_2, file = ff_new_tab_file, append=T)
-    write(ff_tab_new, file = ff_new_tab_file, ncolumns = ff_ncols, append = T, sep = ",")
-
-    # copy this back to the python metric-calculator file (overwrite existing version)
-    file.copy(from = ff_new_tab_file, to = file.path(ff_calc_rawfile_dir,"new_postProcess_4.csv"), overwrite = T)
-    print(paste(scen_id, "copied to FF dir;", i, "of", length(scenario_ids)))
-    # spyder setup block end-----------------------------
-
-    #### OPERATOR
-    # Open Spyder. navigate to main.py.
-    ## Hit Run.
-    ## Enter 7 (Create Annual Flow Matrix csv)
-    ## Hit enter to accept 10/1 start of water year
-    ## Enter 2 (calculate for gauges)
-    ## Enter "11413100" (the name of the gauge whose data you've replaced with the scenario flow)
-    ## It will run. Probably warnings.
-    ## It will say "Done!!!"
-
-    # Then run this line to copy the file back into this folder, with the scenario_id in the file name
-    file.copy(from = postproc_file, to = ff_scen_tab_filename) ;print(paste(scen_id, "FF matrix copied back to diss. dir"))
-
-}
+# save_scenario_flow_data_for_ff_calcs = function(){
+#   # Gotta go through this scenario by scenario so you can run Spyder in the middle of each.
+# 
+#   # scenario_ids = "basecase"; i=1 # for dev.
+#   scenario_ids = scen_ids_for_tab
+#   # Directory where tables of scenario daily flow data gets stored
+#   for_ff_tab_dir = file.path(data_dir, "SVIHM Model Results","tables for func flows")
+#   #weed out ones that already have fflows in the folder
+#   filename_list = list.files(for_ff_tab_dir)
+#   ff_scenario_filenames = filename_list[grep(filename_list,pattern = "func flow metrics.csv")]
+#   existing_scen_ids = trim(unlist(strsplit(x = ff_scenario_filenames, split = "func flow metrics.csv")))
+# 
+#   scenario_ids = scen_ids_for_tab[!(scen_ids_for_tab %in% existing_scen_ids)]
+# 
+#   # Directory in Functional Flows project where raw flow data is stored for processing
+#   ff_calc_rawfile_dir = "C:/Users/Claire/Documents/GitHub/func-flow/rawFiles"
+#   # Directory in Functional Flows project where processed functional flow metrics matrix is stored
+#   ff_calc_postproc_dir = "C:/Users/Claire/Documents/GitHub/func-flow/post_processedFiles/Class-3"
+# 
+#   # File names for template RawFile, RawFile with new scenario data inserted
+#   ff_template_file = file.path(for_ff_tab_dir, "orig new_postProcess_4.csv")
+#   ff_new_tab_file = file.path(for_ff_tab_dir, "new_postProcess_4.csv")
+#   # File name for the postprocessed metric data in the Functional Flows project
+#   postproc_file = file.path(ff_calc_postproc_dir,"11413100_annual_result_matrix.csv")
+# 
+#   # Prepare to overwrite template file
+#   ff_line_1 = ",3,,3,,2,,9,,2"
+#   ff_line_2 = "result_dt,11413100,result_dt,11341400,result_dt,11299000,result_dt,11355500,result_dt,11446220"
+#   ff_ncols = 10
+#   ff_tab_template = read.csv(file = ff_template_file, skip = 1)
+#   i=0 # initialize i index
+# 
+# 
+#   # Run this block for every scenario
+#   # spyder setup block start-----------------------------------------------
+#   i= i+1
+#     scen_id = scenario_ids[i]
+#     ff_scen_tab_filename = file.path(for_ff_tab_dir, paste(scen_id, "func flow metrics.csv")) # output filename
+#     scen_fj = get_simulated_fj_outflow(scenario_id = scen_id)
+# 
+#     if(scen_id == "hist_obs"){
+#       # Pull, process flow data
+#       scen_id = "hist_obs_3"
+#       # File name for when FF metric matrixs gets copied over to the dissertation directory
+#       ff_scen_tab_filename = file.path(for_ff_tab_dir, paste(scen_id, "func flow metrics.csv"))
+# 
+#       # define flow data
+#       # scen_fj = fj_flow[fj_flow$Date>= as.Date("1941-10-01") & fj_flow$Date<= as.Date("1968-09-30"),]
+#       # scen_fj = fj_flow[fj_flow$Date>= as.Date("1968-10-01") & fj_flow$Date<= as.Date("1987-09-30"),]
+#       # scen_fj = fj_flow[fj_flow$Date>= as.Date("1987-10-01") & fj_flow$Date<= as.Date("1988-09-30"),]
+#       scen_fj = fj_flow[fj_flow$Date>= as.Date("1987-10-01") & fj_flow$Date<= as.Date("2021-09-30"),]
+# 
+#     }
+# 
+#     scen_fj = scen_fj[,c("Date", "Flow")] # scen_fj$Date = format(scen_fj$Date, format = "%m/%d%/%Y")
+#     scen_fj$Flow=round(scen_fj$Flow)
+# 
+#     row_diff = nrow(scen_fj) - nrow(ff_tab_template)
+#     if(row_diff <= 0){ # make filler rows on bottom of scen_fj or ff_tab_template if necessary
+#       scen_fj = rbind(scen_fj, data.frame(Date = rep(NA, abs(row_diff)), Flow = rep(NA, abs(row_diff))) )
+#     } else {
+#       temp_tab = ff_tab_template[1:row_diff,] ; ff_tab_template = rbind(ff_tab_template, temp_tab)
+#     }
+# 
+#     #transpose so it writes properly in the file
+#     ff_tab_new = t(as.matrix(cbind(scen_fj, ff_tab_template[,c(-1,-2)])))
+#     # Write the scenario flow data into the template file
+#     writeLines(ff_line_1, con = ff_new_tab_file)
+#     write(ff_line_2, file = ff_new_tab_file, append=T)
+#     write(ff_tab_new, file = ff_new_tab_file, ncolumns = ff_ncols, append = T, sep = ",")
+# 
+#     # copy this back to the python metric-calculator file (overwrite existing version)
+#     file.copy(from = ff_new_tab_file, to = file.path(ff_calc_rawfile_dir,"new_postProcess_4.csv"), overwrite = T)
+#     print(paste(scen_id, "copied to FF dir;", i, "of", length(scenario_ids)))
+#     # spyder setup block end-----------------------------
+# 
+#     #### OPERATOR
+#     # Open Spyder. navigate to main.py.
+#     ## Hit Run.
+#     ## Enter 7 (Create Annual Flow Matrix csv)
+#     ## Hit enter to accept 10/1 start of water year
+#     ## Enter 2 (calculate for gauges)
+#     ## Enter "11413100" (the name of the gauge whose data you've replaced with the scenario flow)
+#     ## It will run. Probably warnings.
+#     ## It will say "Done!!!"
+# 
+#     # Then run this line to copy the file back into this folder, with the scenario_id in the file name
+#     file.copy(from = postproc_file, to = ff_scen_tab_filename) ;print(paste(scen_id, "FF matrix copied back to diss. dir"))
+# 
+# }
 
 
 # scratchwork -------------------------------------------------------------
 
 
 
-obs_v_sim_flow_fig= function(water_year = 2016, obs_flow, sim_flow){
-  # obs_flow = obs
-  # sim_flow = sim
-
-  obs_wy = obs_flow[obs_flow$wy==water_year,]
-  sim_wy = sim_flow[sim_flow$wy==water_year,]
-
-  # Initialize Plot
-  par(mar = c(5,5,4,5) + 0.1) # add more space for 2nd axis
-  plot(obs_wy$Date, obs_wy$Flow, type = "l", log = "y",
-       lwd = 2, col = obs_col, yaxt = "n", xaxt="n",
-       ylim = range(obs_wy$Flow),
-       main = "Observed FJ Flow vs. FJ Flow simulated with SVIHM",
-       # ylab = "Average Daily Flow at FJ Gauge (cfs)",
-       ylab = expression(Average~Daily~Flow~at~FJ~Gauge~(ft^3~"/"~sec)),
-       xlab = paste("Date in water year", water_year))
-  lines(sim_wy$Date, sim_wy$Flow, lwd = 2, col = sim_col)
-
-  # Plot fine-tuning
-  flow_labels = c("0.1","1","10","100","1,000","10,000","100,000")
-  # date_lines = as.Date(paste0(water_year,"-01-01")) + (month_1s - 1)
-  date_lines = seq.Date(from=min(obs_wy$Date), to = max(obs_wy$Date)+32, by = "month")
-  label_these_months = date_lines[c(2,4,6,8,10,12,14)]
-  axis(side=1, at=label_these_months,
-       labels = month.abb[c(month(label_these_months))], las = 1)
-  axis(side=2, at=10^(-1:5), labels = flow_labels, las = 1)
-  axis(side=2, at=rep(1:9,6) * 10 ^ (rep(0:5, each = 9)), labels = NA, tck = -0.01)
-  abline(h=10^(0:5), v = date_lines, col = "gray", lty = 3)
-
-  # Add 2nd cms axis
-  par(new=TRUE)
-  plot(x=c(1,1), y = range(obs_wy$Flow) * cfs_to_m3sec,
-       ylim = range(obs_wy$Flow) * cfs_to_m3sec, col = NA,
-       xaxt = "n", yaxt = "n", log = "y", ylab = "", xlab = "")
-  axis(side=4, at=10^(-1:5), labels = flow_labels, las = 1)
-  axis(side=4, at=rep(1:9,7) * 10 ^ (rep(-1:5, each = 9)), labels = NA, tck = -0.01)
-  mtext(expression(Average~Daily~Flow~at~FJ~Gauge~(m^3~"/"~sec)), side = 4, line = 3)
-
-  legend(x="topright", lwd=2, col = c(obs_col, sim_col), legend = c("Obs.", "Sim."))
-}
-
-obs_v_sim_hbf_fig = function(obs_hbf_tab, sim_hbf_tab){
-  fj_flow_bc = get_simulated_fj_outflow(scenario_id = "basecase")
-  sim_hbf_tab = calc_hbf_tab_mar2022(flow_tab_for_hbf = fj_flow_bc,
-                                     weights = metric_weights,
-                                     ch1_hbftab = F,
-                                     thresholds_hbf = c(10,100),
-                                     last_wy = 2018,
-                                     scen_id = "basecase")
-  obs_hbf_tab = calc_hbf_tab_mar2022(flow_tab_for_hbf = fj_flow,
-                                     weights = metric_weights,
-                                     ch1_hbftab = F,
-                                     thresholds_hbf = c(10,100),
-                                     last_wy = 2018,
-                                     scen_id = "hist_obs")
-  obs_hbf_tab = obs_hbf_tab[obs_hbf_tab$water_year >= 1991,]
-  # par(mfrow = c(2,1))
-  # Panel 1, time series
-  # par(mar = c(5,4,5,1)) # extra room for plot title
-  plot(x = obs_hbf_tab$water_year, y = obs_hbf_tab$hbf_total,
-       main = "HB values calculated from observed and \n simulated flow, water years 1991-2018",
-       xlab = "Water Year", ylab = "HB value (coho spf-equiv.)",
-       col = obs_col, type = "o", pch = 19)
-  points(x = sim_hbf_tab$water_year, y = sim_hbf_tab$hbf_total, col = sim_col, pch = 19)
-  lines(x = sim_hbf_tab$water_year, y = sim_hbf_tab$hbf_total, col = sim_col)
-  grid()
-  abline(h=0, lwd = 1.5, col= "gray")
-
-  summary(obs_hbf_tab$hbf_total - sim_hbf_tab$hbf_total)
-  # sim overpredicts by a mean of 4.5 coho spf (range of 37 underpredict to 49 over)
-
-  # # Panel 2, cdf fuction
-  # par(mar = c(5,4,1,1)) # remove space for plot title
-  # plot(x = (1:nrow(obs_hbf_tab))/nrow(obs_hbf_tab),
-  #      y = sort(obs_hbf_tab$hbf_total, decreasing = T),
-  #      xlab = "Exceedance Probability", ylab = "HB value (coho spf-equiv.)",
-  #      type = "o", pch = 19, col = obs_col)
-  # points(x = (1:nrow(sim_hbf_tab))/nrow(obs_hbf_tab),
-  #        y = sort(sim_hbf_tab$hbf_total, decreasing = T),
-  #        type = "o", pch = 19, col = sim_col)
-  # grid()
-  # abline(h=0, lwd = 1.5, col= "gray")
-  # legend(x="bottomleft", pch = 19, lty = 1, col = c(obs_col, sim_col),
-  #        legend = c("Observed Flow", "Simulated Flow"))
-}
-
-
-
-
-# calculate_HBF_and_ET=function(scenario_tab = scenario_tab, weights){
-#
-#   scenarios = scenario_tab$scenario_id
-#
-#   for(i in 1:length(scenarios)){
-#     scenario_id = scenarios[i]
-#     # print(scenario_id)
-#     # pull results data
-#     swbm = get_swbm_budget_table(scenario_id = scenario_id)
-#     fj_flow_scen = get_simulated_fj_outflow(scenario_id = scenario_id)
-#
-#     # 1. calculate benefit value distribution
-#     hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_scen, weights = weights,
-#                                    scen_id = scenario_id)
-#
-#     # clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
-#     if(scenario_id == "curtail_start_aug15"){
-#       problem_wy = 2011; wy_selector = hbf_tab$water_year==problem_wy
-#       wet_tim_prob = 57 # replace with wet season onset from hist_obs
-#       hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
-#       sp_tim_prob = 199
-#       hbf_tab$Wet_BFL_Dur[wy_selector] = sp_tim_prob - wet_tim_prob
-#       # recalc HBF components
-#       hbf_tab$comp3[wy_selector] = weights[4] * hbf_tab$Wet_Tim[wy_selector]
-#       hbf_tab$comp4[wy_selector] = weights[5] * hbf_tab$Wet_BFL_Dur[wy_selector]
-#       hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
-#         hbf_tab$comp3 + hbf_tab$comp4 + hbf_tab$comp5
-#     }
-#     if(scenario_id == "mar_ilr_flowlims"){
-#       problem_wy = 2001; wy_selector = hbf_tab$water_year==problem_wy
-#       wet_tim_prob = 129 # replace with wet season onset from hist_obs
-#       hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
-#       sp_tim_prob = 185
-#       hbf_tab$Wet_BFL_Dur[hbf_tab$water_year==2001] = sp_tim_prob - wet_tim_prob
-#       # recalc HBF components
-#       hbf_tab$comp3[wy_selector] = weights[4] * hbf_tab$Wet_Tim[wy_selector]
-#       hbf_tab$comp4[wy_selector] = weights[5] * hbf_tab$Wet_BFL_Dur[wy_selector]
-#       hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
-#         hbf_tab$comp3 + hbf_tab$comp4 + hbf_tab$comp5
-#     }
-#
-#     # Calculate distribution values and assign to scenario table
-#     scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total)
-#     scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total)
-#
-#     # 2. calculate ET deviation distribution
-#     et_annual = aggregate(swbm$ET,
-#                           by = list(swbm$Water_Year),
-#                           FUN = sum)
-#     scenario_tab$et_mean[i]=mean(et_annual$x)
-#     scenario_tab$et_stdev[i]=sd(et_annual$x)
-#   }
-#   return(scenario_tab)
+# obs_v_sim_flow_fig= function(water_year = 2016, obs_flow, sim_flow){
+#   # obs_flow = obs
+#   # sim_flow = sim
+# 
+#   obs_wy = obs_flow[obs_flow$wy==water_year,]
+#   sim_wy = sim_flow[sim_flow$wy==water_year,]
+# 
+#   # Initialize Plot
+#   par(mar = c(5,5,4,5) + 0.1) # add more space for 2nd axis
+#   plot(obs_wy$Date, obs_wy$Flow, type = "l", log = "y",
+#        lwd = 2, col = obs_col, yaxt = "n", xaxt="n",
+#        ylim = range(obs_wy$Flow),
+#        main = "Observed FJ Flow vs. FJ Flow simulated with SVIHM",
+#        # ylab = "Average Daily Flow at FJ Gauge (cfs)",
+#        ylab = expression(Average~Daily~Flow~at~FJ~Gauge~(ft^3~"/"~sec)),
+#        xlab = paste("Date in water year", water_year))
+#   lines(sim_wy$Date, sim_wy$Flow, lwd = 2, col = sim_col)
+# 
+#   # Plot fine-tuning
+#   flow_labels = c("0.1","1","10","100","1,000","10,000","100,000")
+#   # date_lines = as.Date(paste0(water_year,"-01-01")) + (month_1s - 1)
+#   date_lines = seq.Date(from=min(obs_wy$Date), to = max(obs_wy$Date)+32, by = "month")
+#   label_these_months = date_lines[c(2,4,6,8,10,12,14)]
+#   axis(side=1, at=label_these_months,
+#        labels = month.abb[c(month(label_these_months))], las = 1)
+#   axis(side=2, at=10^(-1:5), labels = flow_labels, las = 1)
+#   axis(side=2, at=rep(1:9,6) * 10 ^ (rep(0:5, each = 9)), labels = NA, tck = -0.01)
+#   abline(h=10^(0:5), v = date_lines, col = "gray", lty = 3)
+# 
+#   # Add 2nd cms axis
+#   par(new=TRUE)
+#   plot(x=c(1,1), y = range(obs_wy$Flow) * cfs_to_m3sec,
+#        ylim = range(obs_wy$Flow) * cfs_to_m3sec, col = NA,
+#        xaxt = "n", yaxt = "n", log = "y", ylab = "", xlab = "")
+#   axis(side=4, at=10^(-1:5), labels = flow_labels, las = 1)
+#   axis(side=4, at=rep(1:9,7) * 10 ^ (rep(-1:5, each = 9)), labels = NA, tck = -0.01)
+#   mtext(expression(Average~Daily~Flow~at~FJ~Gauge~(m^3~"/"~sec)), side = 4, line = 3)
+# 
+#   legend(x="topright", lwd=2, col = c(obs_col, sim_col), legend = c("Obs.", "Sim."))
 # }
-
-
-# calculate_HBF_and_ET_dev=function(scenario_tab = scenario_tab, et_hist_mean, weights){
-#
-#   scenarios = scenario_tab$scenario_id
-#
-#   for(i in 1:length(scenarios)){
-#     scenario_id = scenarios[i]
-#     # pull results data
-#     swbm = get_swbm_budget_table(scenario_id = scenario_id)
-#     fj_flow_scen = get_simulated_fj_outflow(scenario_id = scenario_id)
-#
-#     # 1. calculate benefit value distribution
-#     hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_scen, weights = weights,
-#                                    scen_id = scenario_id)
-#
-#     # Calculate distribution values and assign to scenario table
-#     scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total)
-#     scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total)
-#
-#     # 2. calculate ET deviation distribution
-#     et_annual = aggregate(swbm$ET,
-#                           by = list(swbm$Water_Year),
-#                           FUN = sum)
-#     et_dev_dist = (et_annual$x / et_hist_mean) - 1
-#     scenario_tab$et_dev_mean[i]=mean(et_dev_dist)
-#     scenario_tab$et_dev_stdev[i]=sd(et_dev_dist)
-#   }
-#   return(scenario_tab)
+# 
+# obs_v_sim_hbf_fig = function(obs_hbf_tab, sim_hbf_tab){
+#   fj_flow_bc = get_simulated_fj_outflow(scenario_id = "basecase")
+#   sim_hbf_tab = calc_hbf_tab_mar2022(flow_tab_for_hbf = fj_flow_bc,
+#                                      weights = metric_weights,
+#                                      ch1_hbftab = F,
+#                                      thresholds_hbf = c(10,100),
+#                                      last_wy = 2018,
+#                                      scen_id = "basecase")
+#   obs_hbf_tab = calc_hbf_tab_mar2022(flow_tab_for_hbf = fj_flow,
+#                                      weights = metric_weights,
+#                                      ch1_hbftab = F,
+#                                      thresholds_hbf = c(10,100),
+#                                      last_wy = 2018,
+#                                      scen_id = "hist_obs")
+#   obs_hbf_tab = obs_hbf_tab[obs_hbf_tab$water_year >= 1991,]
+#   # par(mfrow = c(2,1))
+#   # Panel 1, time series
+#   # par(mar = c(5,4,5,1)) # extra room for plot title
+#   plot(x = obs_hbf_tab$water_year, y = obs_hbf_tab$hbf_total,
+#        main = "HB values calculated from observed and \n simulated flow, water years 1991-2025",
+#        xlab = "Water Year", ylab = "HB value (coho smolt-equiv.)",
+#        col = obs_col, type = "o", pch = 19)
+#   points(x = sim_hbf_tab$water_year, y = sim_hbf_tab$hbf_total, col = sim_col, pch = 19)
+#   lines(x = sim_hbf_tab$water_year, y = sim_hbf_tab$hbf_total, col = sim_col)
+#   grid()
+#   abline(h=0, lwd = 1.5, col= "gray")
+# 
+#   summary(obs_hbf_tab$hbf_total - sim_hbf_tab$hbf_total)
+#   # sim overpredicts by a mean of 4.5 coho spf (range of 37 underpredict to 49 over)
+# 
+#   # # Panel 2, cdf fuction
+#   # par(mar = c(5,4,1,1)) # remove space for plot title
+#   # plot(x = (1:nrow(obs_hbf_tab))/nrow(obs_hbf_tab),
+#   #      y = sort(obs_hbf_tab$hbf_total, decreasing = T),
+#   #      xlab = "Exceedance Probability", ylab = "HB value (coho smolt-equiv.)",
+#   #      type = "o", pch = 19, col = obs_col)
+#   # points(x = (1:nrow(sim_hbf_tab))/nrow(obs_hbf_tab),
+#   #        y = sort(sim_hbf_tab$hbf_total, decreasing = T),
+#   #        type = "o", pch = 19, col = sim_col)
+#   # grid()
+#   # abline(h=0, lwd = 1.5, col= "gray")
+#   # legend(x="bottomleft", pch = 19, lty = 1, col = c(obs_col, sim_col),
+#   #        legend = c("Observed Flow", "Simulated Flow"))
 # }
-
-
-parallel_coord_figure = function(scenario_tab, alpha_val = .6){
-  # # Save historical ET mean
-  scen_id = "basecase"
-  # swbm_monthly = get_swbm_budget_table(scenario_id = scen_id)
-  # et_annual = aggregate(swbm_monthly$ET,
-  #                       by = list(swbm_monthly$Water_Year),
-  #                       FUN = sum)
-  # mean_et_basecase = mean(et_annual$x)
-  mean_et_basecase = scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"]
-
-  # Save historical ET hbf
-  fj_flow_bc = get_simulated_fj_outflow(scenario_id = "basecase")
-  hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_bc, weights = metric_weights,
-                                 scen_id = "basecase")
-  mean_hbf_basecase = mean(hbf_tab$hbf_total)
-
-  scenario_tab$hbf_rel = (scenario_tab$HBF_mean-mean_hbf_basecase) / mean_hbf_basecase
-  scenario_tab$et_rel = (scenario_tab$et_mean-mean_et_basecase) / mean_et_basecase
-  scenario_tab$feas_rel = scenario_tab$feas_cat / - 8
-  y_range = range(scenario_tab[,c("hbf_rel","et_rel", "feas_rel")])
-
-  for(i in 1:nrow(scenario_tab)){
-    scen_id = scenario_tab$scenario_id[i]
-
-    if(i==1){ #initialize plot
-      par(mar = c(5,5,5,2))
-      plot(x = c(1,3), y =c(0.5, -1), pch = 0, col = NA,
-           xaxt = "n", ylab = "Objective performance relative to basecase \n (Lower numbers = less favorable)", xlab = "")
-      # axis labels
-      axis(side = 1, at = 1:3, labels = c("HBF", "ET", "Feasibility"))
-      grid()
-    }
-    points(x = 1:3, scenario_tab[i,c("hbf_rel","et_rel", "feas_rel")],
-           type = "o", pch = 19, cex = 1.2, lwd = 2, col = alpha(scenario_tab$color[i], alpha_val))
-    # lines(x = 1:3, scenario_tab[i,c("hbf_rel","et_rel", "feas_rel")],
-    # col = alpha(scenario_tab$color[i], 0.5), lwd = 2)
-  }
-  legend(x = "topright", pch=21, pt.bg = scen_cat_tab$color,
-         pt.cex = 1.5, cex = 0.8,
-         title = "Mgmt. Action Category",# (# of scenarios)",
-         # col = scen_cat_tab$color, pch = 19,
-         legend = scen_cat_tab$category_long)
-}
-
-
+# 
+# 
+# 
+# 
+# # calculate_HBF_and_ET=function(scenario_tab = scenario_tab, weights){
+# #
+# #   scenarios = scenario_tab$scenario_id
+# #
+# #   for(i in 1:length(scenarios)){
+# #     scenario_id = scenarios[i]
+# #     # print(scenario_id)
+# #     # pull results data
+# #     swbm = get_swbm_budget_table(scenario_id = scenario_id)
+# #     fj_flow_scen = get_simulated_fj_outflow(scenario_id = scenario_id)
+# #
+# #     # 1. calculate benefit value distribution
+# #     hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_scen, weights = weights,
+# #                                    scen_id = scenario_id)
+# #
+# #     # clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
+# #     if(scenario_id == "curtail_start_aug15"){
+# #       problem_wy = 2011; wy_selector = hbf_tab$water_year==problem_wy
+# #       wet_tim_prob = 57 # replace with wet season onset from hist_obs
+# #       hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
+# #       sp_tim_prob = 199
+# #       hbf_tab$Wet_BFL_Dur[wy_selector] = sp_tim_prob - wet_tim_prob
+# #       # recalc HBF components
+# #       hbf_tab$comp3[wy_selector] = weights[4] * hbf_tab$Wet_Tim[wy_selector]
+# #       hbf_tab$comp4[wy_selector] = weights[5] * hbf_tab$Wet_BFL_Dur[wy_selector]
+# #       hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
+# #         hbf_tab$comp3 + hbf_tab$comp4 + hbf_tab$comp5
+# #     }
+# #     if(scenario_id == "mar_ilr_flowlims"){
+# #       problem_wy = 2001; wy_selector = hbf_tab$water_year==problem_wy
+# #       wet_tim_prob = 129 # replace with wet season onset from hist_obs
+# #       hbf_tab$Wet_Tim[wy_selector] = wet_tim_prob
+# #       sp_tim_prob = 185
+# #       hbf_tab$Wet_BFL_Dur[hbf_tab$water_year==2001] = sp_tim_prob - wet_tim_prob
+# #       # recalc HBF components
+# #       hbf_tab$comp3[wy_selector] = weights[4] * hbf_tab$Wet_Tim[wy_selector]
+# #       hbf_tab$comp4[wy_selector] = weights[5] * hbf_tab$Wet_BFL_Dur[wy_selector]
+# #       hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1 + hbf_tab$comp2 +
+# #         hbf_tab$comp3 + hbf_tab$comp4 + hbf_tab$comp5
+# #     }
+# #
+# #     # Calculate distribution values and assign to scenario table
+# #     scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total)
+# #     scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total)
+# #
+# #     # 2. calculate ET deviation distribution
+# #     et_annual = aggregate(swbm$ET,
+# #                           by = list(swbm$Water_Year),
+# #                           FUN = sum)
+# #     scenario_tab$et_mean[i]=mean(et_annual$x)
+# #     scenario_tab$et_stdev[i]=sd(et_annual$x)
+# #   }
+# #   return(scenario_tab)
+# # }
+# 
+# 
+# # calculate_HBF_and_ET_dev=function(scenario_tab = scenario_tab, et_hist_mean, weights){
+# #
+# #   scenarios = scenario_tab$scenario_id
+# #
+# #   for(i in 1:length(scenarios)){
+# #     scenario_id = scenarios[i]
+# #     # pull results data
+# #     swbm = get_swbm_budget_table(scenario_id = scenario_id)
+# #     fj_flow_scen = get_simulated_fj_outflow(scenario_id = scenario_id)
+# #
+# #     # 1. calculate benefit value distribution
+# #     hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_scen, weights = weights,
+# #                                    scen_id = scenario_id)
+# #
+# #     # Calculate distribution values and assign to scenario table
+# #     scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total)
+# #     scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total)
+# #
+# #     # 2. calculate ET deviation distribution
+# #     et_annual = aggregate(swbm$ET,
+# #                           by = list(swbm$Water_Year),
+# #                           FUN = sum)
+# #     et_dev_dist = (et_annual$x / et_hist_mean) - 1
+# #     scenario_tab$et_dev_mean[i]=mean(et_dev_dist)
+# #     scenario_tab$et_dev_stdev[i]=sd(et_dev_dist)
+# #   }
+# #   return(scenario_tab)
+# # }
+# 
+# 
+# parallel_coord_figure = function(scenario_tab, alpha_val = .6){
+#   # # Save historical ET mean
+#   scen_id = "basecase"
+#   # swbm_monthly = get_swbm_budget_table(scenario_id = scen_id)
+#   # et_annual = aggregate(swbm_monthly$ET,
+#   #                       by = list(swbm_monthly$Water_Year),
+#   #                       FUN = sum)
+#   # mean_et_basecase = mean(et_annual$x)
+#   mean_et_basecase = scenario_tab$et_mean[scenario_tab$scenario_id=="basecase"]
+# 
+#   # Save historical ET hbf
+#   fj_flow_bc = get_simulated_fj_outflow(scenario_id = "basecase")
+#   hbf_tab = calc_hbf_tab_feb2022(flow_tab_for_hbf = fj_flow_bc, weights = metric_weights,
+#                                  scen_id = "basecase")
+#   mean_hbf_basecase = mean(hbf_tab$hbf_total)
+# 
+#   scenario_tab$hbf_rel = (scenario_tab$HBF_mean-mean_hbf_basecase) / mean_hbf_basecase
+#   scenario_tab$et_rel = (scenario_tab$et_mean-mean_et_basecase) / mean_et_basecase
+#   scenario_tab$feas_rel = scenario_tab$feas_cat / - 8
+#   y_range = range(scenario_tab[,c("hbf_rel","et_rel", "feas_rel")])
+# 
+#   for(i in 1:nrow(scenario_tab)){
+#     scen_id = scenario_tab$scenario_id[i]
+# 
+#     if(i==1){ #initialize plot
+#       par(mar = c(5,5,5,2))
+#       plot(x = c(1,3), y =c(0.5, -1), pch = 0, col = NA,
+#            xaxt = "n", ylab = "Objective performance relative to basecase \n (Lower numbers = less favorable)", xlab = "")
+#       # axis labels
+#       axis(side = 1, at = 1:3, labels = c("HBF", "ET", "Feasibility"))
+#       grid()
+#     }
+#     points(x = 1:3, scenario_tab[i,c("hbf_rel","et_rel", "feas_rel")],
+#            type = "o", pch = 19, cex = 1.2, lwd = 2, col = alpha(scenario_tab$color[i], alpha_val))
+#     # lines(x = 1:3, scenario_tab[i,c("hbf_rel","et_rel", "feas_rel")],
+#     # col = alpha(scenario_tab$color[i], 0.5), lwd = 2)
+#   }
+#   legend(x = "topright", pch=21, pt.bg = scen_cat_tab$color,
+#          pt.cex = 1.5, cex = 0.8,
+#          title = "Mgmt. Action Category",# (# of scenarios)",
+#          # col = scen_cat_tab$color, pch = 19,
+#          legend = scen_cat_tab$category_long)
+# }
+# 
+# 
