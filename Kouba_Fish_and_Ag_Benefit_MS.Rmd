@@ -886,17 +886,26 @@ st_ft
 
 \elandscape
 
+[@SaleEtAlApproach1982]: reservoir op.  relat between bio instream flow needs and more traditional water project objectives. IFN performance objective: index of physical habitat conditions called weighted usable area (WUA) dev. by USFW. Hydraulic  method. "There exists a strong need for developing new methods which are capable of integrating ecological considerations into water resources decision-making"
+[@BartholowWaddleSearch1995]: options: "mgmt that will perform well despite possible states of nature" (over-engineer?) second option, adaptive management (Holling 1978). "For our purposes, variation in the freshwater environment may be broken into four principal factors: water supply, meteorology, spawner density, and spawner location". "The number of chinook migrating to the ocean is a function of the volume of water released (Bartholow and Waddle 1994)". complex population model simulates spawning, growth, mortality, and movement. input variables (spawner abundance and location), streamflow and water temp are weekly avg. Ran the stochastic model 1200 times. Generated an optimum flow regime. Modeled the relat. between flow and millions of outmigrants. "Besides adjusting flow on an annual basis to hydrologic, meteorologic, and biological variability, adaptive management could respond contingently to other event-driven phenomena, such as flushing the stream of built-up sediment."
+[@PaulsenWernstedtCostEffectiveness1995] "used simulation and optimization to minimize costs of many salmon recovery measures"
+[@CardwellEtAlDesigning1996] - Reservoir operation. fish population model. water supply shortage, habitat avail. for fish species during life stages. habitat capacity metric. 
+[@DraperEtAlEconomicEngineering2003]: CA major water supply economic-engineering optimization model (CALVIN?) Can suggest promising approaches for further study. "environmental objectives were omitted from optimization models or modelled as constraints of legally required minimum instream flows to remove them from economic valuation and decision making"
+[@JagerRoseDesigning2003] in Central Valley rivers, winter minimum flows.... Optimal flow regimes are also different for different species-specific environmental objectives, and vary based on water year type (e.g., a recommendation to provide high spring flows in wet years) 
+ [@LabadieOptimal2004]: Water resource optimization methods review
+[@JenkinsEtAlOptimization2004]: Calvin, clearly. Increasing system flexibility (e.g. water transfers and exchanges) These changes reduce the cost of accomodating env. requirements.
+[@WatanabeEtAlEconomics2006]: localized restoration can achieve small temp reductions. big temp reductions make farther-away restoration more important. Maximizing fish production is different than maximizing stream length that achieves temp goals.
+[@JagerSmithSustainable2008] suggest that managers "conduct research to identify which features of flow variation are essential for river health and to quantify these relationships"
 
-Sale et al 1982
-Cardwell et al 1996 - GOT
-Bartholow and Waddle 1995
-Jager and Rose 2003 - GOT
-Jager and Smith 2008 - GOT
-Watanabe et al 2006 - GOT
-Paulsen and Wernstedt 1995 - GOT
+Relevant papers that cited NullLund2012:
 
-
-
+[@HorneEtAlOptimization2016]: review paper. we must improve adoption of optimization models among end users and stakeholders. We should talk to them during model development.
+[@AdamsEtAlEnvironmental2017]
+[@ChenOldenDesigning2017]
+[@KraftEtAlPrioritizing2019]
+[@ZamaniSabziEtAlStrategic2019]
+[@FarzanehEtAlStochastic2021] "We quantify tradeoffs between human and environmental water needs and identify water sustainability strategies that are resilient to stochastic drought events" Red River south-central US. "Mathematical model for selecting the best water conservation policy." Harsher trade-offs between society and ecological objectives when you want higher reliability. (didn't work with stakeholders per se.)
+[@SanzEtAlProposal2025] Test e-flow regime. hydraulic modeling and habitat suitability. Tagus river in spain. 
 
 
 <!-- ## 4.2 Agricultural-environmental trade-off efficiency -->
