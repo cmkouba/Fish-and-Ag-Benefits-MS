@@ -1,0 +1,14 @@
+---
+title: "Multi-objective assessment of a stakeholder-defined portfolio of groundwater and stream management actions in an agricultural basin"
+author: "Claire Kouba"
+date: "2025-11-12"
+output: 
+  bookdown::word_document2:
+    fig_caption: yes
+    number_sections: true
+    global_numbering: true
+bibliography: library.bib
+
+---
+
+

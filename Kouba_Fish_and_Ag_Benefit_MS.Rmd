@@ -1,7 +1,7 @@
 ---
-title: "Multi-objective assessment of a stakeholder-defined portfolio of groundwater and stream management actions in an agricultural basin"
+title: "Multi-objective assessment of stakeholder-defined portfolio of management options clarifies trade-offs in an active local water planning process"
 author: "Claire Kouba"
-date: "2025-08-29"
+date: "2025-11-12"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -12,6 +12,7 @@ bibliography: library.bib
 ---
 
 ```{r setup1, include = FALSE}
+# old title: Multi-objective assessment of a stakeholder-defined portfolio of groundwater and stream management actions in an agricultural basin
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -106,30 +107,64 @@ save_landuse_figure = F
 
 In rural areas of western North America, agricultural and environmental water needs often come into conflict, and robust management of water resources may require predicting the hydrologic response of complex interconnected surface and groundwater systems to various management actions. Increasingly, to support policy choices, managers in California rely on analyses using hydrologic models, but in many cases these models can provide confusing or overwhelming amounts of information. In this study, we address these challenges for a case study jurisdiction in northern California, which is in the process of implementing a long-term Groundwater Sustainability Plan (GSP). We developed a summary statistic or proxy for each of the three primary policy considerations in the GSP (environmental, agricultural, and project cost). We then used them to summarize the results of **40** management scenarios developed for the GSP in Scott Valley in Northern California, which were simulated using an existing integrated surface- and groundwater model. 
 
-We found that a trade-off in benefits for fish and farms was evident in every category of infrastructure investment (a proxy for project cost), though greater infrastructure investment can achieve some reductions in this trade-off. Additionally, although the GSP management priorities emphasized infrastructure investments, **both infrastructure-based and regulatory approaches fell within the Pareto-optimal set of management options under a strict application of these objective functions**. Finally, regarding regulatory actions, **management interventions targeted at low-flow periods produced a more efficient gain in environmental flow value per cost in agricultural productivity**. 
-
-**revise conclusion statement?** The development of basin-specific objective functions, especially ones using output from existing hydrologic models, could help quantify management decision trade-offs and improve stakeholder communication in ongoing water planning efforts throughout the region.
+We found that a trade-off in benefits for fish and farms was evident in every category of infrastructure investment (a proxy for project cost), though greater infrastructure investment can achieve some reductions in this trade-off. Additionally, although the GSP management priorities emphasized infrastructure investments, both infrastructure-based and regulatory approaches fell within the Pareto-optimal set of management options under a strict application of these objective functions. Finally, regarding regulatory actions, management interventions targeted at low-flow periods produced a more efficient gain in environmental flow value per cost in agricultural productivity. This work demonstrates that developing basin-specific, stakeholder-informed objective functions, especially ones using output from existing hydrologic models, can help clarify trade-offs in ongoing local water planning efforts **and summarize a rich landscape of many choices.** *fix last sentence*
 
 
+<!-- # LIT REVIEW -->
 
-**to do:** add citations from [@NullLundFISH2012]
+<!-- * [@SaleEtAlApproach1982]: reservoir op.  relat between bio instream flow needs and more traditional water project objectives. IFN performance objective: index of physical habitat conditions called weighted usable area (WUA) dev. by USFW. Hydraulic  method. "There exists a strong need for developing new methods which are capable of integrating ecological considerations into water resources decision-making" -->
+<!-- * [@BartholowWaddleSearch1995]: options: "mgmt that will perform well despite possible states of nature" (over-engineer?) second option, adaptive management (Holling 1978). "For our purposes, variation in the freshwater environment may be broken into four principal factors: water supply, meteorology, spawner density, and spawner location". "The number of chinook migrating to the ocean is a function of the volume of water released (Bartholow and Waddle 1994)". complex population model simulates spawning, growth, mortality, and movement. input variables (spawner abundance and location), streamflow and water temp are weekly avg. Ran the stochastic model 1200 times. Generated an optimum flow regime. Modeled the relat. between flow and millions of outmigrants. "Besides adjusting flow on an annual basis to hydrologic, meteorologic, and biological variability, adaptive management could respond contingently to other event-driven phenomena, such as flushing the stream of built-up sediment." -->
+<!-- * [@PaulsenWernstedtCostEffectiveness1995] "used simulation and optimization to minimize costs of many salmon recovery measures" -->
+<!-- * [@CardwellEtAlDesigning1996] - Reservoir operation. fish population model. water supply shortage, habitat avail. for fish species during life stages. habitat capacity metric.  -->
+<!-- * [@DraperEtAlEconomicEngineering2003]: CA major water supply economic-engineering optimization model (CALVIN?) Can suggest promising approaches for further study. "environmental objectives were omitted from optimization models or modelled as constraints of legally required minimum instream flows to remove them from economic valuation and decision making" -->
+<!-- * [@JagerRoseDesigning2003] in Central Valley rivers, winter minimum flows.... Optimal flow regimes are also different for different species-specific environmental objectives, and vary based on water year type (e.g., a recommendation to provide high spring flows in wet years)  -->
+<!-- * [@LabadieOptimal2004]: Water resource optimization methods review -->
+<!-- * [@JenkinsEtAlOptimization2004]: Calvin, clearly. Increasing system flexibility (e.g. water transfers and exchanges) These changes reduce the cost of accomodating env. requirements. -->
+<!-- * [@WatanabeEtAlEconomics2006]: localized restoration can achieve small temp reductions. big temp reductions make farther-away restoration more important. Maximizing fish production is different than maximizing stream length that achieves temp goals. -->
+<!-- * [@JagerSmithSustainable2008] suggest that managers "conduct research to identify which features of flow variation are essential for river health and to quantify these relationships" -->
 
+<!-- Relevant papers that cited NullLund2012: -->
 
+<!-- * [@HorneEtAlOptimization2016]: review paper. we must improve adoption of optimization models among end users and stakeholders. We should talk to them during model development. -->
+<!-- * [@AdamsEtAlEnvironmental2017] - Key finding: "Killing some fish early to preserve water in storage for later use effectively ‘‘hedges bets’’ for the worst-case low hydrologic conditions and can help to avoid later and larger fish kills."  -->
 
+<!-- KEY SUMMARY: "Separate release targets for downstream ecological needs [Arthington, 2012] are generally based on: (a) habitat extent and suitability [Sale et al., 1982], (b) downstream modeled fish populations [Cardwell et al., 1996; Cioffi and Gallerano, 2012; Jager et al., 1997; Jager and Rose, 2003; Null and Lund, 2011], and/or (c) environmental goals based on specified hydraulic, hydrologic, water quality or political metrics [Tharme, 2003]" -->
+
+<!-- "we define the benefit function to be the seasonal flow requirements of each life history stage of one keystone species of fish" but they didn't define the benefit function! "up to the experts" -->
+
+<!-- "the dam operator is responsible for two cohorts over all hydrologic conditions: one developing cohort (e.g., salmon that survive growing from eggs laid to smolts migrating to the ocean; (cohort A) and a second cohort of adults returning after several years at sea to spawn (cohort B)." -->
+
+<!-- In their example, "The hydrologic needs of the fall-run Chinook track the natural hydrograph" -->
+<!-- Trade-off between expected final storage and fish survival (diff for 2 cohorts) -->
+
+<!-- System performance was assessed  -->
+
+<!-- * [@BayazitUnalEffects1990] - rel, res, and mean and max deficit. Standard Operating Policy is best for rel. and res, and fine for deficits. Hedging improves mean deficit performance. Hedging can mean forsaking some reliability. -->
+<!-- * [@YangCaiReservoir2011] (multiobjective framework) - "minimizes flood damage ... and maximizes fish diversity". Adding eco objective "can improve downstream fish habitat without jeopardizing its original flood control objective" -->
+<!-- * [@ChenOldenDesigning2017] - relate hydro regimes and fish species abundance (native and nonnative). Multi-objective optimization. Balanced human water needs with helping native fish and killing nonnative. Many opportunities to advance all objectives - better than achieved by natural flow mimicry. "designer flows can offer multiple ecological and societal benefits in human-altered river" -->
+<!-- * [@KraftEtAlPrioritizing2019] - two objectives. prioritize dam removal by 1) maximize connected aquatic habitat and 2) minimize water scarcity.  -->
+<!-- * [@ZamaniSabziEtAlStrategic2019] - studying water conservation incentives in the Red River. spatial palnning framework. "First, even optimal allocation of water across the network cannot simultaneously meet societal and environmental flow targets given current water availability and societal usage. Second, modest reductions in societal water usage (e.g., 1–3%) can significantly reduce water conflicts in the basin, but only when these water conservation actions are strategically allocated in time and space. Third, however, substantial reduction in societal water usage (> 21%) is needed to fully satisfy societal and environmental flow goals."  -->
+<!-- * [@FarzanehEtAlStochastic2021] "We quantify tradeoffs between human and environmental water needs and identify water sustainability strategies that are resilient to stochastic drought events" Red River south-central US. "Mathematical model for selecting the best water conservation policy." Harsher trade-offs between society and ecological objectives when you want higher reliability. (didn't work with stakeholders per se.) -->
+<!-- * [@SanzEtAlProposal2025] Test e-flow regime. hydraulic modeling and habitat suitability. Tagus river in spain.  -->
+
+<!-- [@BorkHirokawaTrends2021] - calls for more research into adaptive management and ecosystem services trade-offs. Better coordinate scientific research and knowledge needs of local gov -->
+<!-- [@NordgrenEtAlSupporting2016] - "Local governments are on the front line of efforts to address climate-related impacts" "Findings demonstrate that existing services and resources are meeting the early phases of local adaptation efforts such as conducting vulnerability assessments and creating adaptation plans, but are failing to meet the needs associated with implementing, monitoring, and evaluating adaptation activities". streamline resource access.  -->
 
 \newpage
 
 # Introduction
 
-Sustainable development of water resources, in an era of climate change and increasing human water consumption [e.g., @Williams2020; @Rodell2018], requires an interdisciplinary understanding of connected socio-hydrologic systems [@Reuss1992; @DiBaldassarre2019]. One such interdisciplinary approach is water resources systems analysis (WRSA), which involves applying optimization methods to water resource planning [@Maass1962; @Cohon1975; @Brown2015]. The utility of such studies typically depends on robust definitions of the "objective function(s)", which summarize and quantify the desired outcome(s) of the proposed project or management scenario [@Gorelick1983]. In practice, classical WRSA approaches have been criticized as being too removed from stakeholder concerns [e.g., @Rogers1986a]. In this study, we take advantage of the authors' involvement in an existing water resource planning process, and a previously-developed integrated surface- and groundwater model, to test the utility of introducing elements of multi-objective optimization into the prioritization of groundwater management alternatives.
+**no reservoir**
+
+Climate adaptation in the water sector, in its many facets - such as securing our water and food supply, updating our infrastructure to reduce flood and drought risk, and preserving ecosystem function - will by and large be implemented at the local level (**CITE**). Local water managers operate in a complex regulatory landscape and serve diverse stakeholders, and typically have unmet knowledge needs [@BorkHirokawaTrends2021; @NordgrenEtAlSupporting2016].  **Local gw mgmt is good [@vanSteenberger]. Local resource mgmt districts are understudied and should be the focus of more work to improve research into "wicked" water challenges [@Freeman20007]. ** In this study, we take advantage of the authors' familiarity with an existing water resource planning process, and a previously-developed integrated surface- and groundwater model, to test the utility of introducing elements of multi-objective optimization into the prioritization of groundwater management alternatives.
+
+<!-- Even a dedicated case study can be useless unless designed in discussion with stakeholder priorities. -->
+<!-- Sustainable development of water resources, in an era of climate change and increasing human water consumption [e.g., @Williams2020; @Rodell2018], requires an interdisciplinary understanding of connected socio-hydrologic systems [@Reuss1992; @DiBaldassarre2019]. One such interdisciplinary approach is water resources systems analysis (WRSA), which involves applying optimization methods to water resource planning [@Maass1962; @Cohon1975; @Brown2015]. The utility of such studies typically depends on robust definitions of the "objective function(s)", which summarize and quantify the desired outcome(s) of the proposed project or management scenario [@Gorelick1983]. In practice, classical WRSA approaches have been criticized as being too removed from stakeholder concerns [e.g., @Rogers1986a].  -->
 
 In our study area, the intermontane rural Scott Valley in northern California (Figure \@ref(fig:scottLanduseMap)), the local government and public stakeholders spent three years (2018-2021) developing a plan for the long-term use of groundwater (a Groundwater Sustainability Plan or GSP). In that process, they evaluated dozens of potential water management scenarios [Siskiyou County -@SiskiyouCounty2021]. In public meetings, different objectives were often championed by individual stakeholders or interest groups. An integrated hydrologic model, the Scott Valley Integrated Hydrologic Model, or SVIHM [@Tolley2019], was available to support this policy-making process. The numerical streamflow results of simulated management scenarios drove decision-making, but discussions on the balancing of multiple objectives were typically qualitative. In effect, the optimization framework used to arrive at the ultimate list of management priorities was implicit, and the conceptual weight given to different objectives varied between stakeholders. 
-
 Differences between stakeholders in what is considered an acceptable trade-off are common in policy decisions [@Monarchi1973]. Consequently, multi-objective optimization studies commonly avoid proposing a single optimal solution; instead they identify a Pareto-optimal or non-inferior set of options, which can clarify the unavoidable trade-offs in the performance of various system objectives [e.g., @Cohon1973]. Methods for finding the non-inferior set often involve uniform or randomized initial sampling of the decision space [e.g., @Monarchi1973; @Yeh1982; @Kapelan2005]. In the case of the Scott Valley GSP, the management actions considered by stakeholders covered a wide range of decision variables (e.g., land use changes in a variety of spatial configurations, technology and/or infrastructure investment, and regulatory interventions on a range of growing season dates). Because a full randomized sampling of this decision space would be computationally prohibitive, this study instead focused on a set of simulated management scenarios that were effectively pre-screened by stakeholders for feasibility in the landscape of existing land uses and political dynamics. 
 
-To investigate whether an explicit optimization framework would yield different prioritization of management actions than the set agreed upon in public meetings, we developed numerical representations of three objectives: 1) maximizing specific environmental flows, 2) minimizing reduction in agricultural water supplies, and 3) minimizing new infrastructure costs. With these, we quantitatively summarized the management benefits and trade-offs within the existing suite of several dozen stakeholder-proposed management scenarios.
-
-**Possibly reframe as hypothesis or research question**
+In this study we developed numerical representations of three objectives: 1) maximizing specific environmental flows, 2) minimizing reduction in agricultural water supplies, and 3) minimizing new infrastructure costs. With these, we quantitatively summarized the management benefits and trade-offs within the existing suite of several dozen stakeholder-proposed management scenarios. Our hypothesis: that an explicit objective function framework would yield different prioritization of management actions than the set agreed upon in public meetings, as recorded in the 2021 GSP. This work could help frame ongoing water planning efforts in Scott Valley, and constitutes an approach for supporting locally-driven water planning efforts in California and elsewhere. 
 
 **TO DO: MOVE city labels on map in fig 1**
 
@@ -886,27 +921,6 @@ st_ft
 
 \elandscape
 
-[@SaleEtAlApproach1982]: reservoir op.  relat between bio instream flow needs and more traditional water project objectives. IFN performance objective: index of physical habitat conditions called weighted usable area (WUA) dev. by USFW. Hydraulic  method. "There exists a strong need for developing new methods which are capable of integrating ecological considerations into water resources decision-making"
-[@BartholowWaddleSearch1995]: options: "mgmt that will perform well despite possible states of nature" (over-engineer?) second option, adaptive management (Holling 1978). "For our purposes, variation in the freshwater environment may be broken into four principal factors: water supply, meteorology, spawner density, and spawner location". "The number of chinook migrating to the ocean is a function of the volume of water released (Bartholow and Waddle 1994)". complex population model simulates spawning, growth, mortality, and movement. input variables (spawner abundance and location), streamflow and water temp are weekly avg. Ran the stochastic model 1200 times. Generated an optimum flow regime. Modeled the relat. between flow and millions of outmigrants. "Besides adjusting flow on an annual basis to hydrologic, meteorologic, and biological variability, adaptive management could respond contingently to other event-driven phenomena, such as flushing the stream of built-up sediment."
-[@PaulsenWernstedtCostEffectiveness1995] "used simulation and optimization to minimize costs of many salmon recovery measures"
-[@CardwellEtAlDesigning1996] - Reservoir operation. fish population model. water supply shortage, habitat avail. for fish species during life stages. habitat capacity metric. 
-[@DraperEtAlEconomicEngineering2003]: CA major water supply economic-engineering optimization model (CALVIN?) Can suggest promising approaches for further study. "environmental objectives were omitted from optimization models or modelled as constraints of legally required minimum instream flows to remove them from economic valuation and decision making"
-[@JagerRoseDesigning2003] in Central Valley rivers, winter minimum flows.... Optimal flow regimes are also different for different species-specific environmental objectives, and vary based on water year type (e.g., a recommendation to provide high spring flows in wet years) 
- [@LabadieOptimal2004]: Water resource optimization methods review
-[@JenkinsEtAlOptimization2004]: Calvin, clearly. Increasing system flexibility (e.g. water transfers and exchanges) These changes reduce the cost of accomodating env. requirements.
-[@WatanabeEtAlEconomics2006]: localized restoration can achieve small temp reductions. big temp reductions make farther-away restoration more important. Maximizing fish production is different than maximizing stream length that achieves temp goals.
-[@JagerSmithSustainable2008] suggest that managers "conduct research to identify which features of flow variation are essential for river health and to quantify these relationships"
-
-Relevant papers that cited NullLund2012:
-
-[@HorneEtAlOptimization2016]: review paper. we must improve adoption of optimization models among end users and stakeholders. We should talk to them during model development.
-[@AdamsEtAlEnvironmental2017]
-[@ChenOldenDesigning2017]
-[@KraftEtAlPrioritizing2019]
-[@ZamaniSabziEtAlStrategic2019]
-[@FarzanehEtAlStochastic2021] "We quantify tradeoffs between human and environmental water needs and identify water sustainability strategies that are resilient to stochastic drought events" Red River south-central US. "Mathematical model for selecting the best water conservation policy." Harsher trade-offs between society and ecological objectives when you want higher reliability. (didn't work with stakeholders per se.)
-[@SanzEtAlProposal2025] Test e-flow regime. hydraulic modeling and habitat suitability. Tagus river in spain. 
-
 
 <!-- ## 4.2 Agricultural-environmental trade-off efficiency -->
 ### Agricultural-environmental trade-off efficiency
@@ -967,11 +981,20 @@ For all other scenarios, trade-off efficiencies ranged from `r ef_min` to `r ef_
 Four scenario categories form a "low-efficiency" cluster, with all-years efficiencies of less than 1: Crop Change, Curtailment, and the two Natural Vegetation categories (Figure \@ref(fig:efficiency)). These scenarios can produce substantial HB gains (ranging from `r hb_gain_range_low_eff[1]` to `r hb_gain_range_low_eff[2]`) coho spf-equiv., but result in severe agricultural productivity reductions  (`r et_cost_range_low_eff_percent[1]`% to `r et_cost_range_low_eff_percent[2]`%). The "high-efficiency" scenarios, which have an all-years trade-off efficiency greater than 1 (the Enhanced Recharge, Low Flow Diversion Limits, Irrigation Efficiency and Alfalfa Irrigation scenarios), tend to be associated with a small ET cost relative to basecase (`r et_cost_range_high_eff[1]` to `r et_cost_range_high_eff[2]` million m^3^, or `r et_cost_range_high_eff_percent[1]` to `r et_cost_range_high_eff_percent[2]` percent of basecase crop ET).
 
 
-```{r efficiency, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average HB value gained per crop ET value lost (normalized to average basecase HB and ET values, respectively), in all 28 years (x-axis) and in six low-coho years (y-axis; i.e., the six years with basecase predicted HB values of less than 45 coho spf-equiv.). Basecase, Reservoir scenarios and one Enhanced Recharge scenario (MAR) are not included as they have on average no or negative ET loss." , fig.height = 6, warning=F}
+```{r efficiency, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average HB value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Basecase, Reservoir scenarios and Enhanced Recharge scenarios are not included as they have on average no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
 
 
 
-tradeoff_efficiency_fig_nov2025(scenario_tab = scenario_tab)
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 8, height = 6, units = "in", res = 300)
+  tradeoff_efficiency_fig_nov2025(scenario_tab = scenario_tab)
+  dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+
 
 
 ```
