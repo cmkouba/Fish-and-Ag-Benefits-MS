@@ -154,19 +154,16 @@ We found that a trade-off in benefits for fish and farms was evident in every ca
 
 # Introduction
 
-**no reservoir**
-
-Climate adaptation in the water sector, in its many facets - such as securing our water and food supply, updating our infrastructure to reduce flood and drought risk, and preserving ecosystem function - will by and large be implemented at the local level (**CITE**). Local water managers operate in a complex regulatory landscape and serve diverse stakeholders, and typically have unmet knowledge needs [@BorkHirokawaTrends2021; @NordgrenEtAlSupporting2016].  **Local gw mgmt is good [@vanSteenberger]. Local resource mgmt districts are understudied and should be the focus of more work to improve research into "wicked" water challenges [@Freeman20007]. ** In this study, we take advantage of the authors' familiarity with an existing water resource planning process, and a previously-developed integrated surface- and groundwater model, to test the utility of introducing elements of multi-objective optimization into the prioritization of groundwater management alternatives.
+Climate adaptation in the water sector, in its many facets - such as securing our water and food supply, updating infrastructure to reduce flood and drought risk, and preserving ecosystem function - is best implemented at the local level [e.g., @VanSteenbergenPromoting2006]. However, local water managers face a complex regulatory landscape and serve diverse stakeholders, and typically have unmet knowledge needs [@BorkHirokawaTrends2021; @NordgrenEtAlSupporting2016]. While academic hydrologists have the tools to fill such knowledge gaps, in many cases they avoid engaging with specific local water organizations, which can reduce the utility of the resulting research [@FreemanWICKED2000]. In this study, we take advantage of the authors' involvement with an existing water resource planning process, and a previously-developed integrated surface- and groundwater model, to test the utility of introducing quantitative objective functions into the prioritization of groundwater management alternatives.
 
 <!-- Even a dedicated case study can be useless unless designed in discussion with stakeholder priorities. -->
 <!-- Sustainable development of water resources, in an era of climate change and increasing human water consumption [e.g., @Williams2020; @Rodell2018], requires an interdisciplinary understanding of connected socio-hydrologic systems [@Reuss1992; @DiBaldassarre2019]. One such interdisciplinary approach is water resources systems analysis (WRSA), which involves applying optimization methods to water resource planning [@Maass1962; @Cohon1975; @Brown2015]. The utility of such studies typically depends on robust definitions of the "objective function(s)", which summarize and quantify the desired outcome(s) of the proposed project or management scenario [@Gorelick1983]. In practice, classical WRSA approaches have been criticized as being too removed from stakeholder concerns [e.g., @Rogers1986a].  -->
 
-In our study area, the intermontane rural Scott Valley in northern California (Figure \@ref(fig:scottLanduseMap)), the local government and public stakeholders spent three years (2018-2021) developing a plan for the long-term use of groundwater (a Groundwater Sustainability Plan or GSP). In that process, they evaluated dozens of potential water management scenarios [Siskiyou County -@SiskiyouCounty2021]. In public meetings, different objectives were often championed by individual stakeholders or interest groups. An integrated hydrologic model, the Scott Valley Integrated Hydrologic Model, or SVIHM [@Tolley2019], was available to support this policy-making process. The numerical streamflow results of simulated management scenarios drove decision-making, but discussions on the balancing of multiple objectives were typically qualitative. In effect, the optimization framework used to arrive at the ultimate list of management priorities was implicit, and the conceptual weight given to different objectives varied between stakeholders. 
+In our study area, the intermontane rural Scott Valley in northern California (Figure \@ref(fig:scottLanduseMap)), the local government and public stakeholders spent three years (2018-2021) developing a plan for the long-term use of groundwater (a Groundwater Sustainability Plan or GSP). In that process, they evaluated dozens of potential water management scenarios [Siskiyou County -@SiskiyouCounty2021]. In public meetings, different objectives were often championed by individual stakeholders or interest groups. An integrated hydrologic model, the Scott Valley Integrated Hydrologic Model, or SVIHM [@Tolley2019], was available to support this policy-making process. The numerical streamflow results of simulated management scenarios drove decision-making, but discussions on the balancing of multiple objectives were typically qualitative. In effect, the optimization framework used to arrive at the ultimate list of management priorities was implicit, and the conceptual weight given to different objectives varied between stakeholders.
+
 Differences between stakeholders in what is considered an acceptable trade-off are common in policy decisions [@Monarchi1973]. Consequently, multi-objective optimization studies commonly avoid proposing a single optimal solution; instead they identify a Pareto-optimal or non-inferior set of options, which can clarify the unavoidable trade-offs in the performance of various system objectives [e.g., @Cohon1973]. Methods for finding the non-inferior set often involve uniform or randomized initial sampling of the decision space [e.g., @Monarchi1973; @Yeh1982; @Kapelan2005]. In the case of the Scott Valley GSP, the management actions considered by stakeholders covered a wide range of decision variables (e.g., land use changes in a variety of spatial configurations, technology and/or infrastructure investment, and regulatory interventions on a range of growing season dates). Because a full randomized sampling of this decision space would be computationally prohibitive, this study instead focused on a set of simulated management scenarios that were effectively pre-screened by stakeholders for feasibility in the landscape of existing land uses and political dynamics. 
 
-In this study we developed numerical representations of three objectives: 1) maximizing specific environmental flows, 2) minimizing reduction in agricultural water supplies, and 3) minimizing new infrastructure costs. With these, we quantitatively summarized the management benefits and trade-offs within the existing suite of several dozen stakeholder-proposed management scenarios. Our hypothesis: that an explicit objective function framework would yield different prioritization of management actions than the set agreed upon in public meetings, as recorded in the 2021 GSP. This work could help frame ongoing water planning efforts in Scott Valley, and constitutes an approach for supporting locally-driven water planning efforts in California and elsewhere. 
-
-**TO DO: MOVE city labels on map in fig 1**
+In this study we developed numerical representations of three objectives: 1) maximizing specific environmental flows, 2) minimizing reduction in agricultural water supplies, and 3) minimizing new infrastructure costs. With these, we quantitatively summarized the management benefits and trade-offs within the existing suite of several dozen stakeholder-proposed management scenarios. Our hypothesis was that an explicit objective function framework would yield different prioritization of management actions than the set agreed upon in public meetings, as recorded in the 2021 GSP. This work could help frame ongoing water planning efforts in Scott Valley, and constitutes an approach for supporting locally-driven water planning efforts in California and elsewhere. **possibly remove final sentence**
 
 ```{r scottLanduseMap, echo = FALSE, fig.cap = "The Scott River flows south to north through Scott Valley before flowing through a canyon and joining the Klamath River. Land uses in the cultivated areas of the Scott River watershed are shown (adapted from the 2016 DWR Land Use Survey), as well as the location of several communities and the Fort Jones streamflow gauge (USGS Station ID 11519500). \\label{fig:scottLanduseMap}" , fig.height = 8.5, warning = F}
 
@@ -186,20 +183,14 @@ knitr::include_graphics(lu_graphic_filename)
 
 # Case study and summary of GSP development
 
-**must shorten. possibly move to supplement**
-
 ## Hydrography and climate
 
-The Scott River drains a 2,109 km^2^ (814 square mile) intermontane watershed known as Scott Valley, surrounded by several mountain ranges, including the Scott Bar, Marble, Salmon and Scott Mountains to the north, west, southwest, and south, respectively. The valley floor overlies unconsolidated alluvial sediments of up to 79 m (260 ft) thickness [SWRCB -@SWRCB1975]. The sediments form a mostly unconfined aquifer system bordered by low permeable, fractured underlying and adjacent bedrock composed of mostly Paleozoic metasedimentary formations [@Mack1958].
-
-The Scott River begins near the community of Callahan, where the East and South Forks of the Scott River converge, and flows north through the agricultural and residential areas of Scott Valley (Figure \@ref(fig:scottLanduseMap)). Then, 58.0 km (36.0 mi) downstream of Callahan, it passes a key stream gauge (USGS Station ID 11519500, or the Fort Jones Gauge or FJ Gauge) and enters more rugged terrain, flowing 34.7 km (21.6 mi) through a steep canyon until it meets the Klamath River. Because practically all water use in Scott Valley occurs upgradient of the FJ Gauge, it is used to assess hydrologic conditions and inform water management decisions in the populated areas of the valley [e.g., Siskiyou County -@SiskiyouCounty2021].
+The Scott River drains a 2,109 km^2^ (814 square mile) intermontane watershed known as Scott Valley. The valley floor overlies unconsolidated alluvial sediments of up to 79 m (260 ft) thickness [SWRCB -@SWRCB1975]. The sediments form a mostly unconfined aquifer system bordered by low permeable, fractured underlying and adjacent bedrock composed of mostly Paleozoic metasedimentary formations [@Mack1958]. A key stream gauge (USGS Station ID 11519500, or the Fort Jones Gauge or FJ Gauge) is used to assess hydrologic conditions and inform water management decisions in the populated areas of the valley [e.g., Siskiyou County -@SiskiyouCounty2021] (Figure \@ref(fig:scottLanduseMap)).
 
 Scott Valley has a Mediterranean precipitation regime with distinctive seasons of cold, wet winters and warm, dry summers (Figure \@ref(fig:precipAndTempFigure)), panels A and B). Melting snowpack in the surrounding mountains generates streamflow from April through July, though onset and duration of snowmelt varies based on the snowpack volume and timing of warm air temperatures. This seasonality in water input creates seasonal flow in the Scott River and tributary streams, which experience a pronounced wet season and dry season with high and low flows, respectively (Figure \@ref(fig:precipAndTempFigure), panel C).
 
 Streams and groundwater are highly interconnected in the Scott River watershed. Tributary streams and the Scott River are a source of recharge to the aquifer, and groundwater discharge sustains streamflow in some areas, especially during the dry season of August-October or November. In the past two decades, in most dry-to-average type water years, the water table elevation has fallen below the stream bed and reaches of the Scott River have gone dry [@Tolley2019].
 
-
-**TO DO: ADD 2ND y axes with degrees F and inches on fig 2**
 
 ```{r precipAndTempFigure, echo=FALSE, fig.cap="\\label{fig:precipAndTempFigure} Summary of temperature (Panel A), rainfall and reference evapotranspiration (Panel B), and daily streamflow values (Panel C) in Scott Valley. For precipitation, regression relationships between the Callahan and Fort Jones weather station records and the records of NOAA stations in Greenview, Etna, and Yreka (USC00042899, USC00043614, USC00049866, and US1CASK0005) were used to predict missing values (i.e., fill gaps) in the Callahan and Fort Jones records; the daily mean of the two stations was used as the final precipitation record for purposes of this figure and the SVIHM precipitation input." , fig.height=8.4, fig.width=7, warning=F}
 
@@ -217,11 +208,29 @@ fig_i = fig_i +1
 
 ```
 
-## Human population, land use, and local economy
+## Land and water uses
 
-The population of Scott Valley is approximately 5,200, based on area-weighted block-level 2020 census data, including the populations of the two incorporated towns of Etna and Fort Jones [population 678 and 695, respectively; @USCensus2021]. About two thirds of the land within the Scott River watershed is under private ownership with the remaining area managed by the Quartz Valley Indian Reservation, the United States (U.S.) Department of the Interior Bureau of Land Management (BLM) and U.S. Forest Service (USFS) [@Harter2008]. Much of the upper mountainous area of the watershed is part of the Klamath National Forest. On the valley floor, according to land use surveys conducted by DWR [DWR -@DWR2017], half of the area overlying the alluvial aquifer is covered by agriculture, with most of that split approximately evenly between pasture and an alfalfa/grain rotation (Figure \@ref(fig:scottLanduseMap); Table \@ref(tab:scottLanduseTable)).
+<!-- The population of Scott Valley is approximately 5,200, based on area-weighted block-level 2020 census data, including the populations of the two incorporated towns of Etna and Fort Jones [population 678 and 695, respectively; @USCensus2021].  -->
 
-Fort Jones and Etna are categorized as severely economically disadvantaged (defined as communities with an annual median household income [MHI] of less than 60% of the average annual MHI in California). Based on the 2013-2017 American Community Survey Five Year Estimates, the statewide annual MHI is \$67,169, and Fort Jones and Etna both qualify as SDACs with annual MHIs of \$29,662 and \$35,333, respectively [@USCensusBureau2018]. The unincorporated community of Greenview is listed in government databases as a disadvantaged community (defined as an MHI of less than 80% of average state MHI), but no MHI data are available for this community [@DWR2019].
+Because the watershed is undammed, managers and water users influence Scott River flow primarily via diversion of surface waters or pumping of groundwater. Consequently the most powerful tool available to manage Scott River water flow is regulation of land use and thus water demand [Siskiyou County -@SiskiyouCounty2021].
+
+About two thirds of the land within the Scott River watershed is under private ownership with the remaining area managed by the Quartz Valley Indian Reservation, the United States (U.S.) Department of the Interior Bureau of Land Management (BLM) and U.S. Forest Service (USFS) [@Harter2008]. Much of the upper mountainous area of the watershed is part of the Klamath National Forest. On the valley floor, according to land use surveys conducted by DWR [DWR -@DWR2017], half of the area overlying the alluvial aquifer is covered by agriculture, with most of that split approximately evenly between pasture and an alfalfa/grain rotation (Figure \@ref(fig:scottLanduseMap); Table \@ref(tab:scottLanduseTable)).
+
+Historically, local regulation of land use has focused on maintaining the rural and agricultural character of Scott Valley [@SVAP1980]. Regulating land use to improve ecological outcomes entails significant economic, political and social risks, because much of the economic activity in this area is related to agriculture. In addition, Scott River conditions influence fish population dynamics both within the watershed and in the broader Klamath system. 
+<!-- Fort Jones and Etna are categorized as severely economically disadvantaged (defined as communities with an annual median household income [MHI] of less than 60% of the average annual MHI in California). Based on the 2013-2017 American Community Survey Five Year Estimates, the statewide annual MHI is \$67,169, and Fort Jones and Etna both qualify as SDACs with annual MHIs of \$29,662 and \$35,333, respectively [@USCensusBureau2018]. The unincorporated community of Greenview is listed in government databases as a disadvantaged community (defined as an MHI of less than 80% of average state MHI), but no MHI data are available for this community [@DWR2019]. -->
+
+<!-- The health of the Klamath salmon run has implications for commercial fishing, recreational activities, and cultural practices of Native American tribes in the region, including the Quartz Valley Indian Community and the Karuk and Yurok Tribes [@Graham2012]. -->
+
+
+<!-- All of the regulatory and management programs in this region, including recommended instream flows [CDFW -@CDFW2017] and legal rights governing surface water diversion [@SuperiorCourtofSiskiyouCounty1980], are tabulated in units of cubic feet per second (cfs). For consistency, this document will also use primarily cfs units, with metric units in parentheses." -->
+
+<!-- Like many rural watersheds in arid to semi-arid regions, balancing environmental and agricultural water demands is a significant challenge faced by local water managers. Water uses, land management, and the measurement units used in local regulatory documents were discussed in Chapter 1 of this dissertation:  -->
+
+<!-- > "Water in Scott Valley is used for agricultural, domestic, and municipal supply. It also facilitates recreation and provides Native American cultural services, among other designated beneficial uses [NCRWQCB -@NCRWQCB2006b]. -->
+
+
+
+
 
 
 ```{r scottLanduseTable, echo = FALSE, results = 'asis'}
@@ -255,36 +264,27 @@ lu_tab_ft
 ```
 
 
-## Water uses and management objectives
-
-Like many rural watersheds in arid to semi-arid regions, balancing environmental and agricultural water demands is a significant challenge faced by local water managers. Water uses, land management, and the measurement units used in local regulatory documents were discussed in Chapter 1 of this dissertation:
-
-> "Water in Scott Valley is used for agricultural, domestic, and municipal supply. It also facilitates recreation and provides Native American cultural services, among other designated beneficial uses [NCRWQCB -@NCRWQCB2006b]. Because the watershed is undammed, managers and water users influence Scott River flow primarily via diversion of surface waters or pumping of groundwater. Consequently the most powerful tool available to manage Scott River water flow is regulation of land use and thus water demand [Siskiyou County -@SiskiyouCounty2021].
-
-> Historically, local regulation of land use has focused on maintaining the rural and agricultural character of Scott Valley [@SVAP1980]. Regulating land use to improve ecological outcomes would entail significant economic, political and social risks, because much of the economic activity in this area is related to agriculture. The primary crops grown in Scott Valley are alfalfa and pasture for cattle feed [Siskiyou County -@SiskiyouCounty2021]. In addition to local economic impact, Scott River conditions influence fish population dynamics both within the watershed and in the broader Klamath system. The health of the Klamath salmon run has implications for commercial fishing, recreational activities, and cultural practices of Native American tribes in the region, including the Quartz Valley Indian Community and the Karuk and Yurok Tribes [@Graham2012].
-
-> All of the regulatory and management programs in this region, including recommended instream flows [CDFW -@CDFW2017] and legal rights governing surface water diversion [@SuperiorCourtofSiskiyouCounty1980], are tabulated in units of cubic feet per second (cfs). For consistency, this document will also use primarily cfs units, with metric units in parentheses."
 
 ### Environmental stream flows
 
 Sufficient environmental flows at certain times of year are necessary to the survival of vulnerable species in the Scott River watershed. Coho salmon (*Oncorhynchus kisutch*) in Scott Valley belong to the Southern Oregon / Northern California Coast (SONCC) Evolutionarily Significant Unit (ESU), and were listed as threatened under the federal and California Endangered Species Acts (ESAs) in 1997 and 2005, respectively. Statewide coho populations have declined by an estimated >90% since the 1940s [@Brown1994].
 
-To complete their life cycle, coho salmon require several key functional flows in the Scott Valley freshwater stream system, including the following:
+To complete their life cycle, coho salmon require several key functional flows in the Scott Valley freshwater stream system [@KoubaEtAlWatershedSpecific2025], including the following:
 
-* Fall flows, increasing after the dry season in response to early wet season storms, that occur early enough to provide adult fall-run spawners access to preferred spawning reaches
-* Flows providing habitat for rearing juvenile salmon for their ~12-15 months of freshwater residence
-* Sufficient flow in the spring for yearling smolts to emigrate to the ocean
+* Fall flows, increasing after the dry season in response to early wet season storms, that occur early enough to provide adult fall-run spawners access to preferred spawning reaches;
+* Flows providing habitat for rearing juvenile salmon for their ~12-15 months of freshwater residence; and
+* Sufficient flow in the spring for yearling smolts to migrate to the ocean.
 
-Other species may require other functional flows [e.g., cottonwood trees require flood-stage flows to disperse their seeds; @Mahoney1998], but in this work we focus on coho salmon, the most vulnerable species in the watershed. Future work could evaluate the suite of flows needed by a larger set of species in Scott Valley.
+Different functional flows are needed by other fish, such as Chinook [@KoubaEtAlWatershedSpecific2025]; as well other species, such as cottonwood trees, which require flood-stage flows to disperse their seeds [@Mahoney1998]; but in this work we focus on coho salmon as a straightforward examlple in developing an environmental objective function. Alternative objective function formulations are discussed in later sections.
 
 
-### Agricultural water demand
+### Agricultural water demand 
 
-Agricultural water demand in Scott Valley has been simulated for a historical model period of water years 1991-2018 (Oct. 1 of 1990 to Sept. 30 of 2018), using the calibrated Scott Valley Integrated Hydrologic Model [SVIHM; @Harter2008; @Foglia2013a; @Tolley2019]. Water demand for crops and native vegetation (ET in Figure \@ref(fig:avgWaterBudgetFig)) and applied irrigation volumes (diverted surface water and pumped groundwater, noted as SW and GW Irrigation in Figure \@ref(fig:avgWaterBudgetFig)) are highest in the late summer. In dry water years, initial soil moisture levels may be lower, and irrigation demand may be somewhat higher, though annual crop ET and irrigation demand is relatively stable year to year Figure \@ref(fig:annualSWBMBudget)).
+Agricultural water demand in Scott Valley has been simulated for a historical model period of water years 1991-2018 (Oct. 1 of 1990 to Sept. 30 of 2025), using the calibrated Scott Valley Integrated Hydrologic Model [SVIHM; @Harter2008; @Foglia2013a; @Tolley2019]. Water demand for crops and native vegetation (ET in Figure \@ref(fig:avgWaterBudgetFig)) and applied irrigation volumes (diverted surface water and pumped groundwater, noted as SW and GW Irrigation in Figure \@ref(fig:avgWaterBudgetFig)) are highest in the late summer. In dry water years, initial soil moisture levels may be lower, and irrigation demand may be somewhat higher, though annual crop ET and irrigation demand is relatively stable year to year Figure \@ref(fig:annualSWBMBudget)).
 
 In this intermontane valley, the growing season is constrained by hard frosts, and begins in March-April and extends through September-October. Both of the primary crops (alfalfa and pasture) are perennial, and will continue producing through the growing season as long as soil moisture is available. Alfalfa cultivation since the 1970s has commonly involved three to four harvests (referred to as cuttings) per growing season; it is typically irrigated several times and then left to dry before cutting [@Tolley2019].
 
-In the mid-twentieth century, farms and ranches irrigated grain, alfalfa and pasture crops mainly with diverted surface water, which was abundant until mid or late summer, and many utilized flood irrigation. On this schedule two alfalfa cuttings were harvested, with the last irrigation typically occurring in July. Since the 1970s, widespread construction of irrigation wells has effectively extended the irrigation season and allowed alfalfa farmers to harvest three or four cuttings in a growing season. (Additionally, higher-irrigation efficiency technology like wheel-line and center-pivot sprinklers became common, though this does not alter the consumptive demand of the cultivated crops.) Based on historical crop coverage and water demand estimates by Harter and Hines [-@Harter2008], "the amount of water likely used by crops has increased from 1958 to 2000 by between 15 percent (10,000 more acre feet) and 30 percent (20,000 acre feet) depending on the date when surface irrigation [is assumed to have ceased historically], i.e. July 15, Aug 1 or Aug 15."
+<!-- In the mid-twentieth century, farms and ranches irrigated grain, alfalfa and pasture crops mainly with diverted surface water, which was abundant until mid or late summer, and many utilized flood irrigation. On this schedule two alfalfa cuttings were harvested, with the last irrigation typically occurring in July. Since the 1970s, widespread construction of irrigation wells has effectively extended the irrigation season and allowed alfalfa farmers to harvest three or four cuttings in a growing season. (Additionally, higher-irrigation efficiency technology like wheel-line and center-pivot sprinklers became common, though this does not alter the consumptive demand of the cultivated crops.) Based on historical crop coverage and water demand estimates by Harter and Hines [-@Harter2008], "the amount of water likely used by crops has increased from 1958 to 2000 by between 15 percent (10,000 more acre feet) and 30 percent (20,000 acre feet) depending on the date when surface irrigation [is assumed to have ceased historically], i.e. July 15, Aug 1 or Aug 15." -->
 
 The tension between agricultural and ecological water demands is highest at the end of the dry season, when groundwater elevations and surface flows are at their lowest, crop demand remains high, and anadromous fish require access to spawning habitat. The management of these fall flows was a central concern of GSP development in 2018-2021.
 
@@ -363,11 +363,14 @@ The authors of this study simulated dozens of land and water use scenarios to fa
 
 ## Hydrologic model summary
 
-The Scott Valley Integrated Hydrologic Model (SVIHM) is a surface and groundwater model driven by tributary stream inflows, precipitation inputs, and reference evapotranspiration (ET~0~). The boundary of the model domain corresponds approximately to the extent of the alluvial aquifer. For detailed information about the model structure, sensitivity, calibration, uncertainty, and validation of results, see recent work by Tolley et al. [-@Tolley2019]. Like all models, it does not perfectly reproduce observed historical measurements, but it successfully captures key watershed-scale hydrologic phenomena that can be used to evaluate potential outcomes of specific management actions.
+The Scott Valley Integrated Hydrologic Model (SVIHM) [-@Tolley2019] is a surface and groundwater model driven by tributary stream inflows, precipitation inputs, and reference evapotranspiration (ET~0~). Like all models, it does not perfectly reproduce observed historical measurements, but it successfully captures key watershed-scale hydrologic phenomena that can be used to evaluate potential outcomes of specific management actions.
+
+<!-- The boundary of the model domain corresponds approximately to the extent of the alluvial aquifer.  -->
+<!-- For detailed information about the model structure, sensitivity, calibration, uncertainty, and validation of results, see recent work by Tolley et al. .  -->
 
 The SVIHM is composed of three cascading sub-models. First, complete daily records of tributary stream inflow are generated using a statistical streamflow regression model, in which the continuous Fort Jones record was used to predict missing values in the daily flow records of 12 major tributaries [@Foglia2013a]. Second, a custom-built soil water budget model simulated irrigation demand, irrigation applied (surface and groundwater), ET and percolation to aquifer calculated on a field-by-field, daily time step basis. This model simulates individual irrigation applications and assumes the farmer has perfect foresight of daily irrigation demand. Finally, the boundary conditions of stream inflow, aquifer recharge, and groundwater extraction are used to drive an integrated groundwater-surface water model using MODFLOW; stream-aquifer flux and surface flow routing was simulated using the MODFLOW SFR package [@Tolley2019].
 
-For GSP development, SVIHM was used extensively to perform what-if scenarios using the historic climate and land use forcing period, 1991-2018. Scenario simulations repeat the calibrated historical basecase simulation of SVIHM using specified sets of changes in SVIHM boundary conditions (BCs). The set of changes in the BCs of a particular scenario represent specific changes in land use, irrigation management, climate, water management rules, etc. Scenario outcomes are compared against those of the basecase simulation. Key results of each SVIHM scenario, used in the objective functions described below, are:
+For GSP development, SVIHM was used extensively to perform what-if scenarios using the historic climate and land use forcing period, 1991-2018. (For purposes of this study, the model period has been extended through Sept. 30, 2025.) Scenario simulations repeat the calibrated historical basecase simulation of SVIHM using specified sets of changes in SVIHM boundary conditions (BCs). The set of changes in the BCs of a particular scenario represent specific changes in land use, irrigation management, climate, water management rules, etc. Scenario outcomes are compared against those of the basecase simulation. Key results of each SVIHM scenario, used in the objective functions described below, are:
 
 1. A prediction of Scott River daily average flow at the Fort Jones Gauge, which is co-located with the surface water outlet of the model domain; and
 2. Simulated total ET of crops and native vegetation within the model domain.
@@ -375,9 +378,15 @@ For GSP development, SVIHM was used extensively to perform what-if scenarios usi
 
 # Methods
 
-We developed two objective functions and one categorical objective proxy to evaluate the management scenarios developed for the GSP. The three objectives were: maximizing specific environmental flows, maintain current levels of agricultural productivity (represented as minimizing reduction in agricultural water use), and minimizing new infrastructure costs (represented as a categorical infrastructure/feasibility proxy) (Table \@ref(tab:objFunctionTable)). We then applied these to the results of each simulated management scenario, found the Pareto-optimal set of scenarios, and compared them to the prioritization of management actions adopted in the GSP [Siskiyou County -@SiskiyouCounty2021]. 
+We developed two objective functions and one categorical objective proxy to evaluate the management scenarios developed for the GSP. The three objectives were: 
 
-We should note that protecting domestic water use was also discussed as a management objective, but this was not evaluated as an objective function in management scenarios, for three main reasons: it was assumed that solving the environmental flows problem would intrinsically keep groundwater levels sufficiently high to protect domestic groundwater use from well outages; the number of reported well outages in recent dry years was minimal; and the data necessary to assess domestic well outages (specifically, total well depth and pump depth information) was available only for a small number of wells. 
+1) maximize specific environmental flows, 
+2) maintain current levels of agricultural productivity (represented as minimizing reduction in agricultural water use), and 
+3) minimize new infrastructure costs (represented as a categorical infrastructure/feasibility proxy) (Table \@ref(tab:objFunctionTable)). 
+
+We then applied these to the results of each simulated management scenario, found the Pareto-optimal set of scenarios, and compared them to the prioritization of management actions adopted in the GSP [Siskiyou County -@SiskiyouCounty2021]. 
+
+<!-- We should note that protecting domestic water use was also discussed as a management objective, but this was not evaluated as an objective function in management scenarios, for three main reasons: it was assumed that solving the environmental flows problem would intrinsically keep groundwater levels sufficiently high to protect domestic groundwater use from well outages; the number of reported well outages in recent dry years was minimal; and the data necessary to assess domestic well outages (specifically, total well depth and pump depth information) was available only for a small number of wells.  -->
 
 
 ```{r objFunctionTable, echo = FALSE, results = 'asis'}
@@ -440,22 +449,21 @@ coefs_hb_ch_3 = coefs_tab[coefs_tab$species == "chinook" &
                           cols_for_expl]
 ```
 
-In Chapter 1 of this dissertation, we showed that the degree to which the water year provided ecological services needed by coho salmon can be estimated using a Hydrologic Benefit (HB) function, which summarizes environmental flows in a single index value for a given water year. A set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena were weighted according to their power to predict salmon coho smolt production per female spawner. These weighted metrics are combined linearly to predict a value for coho salmon reproduction. See Chapter 1 for more details on these calculations. Specifically, the HB function predicts a higher number of coho salmon produced per female spawner (coho smolts per female, or coho spf-equivalent) when fall flows rise above 10 and 100 cfs earlier in the fall, when the wet season onset is earlier, and when the wet season duration is longer. The equation to calculate the HB value for a given water year is as follows:
+In previous work [@KoubaEtAlWatershedSpecific2025], we showed that the degree to which the water year provided ecological services needed by coho salmon can be empirically estimated using a Hydrologic Benefit (HB) function, which is represented as a linear combination of annual functional flow values. A set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena were weighted according to their power to predict coho smolt production per female spawner. The combination of these weighted metrics can be interpreted as a prediction of coho salmon reproduction *due to hydrologic factors*. Importantly, the HB function selected for this exercise only explains about 60% of variation in observed smolt abundance, and the remaining 40% of variation is related to other life conditions, e.g., number of returning spawners, water quality, food resources, and internal fishery population dynamics. 
 
-$$
-HB_{wy} = b + m_{1}*metric_{1,~wy} + ... + m_{4}*metric_{4,~wy}
-$$
+Specifically, the HB function predicts a higher number of coho smolt produced (coho smolt-equivalent) is related to higher fall flows during a cohort's parents' spawning, lower fall flows during a cohort's time as overwintering yearlings, and a slower spring recession (see intercept and coefficient values in Table \@ref(tab:coefTab)).
 
-Where:
+**language on selecting smolt based on hydro only predictors, and only for coho**
 
-**TO DO: ADD MATH TERMS IN TABLE**
+<!-- HB_{wy} = b + m_{1}*metric_{1,~wy} + ... + m_{4}*metric_{4,~wy} -->
+
 
 ```{r coefTab, echo = FALSE, results = 'asis'}
 
 coef_tab = coefs_hb_co
 
 #Create caption and column labels
-caption_text = "REPLACE CAPTION. "
+caption_text = "Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to coho salmon by specific functional flows. The predicted value is in units of log10(coho smolt) produced due to hydrologic factors."
 column_labels = c("Predictor", "Value", "Greater Hydrologic Benefit value associated with")
 
 colnames(coef_tab) = column_labels
@@ -480,21 +488,21 @@ hb_ft
 
 
 
-$HB_{wy}$ is the Hydrologic Benefit value for a given water year (predicted coho spf or coho spf equivalent)
+<!-- $HB_{wy}$ is the Hydrologic Benefit value for a given water year (predicted coho spf or coho spf equivalent) -->
 
-$b = 87.4$ coho spf equiv.
+<!-- $b = 87.4$ coho spf equiv. -->
 
-$m_{1} = -0.030$ coho spf equiv. per day of reconnection after Aug. 31 (100 cfs)
+<!-- $m_{1} = -0.030$ coho spf equiv. per day of reconnection after Aug. 31 (100 cfs) -->
 
-$m_{2} = -0.365$ coho spf equiv. per day of reconnection after Aug. 31 (200 cfs)
+<!-- $m_{2} = -0.365$ coho spf equiv. per day of reconnection after Aug. 31 (200 cfs) -->
 
-$m_{3} = 0.033$ coho spf equiv. per day of disconnection after Aug. 31 (200 cfs)
+<!-- $m_{3} = 0.033$ coho spf equiv. per day of disconnection after Aug. 31 (200 cfs) -->
 
-$m_{4} = -0.191$ coho spf equiv. per day of reconnection after Aug. 31 (8 cfs)
+<!-- $m_{4} = -0.191$ coho spf equiv. per day of reconnection after Aug. 31 (8 cfs) -->
 
-$m_{5} = -0.004$ coho spf equiv. per cubic meter of lower dry season flow magnitude
+<!-- $m_{5} = -0.004$ coho spf equiv. per cubic meter of lower dry season flow magnitude -->
 
-The HB function was formulated based on functional flow metrics of the observed daily average flow record of the FJ gauge ($FJ_{obs}$). One key result of the historical basecase scenario is a simulated estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$); however, although SVIHM was extensively calibrated [@Tolley2019], because all models involve structural simplifications of a full-scale watershed, $FJ_{sim,~basecase}$ sometimes over- or under-estimates $FJ_{obs}$. As a result of these differences, HB values calculated from flow metrics of $FJ_{sim,~basecase}$ tend to be higher than HB values derived from $FJ_{obs}$ by a mean of 4.5 coho spf-equiv.
+The HB function was formulated based on functional flow metrics of the observed daily average flow record of the FJ gauge ($FJ_{obs}$). One key result of the historical basecase scenario is a simulated estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$); however, although SVIHM was extensively calibrated [@Tolley2019], because all models involve structural simplifications of a full-scale watershed, $FJ_{sim,~basecase}$ sometimes over- or under-estimates $FJ_{obs}$. As a result of these differences, HB values calculated from flow metrics of $FJ_{sim,~basecase}$ tend to be higher than HB values derived from $FJ_{obs}$ by a mean of **4.5** coho spf-equiv.
 
 To control for this, all basecase HB values used in this study are derived from $FJ_{sim,~basecase}$, making them directly comparable to HB values derived from the simulated FJ flow records in the hypothetical management scenarios.
 
@@ -502,7 +510,7 @@ To control for this, all basecase HB values used in this study are derived from 
 
 The annual crop ET volume, which is explicitly simulated in the hydrologic model, is used here as a proxy for agricultural productivity. Other options for framing the agricultural water use objective function include crop yields and total revenue, which may be of greater concern to stakeholders; however, annual crop ET was selected because the impacts of reduced water availability on yield or revenue will likely vary by grower and over time.
 
-Specifically, conversion of ET to yield or revenue would introduce multiple uncertainties, such as those related to marginal crop production costs and available technology [@Howitt1995]. In studies that do implement a water-to-yield or -revenue conversion, multi-year average values for per-acre yield and/or revenue are commonly used [e.g., @Cole2021 for the Scott Valley case], since those are typically the only values available. This approach is most valid when the marginal change in productivity is small relative to the average [@Howitt1995]. Additionally, average values cannot account for time-varying costs of a management action [e.g., the increase in cost of lettuce cultivation due to banning a certain pesticide is higher in some seasons than in others, as described in @Sunding1996].
+<!-- Specifically, conversion of ET to yield or revenue would introduce multiple uncertainties, such as those related to marginal crop production costs and available technology [@Howitt1995]. In studies that do implement a water-to-yield or -revenue conversion, multi-year average values for per-acre yield and/or revenue are commonly used [e.g., @Cole2021 for the Scott Valley case], since those are typically the only values available. This approach is most valid when the marginal change in productivity is small relative to the average [@Howitt1995]. Additionally, average values cannot account for time-varying costs of a management action [e.g., the increase in cost of lettuce cultivation due to banning a certain pesticide is higher in some seasons than in others, as described in @Sunding1996]. -->
 
 Additionally, for alfalfa and pasture, which continue growing as long as water is available, a strong relationship between crop ET and yield is assumed [@Carter1983]. The assumption that crop ET is consistently related to yield or revenue breaks down for a management scenario that includes changing crops; this is explored further in the Discussion section. But on the merits of these options, annual crop ET was selected to represent agricultural benefit. 
 
@@ -520,15 +528,16 @@ This reflects the first-order understanding that, for example, building a reserv
 
 ## Analyses of objective function values
 
-### Trade-off efficiency and "low-coho" years
+### Trade-off efficiency
 
-As discussed previously, balancing agricultural and environmental water demands in this watershed typically takes the form of seeking management actions that can improve flow conditions while minimizing the resulting reduction in agricultural water availability. These objectives are non-commensurable (i.e., an estimated level of fish reproduction cannot be converted into units of agricultural productivity), making an explicit quantification and consideration of benefit trade-offs a critical feature of this decision-support analysis [@Cohon1975]. Environmental benefits are less commonly quantified than agricultural costs [e.g., @Sunding1996, which assessed numerical costs of a management action and assumed qualitative environmental/human health benefits], but the HB function makes this trade-off quantification possible in the Scott Valley case. 
+Combining two of the three objectives, scenarios can also be compared in terms of environmental benefit per agricultural cost. This "trade-off efficiency" of a management scenario, or $Eff~scen~$, is unitless (i.e., it has units of smolt-equiv. per smolt-equiv. / million m^3^ per million m^3^) (see equations below).
 
-For this analysis, which is not intended to identify one "best" or optimal solution, these trade-offs can be considered using scenario objective value differences relative to their basecase (historical simulated) values. We will call this quantity the "trade-off efficiency" of a management scenario. For a given scenario, the trade-off efficiency, or Eff~scen~, is unitless (i.e., it has units of coho spf-equiv. per coho spf-equiv. / million m^3^ per million m^3^), as shown in the formula below.
+<!-- As discussed previously, balancing agricultural and environmental water demands in this watershed typically takes the form of seeking management actions that can improve flow conditions while minimizing the resulting reduction in agricultural water availability; in simple terms, to help fish while not harming farms. These objectives are non-commensurable (i.e., an estimated level of fish reproduction cannot be converted into units of agricultural productivity), making an explicit quantification and consideration of benefit trade-offs a critical feature of this decision-support analysis [@Cohon1975]. Environmental benefits are less commonly quantified than agricultural costs [e.g., @Sunding1996, which assessed numerical costs of a management action and assumed qualitative environmental/human health benefits], but the HB function makes this trade-off quantification possible in the Scott Valley case.  -->
 
-An efficiency for a subset of years can be calculated by averaging the efficiency values over that set of water years only. The set of years with low basecase HB values (operationally defined as values lower than 45 coho spf-equivalent, composed of 1993, 1995, 2002, and 2014-16) is relevant to water managers (see Discussion), and is henceforth referred to as the set of "low-coho" years. A low-coho year efficiency was calculated in addition to the efficiencies averaged over all water years.
+<!-- For this analysis, which is not intended to identify one "best" or optimal solution, these trade-offs can be considered using scenario objective value differences relative to their basecase (historical simulated) values. We will call this quantity the "trade-off efficiency" of a management scenario. For a given scenario, the trade-off efficiency, or $Eff~scen~$, is unitless (i.e., it has units of smolt-equiv. per smolt-equiv. / million m^3^ per million m^3^) (Equation \@ref(eq:hbAvg)). -->
 
 $$HB_{avg} = \frac{1}{n_{wy}}\sum_{i = wy_1}^{wy_n}{HB_{wy_{i}}}$$
+
 $$ET_{avg} = \frac{1}{n_{wy}}\sum_{i = wy_1}^{wy_n}{Crop~ET_{annual,~wy_{i}}}$$
 
 $$Eff_{scen} = \frac{(HB_{avg,~scen}-HB_{avg,~basecase}) / HB_{avg,~basecase}}{-1 * (ET_{avg,~scen}-ET_{avg,~basecase}) / ET_{avg,~basecase}} $$
@@ -1090,6 +1099,8 @@ gsp_ft
 \newpage
 
 # Discussion
+
+**add discussion of alternative env obj functions: Chinook salmon, indices of alteration**
 
 The portfolio of scenarios proposed by stakeholders and simulated for this study included a range of infrastructure investments, regulatory actions and major land use changes. The number and diversity of simulated scenarios was made possible by a surface- and groundwater model designed to approximate existing land use and agricultural water use behavior in the local context [SVIHM; @Tolley2019]. Though the ultimate future effect of these management actions would depend on climate variability and implementation details that have not been explicitly simulated (e.g., the precise location of pumps needed to divert surface water for the expanded enhanced recharge scenarios), it is possible to use objective functions and historical climate records to draw some high-level findings regarding their relative merits.
 

@@ -16,6 +16,8 @@ in_to_mm = 25.4
 af_to_m3 = 1/3.2808 * (1/3.2808)^2 * 43560# m/ft * m^2/ft^2 * ft^2/acre
 cfs_to_m3sec = 1 / 35.3147
 cfs_to_m3day = 1 / 35.3147 * 60*60*24 # 1 cfs / cubic ft per cubic m * seconds per day
+C_to_F_deg = function(deg_C){return(deg_C*9/5+32)}
+mm_to_in = 1/25.4
 
 # Set colors for all figures
 color_cities= "black"
@@ -44,8 +46,10 @@ ilr_col = "yellow1"
 color_river = "blue"
 color_gauges = "yellow"
 
-cities_centroid$label_xmod2 = c(-1.7, 2.7, -2.7, 2.2)
-cities_centroid$label_ymod2 = c(  0, -0.5,  0.2, 0.6)
+sv_places = c("Etna","Fort Jones", "Greenview")
+cities_centroid = cities_centroid[cities_centroid$NAME %in% sv_places,]
+cities_centroid$label_xmod2 = c(-1.7, 2.7, -2.7)
+cities_centroid$label_ymod2 = c(  0, -0.5,  0.2)
 
 #Quartile-based water year type table
 year_type_colors = data.frame(type = c("Dry","Below Avg","Above Avg","Wet"),
@@ -674,7 +678,7 @@ landuse_figure_2016=function(){
     tm_shape(cities_centroid) + tm_symbols(color_cities, size = 0.7) +
     tm_text("NAME", fontface = "bold", xmod = cities_centroid$label_xmod2, ymod = cities_centroid$label_ymod2) +
     tm_shape(fj_gauge) + tm_symbols(color_gauges, size = 1.2, shape=22) +
-    tm_text("station_nm", fontface="bold", xmod = 3, ymod = .7) +
+    tm_text("station_nm", fontface="bold", xmod = 3, ymod = 1.5) +
 
     # tm_shape(basin, name = "Groundwater Basin", is.master=T ) + tm_borders(color_basin, lwd = 2) +
     tm_add_legend(type="symbol", col = c(color_cities, color_gauges), border.lwd = c(1.5, 1),
@@ -802,9 +806,9 @@ precip_temp_flow_figure = function(plot_panel = NA){
   if(is.na(plot_panel) | plot_panel==1){
     #Plot monthly average daily max and min temps
     # ylab_tempC = expression(atop(paste("Air Temperature ( ", degree,"C)")))
-    ylab_tempC = "Air Temperature (degrees C)"
+    ylab_tempC = "Air Temp. (deg. C)"
     # ylab_tempF = expression(atop(paste("Air Temperature ( ", degree,"F)")))
-    par(mar = c(5,4,3,2))
+    par(mar = c(5,4,3,5))
     plot(x = noaa_stn_month_temp_agg$month, y = noaa_stn_month_temp_agg$TMAX,
          col = NA, ylim = c(-10,37), xaxt = "n",
          ylab = ylab_tempC,
@@ -836,12 +840,20 @@ precip_temp_flow_figure = function(plot_panel = NA){
 
     text(x = 1, y = 32, labels = "A", cex = 2) # label plot
     legend(x="topright", pch = 19, col = c("red", "blue"), legend = c("Air Temp Max", "Air Temp Min"))
+    # 2nd y axis
+    par(new=T)
+    plot(x = noaa_stn_month_temp_agg$month, 
+         y = C_to_F_deg(noaa_stn_month_temp_agg$TMAX), 
+         col = NA,
+         ylim = C_to_F_deg(c(-10,37)), axes = F, xlab = "", ylab="", bty = "n")
+    axis(side=4,at=pretty(range(C_to_F_deg(c(-10,37)))))
+    mtext("Air Temp. (deg. F)", side = 4, line = 3, cex = .7)
   }
 
   #Panel 2: Monthly precip + ET
   if(is.na(plot_panel) | plot_panel==2){
     pt_offset = 0.05
-    par(mar = c(5,4,3,2))
+    par(mar = c(5,4,3,5))
     plot(x = (ppt_month$month - pt_offset), xaxt = "n",
          y = ppt_month$PRCP_mm_mean, pch = 19, col = precip_col,
          ylim = c(0, et_monthly$ET_0_mm_mean[7] + et_monthly$ET_0_mm_sd[7]),
@@ -866,7 +878,16 @@ precip_temp_flow_figure = function(plot_panel = NA){
            code = 3, length = .05, angle =  90, col = et_col)
     legend(x = "topleft", pch = 19, col = c(precip_col, et_col), legend = c("Precip.", "ET ref."))
     text(x = 11.5, y = 200, labels = "B", cex = 2) # label plot
-    # add new axis and ET data
+    # 2nd y axis
+    par(new=T)
+    y_limits = c(0, et_monthly$ET_0_mm_mean[7] + et_monthly$ET_0_mm_sd[7]) * mm_to_in
+    plot(x = ppt_month$month - pt_offset, 
+         y = ppt_month$PRCP_mm_mean * mm_to_in, 
+         col = NA,
+         ylim = y_limits, 
+         axes = F, xlab = "", ylab="", bty = "n")
+    axis(side=4,at=pretty(y_limits))
+    mtext("Monthly precip. and ref. ET (in.)", side = 4, line = 3, cex = .7)
   }
 
   # # Panel 3: Annual precip
