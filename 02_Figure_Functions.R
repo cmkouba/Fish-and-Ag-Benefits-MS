@@ -48,7 +48,7 @@ color_gauges = "yellow"
 
 sv_places = c("Etna","Fort Jones", "Greenview")
 cities_centroid = cities_centroid[cities_centroid$NAME %in% sv_places,]
-cities_centroid$label_xmod2 = c(-1.7, 2.7, -2.7)
+cities_centroid$label_xmod2 = c(-2, -2.2, 2.7)
 cities_centroid$label_ymod2 = c(  0, -0.5,  0.2)
 
 #Quartile-based water year type table
