@@ -1,0 +1,10 @@
+Predictor,lasso_jps_on_hydro,lasso_juv_on_hydro,lasso_juv_on_hydro_and_spawners,marss_jps_on_hydro,marss_juv_on_hydro,marss_juv_on_hydro_and_spawners,ensemble_mean_coef,Greater Hydrologic Benefit value associated with
+Intercept,1.592,3.872,3.872,0,0,0,1.556,(Intercept)
+f1_FA_Dif_num,0,0.162,0.162,0.306,0.206,0.55,0.231,Larger fall flow increase (during parents' spawning)
+d1_DS_Mag_90,0,0,0,0,0,0.229,0.0382,"Greater dry season flows (early season, before parents' spawning)"
+w1_Wet_BFL_Mag_50,0,0,0,0.136,0,0,0.0227,Higher wet season baseflows (as eggs and hatchlings)
+w2_Wet_BFL_Mag_50,0,0,0,0,0.08,0,0.0133,Higher wet season baseflows (as overwintering juveniles)
+w1_Wet_Tim,-0.007,0,0,0,0,0,-0.0012,Earlier wet season onset (as eggs and fry)
+s1_SP_ROC,0,-0.02,-0.02,0,0,0,-0.0067,"Slower rate of change, spring recession (as recent hatchlings)"
+f2_FA_Dif_num,-0.012,-0.13,-0.13,0,-0.136,0,-0.068,Smaller fall flow increase (as juvenile fish)
+f1_recon_120,-0.155,0,0,-0.403,0,-0.605,-0.1938,Earlier fall reconnection (during parents' spawning)

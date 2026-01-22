@@ -1,0 +1,9 @@
+Predictor,lasso_jps_on_hydro,lasso_juv_on_hydro,lasso_juv_on_hydro_and_spawners,marss_jps_on_hydro,marss_juv_on_hydro,marss_juv_on_hydro_and_spawners,ensemble_mean_coef,Greater Hydrologic Benefit value associated with
+Intercept,1.944,5.45,5.442,0,0,0,2.1393,(Intercept)
+chinook_spawners_zscored,0,0,0.139,0,0,0,0.0232,Higher abundace of Chinook spawners
+d1_DS_Mag_50,0,0,0,0,0.089,0,0.0148,"Higher dry season flow (mid-late season, before parents' spawning)"
+d1_DS_Mag_90,0,0,0,0.069,0,0,0.0115,"Higher dry season flow (early season, before parents' spawning)"
+w1_Wet_Tim,0,0,-0.012,0,0,0,-0.0020,Earlier wet season onset (as eggs and hatchlings)
+f1_recon_120,0,0,0,-0.039,0,-0.062,-0.0168,Earlier fall reconnection (during parents' spawning)
+s1_SP_ROC_Max,-0.041,0,-0.062,-0.057,-0.106,-0.116,-0.0637,"Slower max. rate of change, spring recession (as outmigrating smolt)"
+w1_Wet_BFL_Mag_50,-0.181,-0.309,-0.314,0,-0.135,-0.132,-0.1785,Lower wet season baseflows (as eggs and hatchlings)

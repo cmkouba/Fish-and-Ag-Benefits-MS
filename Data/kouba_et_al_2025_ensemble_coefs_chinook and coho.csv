@@ -1,0 +1,13 @@
+Predictor,chinook_lasso_jps_on_hydro,chinook_lasso_juv_on_hydro,chinook_lasso_juv_on_hydro_and_spawners,chinook_marss_jps_on_hydro,chinook_marss_juv_on_hydro,chinook_marss_juv_on_hydro_and_spawners,coho_lasso_jps_on_hydro,coho_lasso_juv_on_hydro,coho_lasso_juv_on_hydro_and_spawners,coho_marss_jps_on_hydro,coho_marss_juv_on_hydro,coho_marss_juv_on_hydro_and_spawners,ensemble_mean_coef,Greater Hydrologic Benefit value associated with
+Intercept,1.944,5.45,5.442,0,0,0,1.592,3.872,3.872,0,0,0,1.847666667,Intercept Term
+f1_FA_Dif_num,0,0,0,0,0,0,0,0.162,0.162,0.306,0.206,0.55,0.1155,Larger fall flow increase (during parents' spawning)
+d1_DS_Mag_90,0,0,0,0.069,0,0,0,0,0,0,0,0.229,0.024833333,Higher early dry season flows (before parents' spawning)
+chinook_spawners_zscored,0,0,0.139,0,0,0,0,0,0,0,0,0,0.011583333,Higher abundance of Chinook spawners
+d1_DS_Mag_50,0,0,0,0,0.089,0,0,0,0,0,0,0,0.007416667,Higher late dry season flows (before parents' spawning)
+w2_Wet_BFL_Mag_50,0,0,0,0,0,0,0,0,0,0,0.08,0,0.006666667,Smaller wet season baseflows (as overwintering juveniles)
+w1_Wet_Tim,0,0,-0.012,0,0,0,-0.007,0,0,0,0,0,-0.001583333,Earlier wet season onset (as eggs and fry)
+s1_SP_ROC,0,0,0,0,0,0,0,-0.02,-0.02,0,0,0,-0.003333333,"Slower rate of change, spring recession (as recent hatchlings)"
+s1_SP_ROC_Max,-0.041,0,-0.062,-0.057,-0.106,-0.116,0,0,0,0,0,0,-0.031833333,"Slower max. rate of change, spring recession (as outmigrating smolt)"
+f2_FA_Dif_num,0,0,0,0,0,0,-0.012,-0.13,-0.13,0,-0.136,0,-0.034,Smaller fall pulse (as juvenile fish)
+w1_Wet_BFL_Mag_50,-0.181,-0.309,-0.314,0,-0.135,-0.132,0,0,0,0.136,0,0,-0.077916667,Smaller wet season baseflows (as eggs and hatchlings)
+f1_recon_120,0,0,0,-0.039,0,-0.062,-0.155,0,0,-0.403,0,-0.605,-0.105333333,Earlier fall reconnection (during parents' spawning)

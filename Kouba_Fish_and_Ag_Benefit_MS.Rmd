@@ -181,7 +181,7 @@ knitr::include_graphics(lu_graphic_filename)
 ```
 
 
-# Methods: Case study, GSP development and hydrologic model
+# Background: Case study and GSP development
 
 ## Hydrography and climate
 
@@ -369,23 +369,7 @@ SGMA requires each local GSA to define sustainability in the negative, by quanti
 
 During GSP development, the authors of this study simulated dozens of land and water use scenarios to facilitate the comparison of management alternatives that could reduce streamflow depletion to various degrees. Simulations were conducted with a spatially explicit, integrated surface water-groundwater model [@TolleyEtAlSensitivity2019], as described below.
 
-
-## Hydrologic model summary
-
-The Scott Valley Integrated Hydrologic Model (SVIHM) [-@TolleyEtAlSensitivity2019] is a surface and groundwater model driven by tributary stream inflows, precipitation inputs, and reference evapotranspiration (ET~0~). Like all models, it does not perfectly reproduce observed historical measurements, but it successfully captures key watershed-scale hydrologic phenomena that can be used to evaluate potential outcomes of specific management actions.
-
-<!-- The boundary of the model domain corresponds approximately to the extent of the alluvial aquifer.  -->
-<!-- For detailed information about the model structure, sensitivity, calibration, uncertainty, and validation of results, see recent work by Tolley et al. .  -->
-
-The SVIHM is composed of three cascading sub-models. First, complete daily records of tributary stream inflow are generated using a statistical streamflow regression model, in which the continuous Fort Jones record was used to predict missing values in the daily flow records of 12 major tributaries [@FogliaEtAlScott2013]. Second, a custom-built soil water budget model simulated irrigation demand, irrigation applied (surface and groundwater), ET and percolation to aquifer calculated on a field-by-field, daily time step basis. This model simulates individual irrigation applications and assumes the farmer has perfect foresight of daily irrigation demand. Finally, the boundary conditions of stream inflow, aquifer recharge, and groundwater extraction are used to drive an integrated groundwater-surface water model using MODFLOW; stream-aquifer flux and surface flow routing was simulated using the MODFLOW SFR package [@TolleyEtAlSensitivity2019]. **Add text re: Leland's updates to SVIHM? Bah, should I rerun everything using the latest model version?**
-
-For GSP development, SVIHM was used extensively to perform what-if scenarios using the historic climate and land use forcing period, covering 1991-2018. (For purposes of this study, the model period has been extended through Sept. 30, 2025.) Scenario simulations repeat the calibrated historical basecase simulation of SVIHM while varying specific changes in SVIHM boundary conditions (BCs). The set of changes in the BCs of a particular scenario represent specific changes in land use, irrigation management, climate, water management rules, etc. Scenario outcomes are compared against those of the basecase simulation. Key results of each SVIHM scenario, used in the objective functions described below, are:
-
-1. A prediction of Scott River daily average flow at the Fort Jones Gauge, which is co-located with the surface water outlet of the model domain; and
-2. Simulated total ET of crops and native vegetation within the model domain.
-
-
-# Methods: Quantitative analysis
+# Methods
 
 We developed two objective functions and one categorical objective proxy to evaluate the management scenarios developed for the GSP. The three objectives were: 
 
@@ -436,40 +420,70 @@ mo_tab_ft
 
 ```{r read_HB_coefs, echo = F}
 
-coefs_tab = read.csv(file.path(data_dir,"kouba_et_al_2025_lasso_coeffs.csv"))
+# coefs_tab = read.csv(file.path(data_dir,"kouba_et_al_2025_lasso_coeffs.csv"), header = T)
+# 
+# 
+# cols_for_expl = c("Predictor", "Value", "Greater.Hydrologic.Benefit.value.associated.with")
+# coefs_hb_co = coefs_tab[coefs_tab$species == "coho" &
+#                             coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
+# coefs_hb_co_2 = coefs_tab[coefs_tab$species == "coho" & 
+#                             coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
+# coefs_hb_co_3 = coefs_tab[coefs_tab$species == "coho" & 
+#                             coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
+#                           cols_for_expl]
+# 
+# coefs_hb_ch = coefs_tab[coefs_tab$species == "chinook" & 
+#                             coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
+# 
+# coefs_hb_ch_2 = coefs_tab[coefs_tab$species == "chinook" & 
+#                             coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
+# coefs_hb_ch_3 = coefs_tab[coefs_tab$species == "chinook" & 
+#                             coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
+#                           cols_for_expl]
 
+# attempt 2
+# cols_for_expl = c("Predictor", "ensemble_mean_coef", "Greater.Hydrologic.Benefit.value.associated.with")
+# # 
+# # coefs_tab_co = read.csv(file.path(data_dir,"kouba_et_al_2025_ensemble_coefs_coho.csv"))
+# # coefs_tab_co = coefs_tab_co[,cols_for_expl]
+# # 
+# # coefs_tab_ch = read.csv(file.path(data_dir,"kouba_et_al_2025_ensemble_coefs_chinook.csv"))
+# # coefs_tab_ch = coefs_tab_ch[,cols_for_expl]
+# # # remove spawner predictor
+# # coefs_tab_ch = coefs_tab_ch[coefs_tab_ch$Predictor!="chinook_spawners_zscored",]
+# 
+coefs_tab = read.csv(file.path(data_dir, "kouba_et_al_2025_ensemble_coefs_chinook and coho.csv"))
+# coefs_tab = coefs_tab[,cols_for_expl]
+# coefs_tab = coefs_tab[coefs_tab$Predictor!="chinook_spawners_zscored",]
 
-cols_for_expl = c("Predictor", "Value", "Greater.Hydrologic.Benefit.value.associated.with")
-coefs_hb_co = coefs_tab[coefs_tab$species == "coho" & 
-                            coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
-coefs_hb_co_2 = coefs_tab[coefs_tab$species == "coho" & 
-                            coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
-coefs_hb_co_3 = coefs_tab[coefs_tab$species == "coho" & 
-                            coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
-                          cols_for_expl]
-
-coefs_hb_ch = coefs_tab[coefs_tab$species == "chinook" & 
-                            coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
-
-coefs_hb_ch_2 = coefs_tab[coefs_tab$species == "chinook" & 
-                            coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
-coefs_hb_ch_3 = coefs_tab[coefs_tab$species == "chinook" & 
-                            coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
-                          cols_for_expl]
 ```
 
-In previous work [@KoubaEtAlWatershedSpecific2025], we showed that the relative degree to which a given  water year provided ecological services needed by coho salmon can be empirically estimated using a Hydrologic Benefit (HB) function, which is represented as a linear combination of annual functional flow values. A set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena were weighted according to their power to predict coho outcomes, such as smolt production or smolt production normalized per female spawner. The combination of these weighted metrics can be interpreted as a prediction of coho salmon reproduction *due to hydrologic factors*. Importantly, the HB function selected for this exercise only explains about **60%** of variation in observed smolt abundance, and the remaining 40% of variation is assumed related to other life conditions, e.g., number of returning spawners, water quality, food resources, and internal fishery population dynamics. 
+In previous work [@KoubaEtAlWatershedSpecific2025], we showed that the relative degree to which a given  water year provided ecological services needed by coho salmon can be empirically estimated using a Hydrologic Benefit (HB) function, which is represented as a linear combination of annual functional flow values. Functional flows are set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena [@YarnellEtAlFunctional2015; @PattersonEtAlHydrologic2020; @CarpenterAccurately2024] were weighted according to their power to predict coho outcomes, such as smolt production or smolt production normalized per female spawner. The combination of these weighted metrics can be interpreted as a prediction of coho salmon reproduction *due to hydrologic factors*. Importantly, the HB function selected for this exercise only explains about **60%** of variation in observed smolt abundance, and the remaining 40% of variation is assumed related to other life conditions, e.g., number of returning spawners, water quality, food resources, and internal fishery population dynamics. 
 
 Specifically, the HB function predicts a higher number of coho smolt produced (coho smolt-equivalent) is related to higher fall flows during a cohort's parents' spawning, lower fall flows during a cohort's time as overwintering yearlings, and a slower spring recession (see intercept and coefficient values in Table \@ref(tab:coefTab)).
 
 **language on selecting smolt based on hydro only predictors, and only for coho**
+
+### Ensemble HB function
+
+For each species, across all statistical methods, the coefficients for any single predictor were consistently negative or positive; e.g., 
+
 
 <!-- HB_{wy} = b + m_{1}*metric_{1,~wy} + ... + m_{4}*metric_{4,~wy} -->
 
 
 ```{r coefTab, echo = FALSE, results = 'asis'}
 
-coef_tab = coefs_hb_co
+# coef_tab = coefs_hb_co_2
+# coef_tab = coefs_tab_co
+
+model_name = "chinook_lasso_jps_on_hydro"
+coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
+coef_tab = coef_tab[coef_tab[,model_name] != 0,]
+
+
+
+
 
 #Create caption and column labels
 caption_text = "Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to coho salmon by specific functional flows. The predicted value is in units of log10(coho smolt) produced due to hydrologic factors."
@@ -558,7 +572,21 @@ After calculating the objective function values for each scenario, we applied a 
 
 <!-- For example, the objective function values for the scenario simulating managed aquifer recharge and in-lieu recharge (MAR and ILR, or scenario identifier `mar_ilr`) are 76.1 predicted coho smolts per female equivalent (HB value), 111.0 million m^3^ of crop ET, and infrastructure category 3. Most scenarios (33) have a higher HB value than `mar_ilr`, but only eight have a higher ET value. Only the reservoir scenarios show up in both sets, with higher ET and higher HB value than `mar_ilr`. However, the reservoir scenarios are more difficult to implement, so any of those scenarios would have less desirable performance on the infrastructure objective. Consequently, since no scenarios perform better than `mar_ilr` in more than one objective, it must be included in the Pareto-optimal set. -->
 
-## Scenario descriptions
+## Hydrologic model summary
+
+The Scott Valley Integrated Hydrologic Model (SVIHM) [-@TolleyEtAlSensitivity2019] is a surface and groundwater model driven by tributary stream inflows, precipitation, and reference evapotranspiration (ET~0~). Like all models, it does not perfectly reproduce historical observations, but it successfully captures key watershed-scale hydrologic phenomena that can be used to evaluate potential outcomes of specific management actions.
+
+<!-- The boundary of the model domain corresponds approximately to the extent of the alluvial aquifer.  -->
+<!-- For detailed information about the model structure, sensitivity, calibration, uncertainty, and validation of results, see recent work by Tolley et al. .  -->
+
+The SVIHM is composed of three cascading sub-models. First, **complete daily records of tributary stream inflow are generated using a statistical streamflow regression model, in which the continuous Fort Jones record was used to predict missing values in the daily flow records of 12 major tributaries** [@FogliaEtAlScott2013]. Second, a custom-built soil water budget model simulated irrigation demand, irrigation applied (surface and groundwater), ET and percolation to aquifer calculated on a field-by-field, daily time step basis. This model simulates individual irrigation applications and assumes the farmer has perfect foresight of daily irrigation demand. Finally, the boundary conditions of stream inflow, aquifer recharge, and groundwater extraction are used to drive an integrated groundwater-surface water model using MODFLOW; stream-aquifer flux and surface flow routing was simulated using the MODFLOW SFR package [@TolleyEtAlSensitivity2019]. **Add text re: Leland's updates to SVIHM? Bah, should I rerun everything using the latest model version?**
+
+For GSP development, SVIHM was used extensively to perform what-if scenarios using the historic climate and land use forcing period, covering 1991-2018. (For purposes of this study, the model period has been extended through Sept. 30, 2025.) Scenario simulations repeat the calibrated historical basecase simulation of SVIHM while varying specific changes in SVIHM boundary conditions (BCs). The set of changes in the BCs of a particular scenario represent specific changes in land use, irrigation management, climate, water management rules, etc. Scenario outcomes are compared against those of the basecase simulation. Key results of each SVIHM scenario, used in the objective functions described below, are:
+
+1. A prediction of Scott River daily average flow at the Fort Jones Gauge, which is co-located with the surface water outlet of the model domain; and
+2. Simulated total ET of crops and native vegetation within the model domain.
+
+## Management scenario descriptions
 
 For the Scott Valley GSP, SVIHM was used to simulate 64 management action scenarios; in most other California GSPs, between one and five scenarios was more common [e.g., FCGMA -@FoxCanyonGroundwaterManagementAgencyGroundwater2019; YSGA -@YoloSubbasinGroundwaterAgencyYolo2022]. This high number of scenarios was possible because the SVIHM had been under development for 8 years prior to the start of GSP work [e.g., @FogliaEtAlScott2013; @TolleyEtAlSensitivity2019], and cost-effective technical support was provided by graduate students at the University of California, Davis. Of the 64 scenarios, only 25 are considered here. Several were ruled out as obviously unfeasible (e.g., construction of a 134 thousand acre-foot reservoir to ensure 100% flow reliability even during severe drought, in an area with topography that could not support such a large capacity), and some were excluded because they are largely redundant with some of the 25 considered here. 
 
@@ -652,7 +680,7 @@ colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
 
 ```
 
-As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value (in units of predicted coho smolt production per spawning female, or coho spf-equivalent) and a total crop ET volume was calculated for each water year in the 28-year simulation period, for each scenario. Each scenario has also been given an infrastructure feasibility proxy (Table \@ref(tab:scenarioResultsTab)).
+As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value (in units of **predicted coho smolt production per spawning female, or coho spf-equivalent**) and a total crop ET volume was calculated for each water year in the 28-year simulation period, for each scenario. Each scenario has also been given an infrastructure feasibility proxy (Table \@ref(tab:scenarioResultsTab)).
 
 <!-- ## 4.1 Environmental and agricultural objective function values -->
 ## Environmental and agricultural objective function values
@@ -725,7 +753,7 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 
 
 
-```{r benefitByWY, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2018. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels C and D show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 10th, August 1st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, and '18." , fig.height=8.3, fig.width=7, warning=F}
+```{r benefitByWY, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , fig.height=8.3, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -875,6 +903,9 @@ scen_tab$hb_gained_to_et_lost[scenario_tab$hb_gained <=0 |
 #                                     scen_tab$scenario_id == "basecase"] = "--"
 scen_tab$et_mean = round(scenario_tab$et_mean * (-1 / 10^6), 2)
 # scen_tab$et_mean_lc = round(scenario_tab$et_mean_lc * (-1 / 10^6), 2)
+
+# Exclude attribution scenarios
+scen_tab = scen_tab[scen_tab$scenario_category != "Attr",]
 
 #Create caption and column labels
 caption_text = "Scenario attributes for 25 scenarios. Units for Hydrologic Benefit (HB) value are coho smolt per female-equivalent; for ET are million cubic meters; both are averages of 35 annual values. Efficiency not calculated for scenarios with no average ET loss."
