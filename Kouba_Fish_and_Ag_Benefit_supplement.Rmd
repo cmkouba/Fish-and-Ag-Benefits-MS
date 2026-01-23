@@ -11,4 +11,199 @@ bibliography: library.bib
 
 ---
 
+# Fish-Farm Results of all 8 HB function formulations
+
+```{r coefTabCaptionMaker, echo = FALSE}
+
+model_names = colnames(coefs_tab)[2:13]
+
+model_name_to_df = function(model_names, extra_info = T){
+  model_names_pieces = strsplit(model_names, "_")
+  sp_vector = unlist(lapply(X=model_names_pieces, function(x){x[1]}))
+  stat_vector = toupper(unlist(lapply(X=model_names_pieces, function(x){x[2]})))
+  predicted_vector = unlist(lapply(X=model_names_pieces, function(x){x[3]}))
+  model_names_pieces_2 = strsplit(model_names,"_on_")
+  predictors_vector = unlist(lapply(X=model_names_pieces_2, function(x){x[2]}))
+  
+  
+  capmaker = data.frame(model_name = model_names, 
+                        stats_method = stat_vector, 
+                        species = sp_vector, predictors = predictors_vector,
+                        predicted = predicted_vector)
+  
+  ch_rows = capmaker$species=="chinook"
+  capmaker$species[ch_rows] = str_to_title(capmaker$species[ch_rows])
+  
+  #add extra info
+  if(extra_info){
+    capmaker$predictor_cap_text = NA
+    capmaker$predictor_cap_text[capmaker$predictors == "hydro"] = "only hydrological factors"
+    capmaker$predictor_cap_text[capmaker$predictors == "hydro_and_spawners"] = "both hydrological factors and spawner abundance"
+
+    capmaker$predicted_cap_text = NA
+    capmaker$predicted_cap_text[capmaker$predicted == "jps"] = "juveniles per spawner"
+    capmaker$predicted_cap_text[capmaker$predicted == "juv"] = "juvenile abundance"
+    
+  }
+  
+  return(capmaker)
+}
+
+capmaker = model_name_to_df(model_names)
+
+
+
+```
+
+
+## Models of Chinook reproductive success
+
+### LASSO model, juveniles per spawner, hydrologic predictors only
+
+TO DO: PACKAGE all this as a function and feed it the model name 8 times
+
+```{r coefTab01, echo = FALSE, results = 'asis'}
+
+model_name = "chinook_lasso_jps_on_hydro"
+coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
+coef_tab = coef_tab[coef_tab[,model_name] != 0,]
+attr = model_name_to_df(model_name)
+
+#Create caption and column labels
+caption_text = 
+  paste0("Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to ",
+         attr$species,
+         " salmon by specific functional flows. The predicted value is in units of log10(",
+         attr$predicted_cap_text,
+         ") produced, modeled using ",
+         attr$predictor_cap_text, ".")
+column_labels = c("Predictor", "Value", "Greater Hydrologic Benefit value associated with")
+
+colnames(coef_tab) = column_labels
+
+hb_ft = flextable(data = coef_tab)
+hb_ft = set_caption(hb_ft, caption = caption_text)
+hb_ft = flextable::width(hb_ft, j = 1,  width = 1.5)
+hb_ft = flextable::width(hb_ft, j= 2,  width = 1)
+hb_ft = flextable::width(hb_ft, j=3,  width = 3)
+hb_ft
+
+```
+
+
+```{r farmerFishTradeoffTable, echo = F, warning =F}
+
+
+scenario_tab_init = get_scenario_tab_init()
+coef_tab = coef_tab[, c("Predictor", "Value")]
+
+# Calculate mean of 35 years of hydrologic benefit value and ET 
+obj_fn_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
+                                        weights = coef_tab,
+                                        include_years = "all")
+
+scenario_tab = obj_fn_results$scenario_tab
+obj_fn_wy = obj_fn_results$obj_fn_results_by_wy
+
+# unzscore_data = function(x, mean_x, sd_x){
+#   return((x * sd_x) + mean_x)
+# }
+
+# zscore_column_na_rm = function(x){
+#   mean_x = mean(x, na.rm=T)
+#   sd_x = sd(x, na.rm=T)
+#   return((x - mean_x) / sd_x)
+# }
+
+# replace transformed data with straight abundance data for better interpretability
+
+# for scenario tab
+scenario_tab$hb_untrans_mean = 10^scenario_tab$HBF_mean
+scenario_tab$hb_untrans_stdev = 10^scenario_tab$HBF_stdev
+
+colnames(scenario_tab) = gsub(pattern = "HBF", 
+                              replacement = "HBF_log10", 
+                              x = colnames(scenario_tab))
+colnames(scenario_tab) = gsub(pattern = "hb_untrans", 
+                              replacement = "HBF", 
+                              x = colnames(scenario_tab))
+
+# for obj_fn_wy
+obj_fn_wy$hb_val_untrans = 10^obj_fn_wy$hb_val
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
+
+```
+
+
+
+```{r scenario_tab_plot_columns, echo = F, warning=F}
+
+# Plot specs
+scen_cat_tab = add_plot_cols_to_scen_cat_tab(scen_cat_tab_1 = scen_cat_tab)
+
+# Assign category featurs to full scenario table
+scenario_tab$color = scen_cat_tab$color[match(scenario_tab$scenario_category,
+                                                    scen_cat_tab$category)]
+scenario_tab$feas_cat = scen_cat_tab$feas_cat[match(scenario_tab$scenario_category,
+                                                    scen_cat_tab$category)]
+scenario_tab$mgmt_cat = scen_cat_tab$mgmt_cat[match(scenario_tab$scenario_category,
+                                                    scen_cat_tab$category)]
+scenario_tab$symbol = scen_cat_tab$symbol[match(scenario_tab$scenario_category,
+                                                    scen_cat_tab$category)]
+scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
+
+```
+
+
+
+```{r benefitByWY, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , fig.height=8.3, fig.width=7, warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
+  
+  # plot_scenarios = scenario_tab$scenario_id
+  plot_scenarios1 = c("basecase", "alf_curtail_08.15", "alf_curtail_07.31", 
+                      "alf_curtail_07.15")
+  plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
+                      "grain_12k")
+  
+  par(mfcol = c(4,1))
+  plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
+                    cols = get_palette(c("black","dodgerblue",
+                                         "green4","darkgoldenrod"),
+                                       length(plot_scenarios1)),
+                    panel_labels = c("A","B"))
+  plot_obj_fn_by_wy(plot_scenarios = plot_scenarios2, 
+                    cols = sequential_hcl(n=length(plot_scenarios1), 
+                                          palette = "Red-Blue"),
+                    panel_labels = c("C","D"))
+  dev.off()
+}
+
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
+
+```{r farmerFishTradeoffFigure, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 39 management scenarios. Symbol x and y coordinates are the average of 28 annual HB and ET values for each scenario over the full model period (water years 1991-2018). Whiskers show standard error of the 28 years of annual HB values; standard errors in the direction of the y-axis are smaller than the height covered by each symbol." , fig.height=8, fig.width=7, warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
+  farm_fish_tradeoff_fig(scenario_tab = scenario_tab, 
+                         plot_title = "Environmental vs Agricultural Benefit \n Mean of annual values, 1991-2025")
+  dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+#Make blank axes for slides
+if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure ",fig_i,".png")), width = 8, height = 8, units = "in", res = 300)
+  farm_fish_tradeoff_blank(scenario_tab = scenario_tab)
+  fig_i = fig_i +1; dev.off()}
+
+```
+
 
