@@ -71,6 +71,58 @@ wtr_yr = function(date_vector){
   return(water_year_vector)
 }
 
+kouba_2025_y_val_label_tab = function(){
+  # calculate number of predictors for text below
+  
+  all_szns = paste(c("d1", "f1", "w1", "s1", "d2", "f2", "w2", "s2"), collapse =", ")
+  y1_szns = paste(c("d1", "f1", "w1", "s1"), collapse = ", ")
+  spawn_szns = paste(c("d1", "f1", "w1"), collapse = ", ")
+  # spawn_szns = paste(c("d1", "f1"), collapse = ", ")
+  
+  y_val_label_tab = data.frame(y_val = c("chinook_spawner_abundance",
+                                         "chinook_juvenile_abundance",
+                                         "chinook_juv_per_adult",
+                                         "coho_spawner_abundance",
+                                         "coho_smolt_abun_est",
+                                         "coho_smolt_per_fem",
+                                         "coho_redds_in_brood"
+                                         
+  ),
+  y_val_title = c("Chinook spawners",
+                  "Chinook juv. abundance",
+                  "Chinook jpa",
+                  "coho spawners",
+                  "coho smolt abundance",
+                  "coho spf",
+                  "coho redd abundace"
+                  
+  ),
+  y_val_label = c("Num. Chinook spawners",# (escapement)",
+                  "Num. Chinook juveniles",
+                  "Chinook juv. per adult",
+                  "Num. coho spawners",# (escapement)",
+                  "Est. num. coho smolt",
+                  "Coho smolt per fem. spawner",
+                  "Num. obs. coho redds"),
+  influencing_seasons = c(spawn_szns,
+                          y1_szns,
+                          y1_szns,
+                          spawn_szns,
+                          all_szns,
+                          all_szns,
+                          spawn_szns))
+  return(y_val_label_tab)
+}
+
+apply_zscore = function(hbf_ff, ff_id){
+  ff_sd = zscore_k25$sd_k25[zscore_k25$func_flow==ff_id]
+  ff_mean = zscore_k25$mean_k25[zscore_k25$func_flow==ff_id]
+  # ff_sd = sd(hbf_ff[,1], na.rm=T)
+  # ff_mean = mean(hbf_ff[,1], na.rm=T)
+  out = (hbf_ff - ff_mean)/ff_sd
+  return(out)
+}
+
 fj_wy_type_tab = function(fjd,
                           start_date = as.Date("1940-10-01"),
                           end_date = as.Date("2021-10-01"),
@@ -634,6 +686,49 @@ make_daily_flow_regime = function(regime_tab, record_dates){
 }
 
 
+model_name_to_coefs_df = function(model_names, extra_info = T){
+  model_names_pieces = strsplit(model_names, "_")
+  sp_vector = unlist(lapply(X=model_names_pieces, function(x){x[1]}))
+  stat_vector = toupper(unlist(lapply(X=model_names_pieces, function(x){x[2]})))
+  predicted_vector = unlist(lapply(X=model_names_pieces, function(x){x[3]}))
+  model_names_pieces_2 = strsplit(model_names,"_on_")
+  predictors_vector = unlist(lapply(X=model_names_pieces_2, function(x){x[2]}))
+  
+  
+  capmaker = data.frame(model_name = model_names, 
+                        stats_method = stat_vector, 
+                        species = sp_vector, predictors = predictors_vector,
+                        predicted = predicted_vector)
+  
+  ch_rows = capmaker$species=="chinook"
+  capmaker$species[ch_rows] = str_to_title(capmaker$species[ch_rows])
+  
+  #add extra info
+  if(extra_info){
+    capmaker$predictor_cap_text = NA
+    capmaker$predictor_cap_text[capmaker$predictors == "hydro"] = "only hydrological factors"
+    capmaker$predictor_cap_text[capmaker$predictors == "hydro_and_spawners"] = "both hydrological factors and spawner abundance"
+    
+    capmaker$predicted_cap_text = NA
+    capmaker$predicted_cap_text[capmaker$predicted == "jps"] = "juveniles per spawner"
+    capmaker$predicted_cap_text[capmaker$predicted == "juv"] = "juvenile abundance"
+    
+  }
+  
+  return(capmaker)
+}
+
+
+results8_cap_maker = function(attr){
+  return(
+    paste0("Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to ",
+           attr$species,
+           " salmon by specific functional flows. The predicted value is in units of log10(",
+           attr$predicted_cap_text,
+           ") produced, modeled using ",
+           attr$predictor_cap_text, ".")
+  )
+}
 
 # figure functions --------------------------------------------------------
 
@@ -1621,6 +1716,53 @@ add_func_flows_to_hbf_tab=function(pre_hbf_tab, ff_ids,
   return(hbf_tab)
 }
 
+
+add_conn_timing_cols_to_ff_tab = function(ff_tab, scenario_id,
+                                          weights = NULL, 
+                                          cov_i = NA){
+  # Pull FJ flow for connectivity timing metrics
+  fj_flow_scen = scen_fj_out[,c("Date",scenario_id)]
+  colnames(fj_flow_scen)[colnames(fj_flow_scen) != "Date"] = "Flow"
+  fj_flow_scen$wy = wtr_yr(fj_flow_scen$Date)
+  # pull flow thresholds from weights column names
+  if(!is.null(weights)){
+    re_and_discon_cols = colnames(weights)[c(grep(pattern = "recon", x = colnames(weights)), 
+                                             grep(pattern = "discon", x = colnames(weights)))]
+  } else if(!is.na(cov_i)){
+    re_and_discon_cols = c(grep(pattern = "recon", x = cov_i), 
+                           grep(pattern = "discon", x = cov_i))
+  }
+  
+  if(length(re_and_discon_cols) > 1){
+    re_and_discon_cols_matrix = matrix(unlist(strsplit(re_and_discon_cols, split="_")), ncol=3, byrow=T)
+    re_and_discon_thresh = unique(as.numeric(re_and_discon_cols_matrix[,3]))
+  } else {
+    re_and_discon_thresh = 120# c(20, 40, 120)
+  }
+  
+  # calculate connectivity times
+  pre_hbf_tab = re_and_disconnect_date_tab(thresholds = re_and_discon_thresh,
+                                           fj_flow = fj_flow_scen)
+  # align for 1st and 2nd years
+  colnames(pre_hbf_tab)=gsub(pattern = "recon_date_", replacement = "f1_recon_",
+                             x = colnames(pre_hbf_tab))
+  colnames(pre_hbf_tab)=gsub(pattern = "discon_date_", replacement = "s1_discon_",
+                             x = colnames(pre_hbf_tab))
+  f1_colnames = colnames(pre_hbf_tab)[grep(pattern = "f1_recon", x = colnames(pre_hbf_tab))]
+  f2_colnames = gsub(pattern = "f1",replacement = 'f2' , x = f1_colnames)
+  s1_colnames =  colnames(pre_hbf_tab)[grep(pattern = "s1_discon", x = colnames(pre_hbf_tab))]
+  s2_colnames = gsub(pattern = "s1", replacement = "s2", x = s1_colnames)
+  pre_hbf_tab[,c(f2_colnames, s2_colnames)] = pre_hbf_tab[c(2:nrow(pre_hbf_tab),NA),
+                                                          c(f1_colnames, s1_colnames)]
+  
+  # return columns of connectivity times
+  attach_these_cols = colnames(pre_hbf_tab)[!(colnames(pre_hbf_tab) %in% 
+                                                c("water_year","min_flow","tot_flow"))]
+  
+  ff_tab[,attach_these_cols] = pre_hbf_tab[,attach_these_cols]
+  return(ff_tab)
+}
+
 calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
                                 flow_tab_for_hbf, weights,
                                 scen_id = "hist_obs"){
@@ -1665,24 +1807,21 @@ calc_hbf_tab_nov2024 = function(thresholds_hbf, last_wy = 2018,
   return(hbf_tab)
 }
 
-calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
-                                func_flows,
-                                flow_tab_for_hbf, weights,
-                                scen_id = "hist_obs"){
+
+calc_lasso_hbf_tab_jan2026 = function(thresholds_hbf, last_wy = 2025,
+                                      func_flows,
+                                      flow_tab_for_hbf, 
+                                      weights,
+                                      scen_id = "hist_obs",
+                                      fill_gaps_with_avgs = F){
   
-  pre_hbf_tab = re_and_disconnect_date_tab(thresholds = thresholds_hbf,
-                                           fj_flow = flow_tab_for_hbf)
-  # align for 1st and 2nd years
-  colnames(pre_hbf_tab)=gsub(pattern = "recon_date_", replacement = "f1_recon_",
-                             x = colnames(pre_hbf_tab))
-  colnames(pre_hbf_tab)=gsub(pattern = "discon_date_", replacement = "s1_discon_",
-                             x = colnames(pre_hbf_tab))
-  f1_colnames = colnames(pre_hbf_tab)[grep(pattern = "f1_recon", x = colnames(pre_hbf_tab))]
-  f2_colnames = gsub(pattern = "f1",replacement = 'f2' , x = f1_colnames)
-  s1_colnames =  colnames(pre_hbf_tab)[grep(pattern = "s1_discon", x = colnames(pre_hbf_tab))]
-  s2_colnames = gsub(pattern = "s1", replacement = "s2", x = s1_colnames)
-  pre_hbf_tab[,c(f2_colnames, s2_colnames)] = pre_hbf_tab[c(2:nrow(pre_hbf_tab),NA),
-                                                          c(f1_colnames, s1_colnames)]
+  # #read in means and st devs from kouba et al 2025 data for flow metric transformation
+  # coefs_mean_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_mean_for_zscore.csv"))
+  # colnames(coefs_mean_kouba25)=c("func_flow","mean_k25")
+  # coefs_sd_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_sd_for_zscore.csv"))
+  # colnames(coefs_sd_kouba25)=c("func_flow","sd_k25")
+  # zscore_k25 = merge(coefs_mean_kouba25, coefs_sd_kouba25, by = "func_flow")
+  
   # fill in missing values with averages
   ff_ids = weights$Predictor[weights$Predictor !="Intercept"] 
   ff_aligned_scen = func_flows
@@ -1692,14 +1831,14 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
                                       ff_aligned_scen = ff_aligned_scen,
                                       scen_id = scen_id)
   
-  apply_log10_for_hbf = function(hbf_ff){
-    out = log10(hbf_ff)
-    out[hbf_ff == 0] = 0
-    return(out)
-  }
-
+  # apply_log10_for_hbf = function(hbf_ff){
+  #   out = log10(hbf_ff)
+  #   out[hbf_ff == 0] = 0
+  #   return(out)
+  # }
+  
   for(ff_id in ff_ids){
-    hbf_tab[,paste0(ff_id,"_log10")] = apply_log10_for_hbf(hbf_tab[ff_id])
+    hbf_tab[,paste0(ff_id,"_zscore")] = apply_zscore(hbf_ff = hbf_tab[ff_id], ff_id)
   }
   
   hbf_tab = hbf_tab[hbf_tab$water_year <= last_wy,]
@@ -1710,13 +1849,14 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
                                     last_wy,".csv")))
   
   # fill gaps with averages
-  col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
-  col_avgs_no_na = apply(X=hbf_tab, MARGIN = 2, FUN = median, na.rm=T)
-  for(j in 1:ncol(hbf_tab)){
-    if(is.na(col_avgs[j])){
-      hbf_tab[is.na(hbf_tab[,j]),j] = col_avgs_no_na[j]
+  if(fill_gaps_with_avgs == T){
+    col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
+    col_avgs_no_na = apply(X=hbf_tab, MARGIN = 2, FUN = median, na.rm=T)
+    for(j in 1:ncol(hbf_tab)){
+      if(is.na(col_avgs[j])){
+        hbf_tab[is.na(hbf_tab[,j]),j] = col_avgs_no_na[j]
+      }
     }
-    
   }
   
   # Calculate HBF component parts and add together
@@ -1724,14 +1864,15 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
   
   for(i in 1:length(ff_ids)){
     hbf_colname_i = paste0("comp",i)
-    ff_colname = paste0(weights$Predictor[i+1],"_log10")
+    # ff_colname = paste0(weights$Predictor[i+1],"_log10")
+    ff_colname = paste0(weights$Predictor[i+1],"_zscore")
     # multiply metric values by coefficient
     hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights$Value[i+1])
   }
   
   if(length(ff_ids)>1){ 
     hbf_tab$hbf_total = hbf_tab$Int + 
-    rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
+      rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
   }
   if(length(ff_ids)==1){
     hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
@@ -1740,53 +1881,306 @@ calc_hbf_tab_oct2025 = function(thresholds_hbf, last_wy = 2025,
   return(hbf_tab)
 }
 
+calc_LASSO_hbf_tab_feb2026 = function(#thresholds_hbf, 
+                                      last_wy = 2025,
+                                      func_flows,
+                                      # flow_tab_for_hbf, 
+                                      weights,
+                                      scen_id = "hist_obs",
+                                      fill_gaps_with_avgs = F){
+  
+  # #read in means and st devs from kouba et al 2025 data for flow metric transformation
+  # coefs_mean_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_mean_for_zscore.csv"))
+  # colnames(coefs_mean_kouba25)=c("func_flow","mean_k25")
+  # coefs_sd_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_sd_for_zscore.csv"))
+  # colnames(coefs_sd_kouba25)=c("func_flow","sd_k25")
+  # zscore_k25 = merge(coefs_mean_kouba25, coefs_sd_kouba25, by = "func_flow")
+  
+  # # fill in missing values with averages
+  ff_ids = weights$Predictor[weights$Predictor !="Intercept"]
+  hbf_tab = func_flows
+  # ff_aligned_scen = func_flows
+  
+  # hbf_tab = add_func_flows_to_hbf_tab(pre_hbf_tab = pre_hbf_tab, 
+  #                                     ff_ids = ff_ids,
+  #                                     ff_aligned_scen = func_flows,
+  #                                     scen_id = scen_id)
+  # 
+  # # apply_log10_for_hbf = function(hbf_ff){
+  # #   out = log10(hbf_ff)
+  # #   out[hbf_ff == 0] = 0
+  # #   return(out)
+  # # }
+  # 
+  # for(ff_id in ff_ids){
+  #   hbf_tab[,paste0(ff_id,"_zscore")] = apply_zscore(hbf_ff = hbf_tab[ff_id], ff_id)
+  # }
+  
+  hbf_tab = hbf_tab[hbf_tab$brood_year <= last_wy,]
+  
+  # write.csv(x = hbf_tab, quote = F, row.names = T,
+  #           file = file.path(ms_dir, "Graphics and Supplements",
+  #                            paste0("Supplemental Table 2 - Flow Metrics by Water Year, 1942-",
+  #                                   last_wy,".csv")))
+  
+  # fill gaps with averages
+  if(fill_gaps_with_avgs == T){
+    col_avgs = apply(X=hbf_tab, MARGIN = 2, FUN = mean)
+    col_avgs_no_na = apply(X=hbf_tab, MARGIN = 2, FUN = median, na.rm=T)
+    for(j in 1:ncol(hbf_tab)){
+      if(is.na(col_avgs[j])){
+        hbf_tab[is.na(hbf_tab[,j]),j] = col_avgs_no_na[j]
+      }
+    }
+  }
+  
+  # Calculate HBF component parts and add together
+  hbf_tab$Int = as.numeric(weights$Value[weights$Predictor=="Intercept"])# add intercept term
+  
+  for(i in 1:length(ff_ids)){
+    hbf_colname_i = paste0("comp",i)
+    # ff_colname = paste0(weights$Predictor[i+1],"_log10")
+    ff_colname = paste0(weights$Predictor[i+1],"_zscore")
+    # multiply metric values by coefficient
+    hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights$Value[i+1])
+  }
+  
+  if(length(ff_ids)>1){ 
+    hbf_tab$hbf_total = hbf_tab$Int + 
+      rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
+  }
+  if(length(ff_ids)==1){
+    hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
+  }
+  
+  return(hbf_tab)
+}
 
-calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights, 
-                                   include_years = "all",
-                                   start_wy = 1991, 
-                                   end_wy = 2025
-                                   ){
+calc_MARSS_hbf_tab = function(metrics_tab, 
+                          y_val,
+                          cov_i, mod_i,
+                          yval_yrs ){
+
+  # prediction = predict(mod_i, type = "ytt")
+  
+  p1 = predict(mod_i, type = "ytT")
+  f1 = forecast(mod_i, type = "ytt", h = nrow(metrics_tab),
+                newdata = list(c=t[metrics_tab[,cov_i]]))
+  # CURRENTLY HERE. NEW DATA? TEST
+  
+    pred_new = predict(mod_i, type = "ytt",
+                         newdata=list(metrics_tab[,cov_i]))
+  pred_new$pred
+  
+  pred_new = forecast(mod_i, type = "ytt", 
+                      newdata = list(metrics_tab, cov_i))
+  
+  # metrics_tab$model_pred_y = NA
+  # metrics_tab$model_pred_y[pred_yrs_i] = prediction$pred$estimate
+  # 
+  # 
+  # return(metrics_tab$model_pred_y)
+  
+  # if(length(ff_ids)==1){
+  #   hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
+  # }
+  
+  #hbf_total, #water_year
+  hbf_tab = data.frame(brood_year = metrics_tab$Brood_Year,
+                       hbf_total = prediction$pred$estimate)
+  
+  return(hbf_tab)
+}
+
+marss_predict_plot_single_covars = function(metrics_tab, pred_yrs, y_val,
+                                            cov_i, mod_i){
+  # for diagnostic
+  pred_yrs_i = match(pred_yrs, metrics_tab_orig$brood_year)
+  pred_yrs_i = pred_yrs_i[!is.na(pred_yrs_i)]
+  
+  pred_yrs_ff_i = match(pred_yrs, metrics_tab$brood_year)
+  pred_yrs_ff_i = pred_yrs_ff_i[!is.na(pred_yrs_ff_i)]
+  
+  plot(metrics_tab_orig$brood_year,
+       metrics_tab_orig[, y_val],
+       main = paste0("MARSS models of ", yvlt$y_val_title[yvlt$y_val==y_val],
+                     ", \n single hydrologic covariates"), pch = 19, #type = "o",
+       xlab = "Brood Year",
+       ylab = paste0("Log10 of ", yvlt$y_val_title[yvlt == y_val]))
+  grid()
+  
+  prediction = predict(mod_i, type = "ytt")
+  f1 = forecast(mod_i, type = "ytt", h = 25, newdata = )
+  
+  lines(x = metrics_tab$brood_year[pred_yrs_ff_i],
+        y = prediction$pred$estimate, col = 2,
+        lty = 2, pch = 18)
+  
+  legend(x = "bottomright", legend = cov_i,
+         col = 1+(1:length(cov_i)), lwd = 1)
+  
+}
+
+
+
+
+calc_scen_crop_ET_all_scen=function(scenario_tab = scenario_tab, 
+                           include_years = "all",
+                           start_wy = 1991, 
+                           end_wy = 2025
+){
   
   scenarios = scenario_tab$scenario_id
   # Initialize tables for results with full water years
   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
                          wy = rep(start_wy:end_wy, n_scen),
-                         hb_val = NA, et_tot = NA)
+                         # hb_val = NA, 
+                         et_tot = NA)
   
   for(i in 1:length(scenarios)){
-    scenario_id = scenarios[i]
-    # print(scenario_id)
+    scenario_id = scenarios[i]#; print(scenario_id)
+    by_wy_selector = by_wy_tab$scenario == scenario_id
     
     # pull SWBM results data
     swbm = get_swbm_tab_with_separated_et(scen_id = scenario_id)
     swbm$Month=NULL
     
-    # Pull FJ flow
-    fj_flow_scen = scen_fj_out[,c("Date",scenario_id)]
-    colnames(fj_flow_scen)[colnames(fj_flow_scen) != "Date"] = "Flow"
-    fj_flow_scen$wy = wtr_yr(fj_flow_scen$Date)
-    # Pull functional flow metrics
-    ff = ffs_scenarios[[scenario_id]]
+    # 2. calculate ET deviation distribution
+    et_annual = aggregate(swbm$`Crop ET`, by = list(swbm$Water_Year),
+                          FUN = sum)
+    et_nv_annual = aggregate(swbm$`Nat. Veg. ET`, by = list(swbm$Water_Year),
+                             FUN = sum)
+    # 2a) Add HBF values to the water year table
+    by_wy_tab$et_tot[by_wy_selector] = et_annual$x[match(by_wy_tab$wy[by_wy_selector], et_annual$Group.1)]
     
-    # pull flow thresholds from weights column names
-    re_and_discon_cols = colnames(weights)[c(grep(pattern = "recon", x = colnames(weights)), 
-                                             grep(pattern = "discon", x = colnames(weights)))]
-    if(length(re_and_discon_cols) > 1){
-      re_and_discon_cols_matrix = matrix(unlist(strsplit(re_and_discon_cols, split="_")), ncol=3, byrow=T)
-      re_and_discon_thresh = unique(as.numeric(re_and_discon_cols_matrix[,3]))
-    } else {re_and_discon_thresh = c(20, 40, 120)}
+    # filter for dry years only if selected
+    if(sum(include_years %in% c("all", "All", "ALL"))<1){
+      et_annual = et_annual[et_annual$Group.1 %in% include_years,]
+      et_nv_annual = et_annual[et_nv_annual$Group.1 %in% include_years,]
+    }
+    scenario_tab$et_mean[i]=mean(et_annual$x)
+    scenario_tab$et_stdev[i]=sd(et_annual$x)
+    scenario_tab$et_mean_nv[i] = mean(et_nv_annual$x)
     
-    # 1. calculate benefit value distribution
-    
-    hbf_tab = calc_hbf_tab_oct2025(flow_tab_for_hbf = fj_flow_scen,
-                                   func_flows = ff,
-                                   weights = weights, 
-                                   thresholds_hbf = re_and_discon_thresh, 
-                                   scen_id = scenario_id)
-    # 1a) Add HBF values to the water year table
+  }
+  
+  results = list(scenario_tab, by_wy_tab)
+  names(results) = c("scenario_tab", "obj_fn_results_by_wy")
+  return(results)
+}
+
+calc_scen_crop_ET=function(scenario_tab = scenario_tab, 
+                                    include_years = "all",
+                                    start_wy = 1991, 
+                                    end_wy = 2025
+){
+  
+  scenarios = scenario_tab$scenario_id
+  # Initialize tables for results with full water years
+  n_years = length(start_wy:end_wy); n_scen = length(scenarios)
+  by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
+                         wy = rep(start_wy:end_wy, n_scen),
+                         # hb_val = NA, 
+                         et_tot = NA)
+  
+  for(i in 1:length(scenarios)){
+    scenario_id = scenarios[i]#; print(scenario_id)
     by_wy_selector = by_wy_tab$scenario == scenario_id
-    by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
+    
+    # pull SWBM results data
+    swbm = get_swbm_tab_with_separated_et(scen_id = scenario_id)
+    swbm$Month=NULL
+    
+    # 2. calculate ET deviation distribution
+    et_annual = aggregate(swbm$`Crop ET`, by = list(swbm$Water_Year),
+                          FUN = sum)
+    et_nv_annual = aggregate(swbm$`Nat. Veg. ET`, by = list(swbm$Water_Year),
+                             FUN = sum)
+    # 2a) Add HBF values to the water year table
+    by_wy_tab$et_tot[by_wy_selector] = et_annual$x[match(by_wy_tab$wy[by_wy_selector], et_annual$Group.1)]
+    
+    # filter for dry years only if selected
+    if(sum(include_years %in% c("all", "All", "ALL"))<1){
+      et_annual = et_annual[et_annual$Group.1 %in% include_years,]
+      et_nv_annual = et_annual[et_nv_annual$Group.1 %in% include_years,]
+    }
+    scenario_tab$et_mean[i]=mean(et_annual$x)
+    scenario_tab$et_stdev[i]=sd(et_annual$x)
+    scenario_tab$et_mean_nv[i] = mean(et_nv_annual$x)
+    
+  }
+  
+  results = list(scenario_tab, by_wy_tab)
+  names(results) = c("scenario_tab", "obj_fn_results_by_wy")
+  return(results)
+}
+
+get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab, 
+                                     lasso_weights=NULL,
+                                     # cov_i = NA, 
+                                     # mod_i = NULL,
+                                     start_wy = 1991,
+                                     end_wy = 2025
+                                     # yval_yrs = NA
+){
+
+  scenarios = scenario_tab$scenario_id
+  # Initialize tables for results with full water years
+  n_years = length(start_wy:end_wy)
+  n_scen = length(scenarios)
+  by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
+                         wy = rep(start_wy:end_wy, n_scen),
+                         hb_val = NA, et_tot = NA)
+  
+  for(i in 1:length(scenarios)){
+    scenario_id = scenarios[i]#; print(scenario_id)
+    
+    # 1. Pull and transform functional flow metrics
+    # Select Functional Flows table for given scenario
+    ff = ffs_scenarios[[scenario_id]]
+    # add connectivity timing metrics before transforming
+    ff = add_conn_timing_cols_to_ff_tab(ff_tab = ff, scenario_id,
+                                        lasso_weights, cov_i)
+    
+    ff_ids = colnames(ff[!(colnames(ff) %in% c("Brood_Year", "WY_Cat"))])
+    colnames(ff)[colnames(ff)=="Brood_Year"]="brood_year"
+    
+    # transform ff metrics
+    for(ff_id in ff_ids){
+      ff[,paste0(ff_id,"_zscore")] = 
+        apply_zscore(hbf_ff = ff[,ff_id], ff_id)
+      colnames(ff)[colnames(ff) == ff_id] = paste0(ff_id, "_untrans")
+      # colnames(ff)[colnames(ff) == paste0(ff_id,"_zscore")] = ff_id
+    }
+
+    
+    # 2. calculate benefit value distribution
+    if(!is.null(lasso_weights)){
+      hbf_tab = calc_LASSO_hbf_tab_feb2026(
+        #flow_tab_for_hbf = fj_flow_scen,
+        func_flows = ff,
+        weights = lasso_weights, 
+        # mod_i = mod_i, cov_i = cov_i,
+        # thresholds_hbf = re_and_discon_thresh, 
+        scen_id = scenario_id)
+    } else {
+      # marss_predict_plot_single_covars(metrics_tab=ff, 
+      #                                  pred_yrs = yval_yrs, 
+      #                                  y_val,
+      #                                  cov_i = cov_i,
+      #                                  mod_i = mod_i)
+      
+      hbf_tab = calc_MARSS_hbf_tab(
+        metrics_tab = ff,
+        mod_i = mod_i, cov_i = cov_i,
+        # scen_id = scenario_id,
+        yval_yrs = yval_yrs)
+    }
+    
+    # 2a) Add HBF values to the water year table
+    by_wy_selector = by_wy_tab$scenario == scenario_id
+    by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$brood_year)]
     
     # 1b) Clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
     # if(scenario_id == "curtail_start_aug15"){
@@ -1815,13 +2209,19 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
     # }
     
     # 1c) Assign HBF mean value to scenario_tab
-    # filter for dry years only if selected
-    if(sum(include_years %in% c("all", "All", "ALL"))<1){hbf_tab = hbf_tab[hbf_tab$water_year %in% include_years,]}
+    # # filter for dry years only if selected
+    # if(sum(include_years %in% c("all", "All", "ALL"))<1){hbf_tab = hbf_tab[hbf_tab$water_year %in% include_years,]}
     # 1d) Calculate distribution values and assign to scenario table
-    scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total)
-    scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total)
+    scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total, na.rm=T)
+    scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total, na.rm=T)
     
-    # 2. calculate ET deviation distribution
+    # 3. calculate ET deviation distribution
+    
+    # pull SWBM results data
+    
+    swbm = get_swbm_tab_with_separated_et(scen_id = scenario_id)
+    swbm$Month=NULL
+
     et_annual = aggregate(swbm$`Crop ET`, by = list(swbm$Water_Year),
                           FUN = sum)
     et_nv_annual = aggregate(swbm$`Nat. Veg. ET`, by = list(swbm$Water_Year),
@@ -1829,17 +2229,13 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
     # 2a) Add HBF values to the water year table
     by_wy_tab$et_tot[by_wy_selector] = et_annual$x[match(by_wy_tab$wy[by_wy_selector], et_annual$Group.1)]
     
-    # filter for dry years only if selected
-    if(sum(include_years %in% c("all", "All", "ALL"))<1){
-      et_annual = et_annual[et_annual$Group.1 %in% include_years,]
-      et_nv_annual = et_annual[et_nv_annual$Group.1 %in% include_years,]
-    }
+    # et_annual = et_annual[et_annual$Group.1 %in% include_years,]
+    # et_nv_annual = et_annual[et_nv_annual$Group.1 %in% include_years,]
+    
     scenario_tab$et_mean[i]=mean(et_annual$x)
     scenario_tab$et_stdev[i]=sd(et_annual$x)
     scenario_tab$et_mean_nv[i] = mean(et_nv_annual$x)
-    
-    
-    
+
   }
   
   results = list(scenario_tab, by_wy_tab)
@@ -1848,6 +2244,69 @@ calculate_HBF_and_crop_ET=function(scenario_tab = scenario_tab, weights,
 }
 
 
+# get_HBF_columns=function(scenario_tab = scenario_tab, 
+#                          weights = NULL,
+#                          mod_i = NULL, cov_i = NA,
+#                                    include_years = "all",
+#                                    start_wy = 1991, 
+#                                    end_wy = 2025
+# ){
+#   
+#   scenarios = scenario_tab$scenario_id
+#   # Initialize tables for results with full water years
+#   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
+#   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
+#                          wy = rep(start_wy:end_wy, n_scen),
+#                          hb_val = NA#, et_tot = NA
+#                          )
+#   
+#   for(i in 1:length(scenarios)){
+#     scenario_id = scenarios[i]#; print(scenario_id)
+#     
+#     # Pull FJ flow
+#     fj_flow_scen = scen_fj_out[,c("Date",scenario_id)]
+#     colnames(fj_flow_scen)[colnames(fj_flow_scen) != "Date"] = "Flow"
+#     fj_flow_scen$wy = wtr_yr(fj_flow_scen$Date)
+#     # Pull functional flow metrics
+#     ff = ffs_scenarios[[scenario_id]]
+#     
+#     # pull flow thresholds from weights column names
+#     re_and_discon_cols = colnames(weights)[c(grep(pattern = "recon", x = colnames(weights)), 
+#                                              grep(pattern = "discon", x = colnames(weights)))]
+#     if(length(re_and_discon_cols) > 1){
+#       re_and_discon_cols_matrix = matrix(unlist(strsplit(re_and_discon_cols, split="_")), ncol=3, byrow=T)
+#       re_and_discon_thresh = unique(as.numeric(re_and_discon_cols_matrix[,3]))
+#     } else {
+#       re_and_discon_thresh = 120# c(20, 40, 120)
+#     }
+#     
+#     # 1. calculate benefit value distribution
+#     if(is.null(mod_i)){
+#       hbf_tab = calc_lasso_hbf_tab_jan2026(flow_tab_for_hbf = fj_flow_scen,
+#                                      func_flows = ff,
+#                                      weights = weights, 
+#                                      thresholds_hbf = re_and_discon_thresh, 
+#                                      scen_id = scenario_id)
+#       
+#     }
+#     
+#     
+#     # 1a) Add HBF values to the water year table
+#     by_wy_selector = by_wy_tab$scenario == scenario_id
+#     by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
+#     
+#     # 1c) Assign HBF mean value to scenario_tab
+#     # # filter for dry years only if selected
+#     # if(sum(include_years %in% c("all", "All", "ALL"))<1){hbf_tab = hbf_tab[hbf_tab$water_year %in% include_years,]}
+#     # 1d) Calculate distribution values and assign to scenario table
+#     scenario_tab$HBF_mean[i] = mean(hbf_tab$hbf_total, na.rm=T)
+#     scenario_tab$HBF_stdev[i]=sd(hbf_tab$hbf_total, na.rm=T)
+#   }
+#   
+#   results = list(scenario_tab, by_wy_tab)
+#   names(results) = c("scenario_tab", "obj_fn_results_by_wy")
+#   return(results)
+# }
 
 
 add_plot_cols_to_scen_cat_tab = function(scen_cat_tab_1){

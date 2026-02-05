@@ -36,6 +36,7 @@ library(dataRetrieval) # USGS flow data
 # library(readr) # for parsing downloaded NOAA data
 # library(devtools); devtools::install_github("flowwest/CDECRetrieve") # This line only needs to be run once to install the CDECRetrieve package (which is not available on CRAN)
 # library(CDECRetrieve) # for CDEC data
+library(MARSS)
 
 
 
@@ -397,14 +398,6 @@ mo_tab = data.frame(mgmt_o = c("Maximize specific environmental flows",
                               "Feasibility category of 1-4 (lower values preferred)"))
 colnames(mo_tab) = column_labels
 
-#declare xtable object, assign formatted column labels, and print to latex object
-# mo_xtab = xtable(mo_tab, label = "tab:objFunctionTable",
-#                  caption = caption_text,align = "lp{6cm}p{6cm}")#, digits = c(NA, NA, NA))
-# names(mo_xtab) = column_labels
-# print.xtable(mo_xtab, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F, hline.after = 0:3)
-# #caption.placement = "top",
-
-
 mo_tab_ft = flextable(data = mo_tab)
 mo_tab_ft = set_caption(mo_tab_ft, caption = caption_text)
 mo_tab_ft = flextable::width(mo_tab_ft,j=1,  width = 2.5)
@@ -453,6 +446,7 @@ mo_tab_ft
 # # coefs_tab_ch = coefs_tab_ch[coefs_tab_ch$Predictor!="chinook_spawners_zscored",]
 # 
 coefs_tab = read.csv(file.path(data_dir, "kouba_et_al_2025_ensemble_coefs_chinook and coho.csv"))
+
 # coefs_tab = coefs_tab[,cols_for_expl]
 # coefs_tab = coefs_tab[coefs_tab$Predictor!="chinook_spawners_zscored",]
 
@@ -477,7 +471,7 @@ For each species, across all statistical methods, the coefficients for any singl
 # coef_tab = coefs_hb_co_2
 # coef_tab = coefs_tab_co
 
-model_name = "chinook_lasso_jps_on_hydro"
+model_name = "coho_lasso_juv_on_hydro"
 coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
 coef_tab = coef_tab[coef_tab[,model_name] != 0,]
 
@@ -486,7 +480,7 @@ coef_tab = coef_tab[coef_tab[,model_name] != 0,]
 
 
 #Create caption and column labels
-caption_text = "Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to coho salmon by specific functional flows. The predicted value is in units of log10(coho smolt) produced due to hydrologic factors."
+caption_text = "Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to coho salmon by specific functional flows. The predicted value is in units of log10(coho smolt) produced due to hydrologic factors (expressed as Z-score transformed functional flow metrics; see Kouba et al. 2025 for more details)."
 column_labels = c("Predictor", "Value", "Greater Hydrologic Benefit value associated with")
 
 colnames(coef_tab) = column_labels

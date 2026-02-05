@@ -805,6 +805,14 @@ for(i in 1:length(scenario_list)){
 }
 
 
+#read in means and st devs from kouba et al 2025 data for flow metric transformation
+coefs_mean_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_mean_for_zscore.csv"))
+colnames(coefs_mean_kouba25)=c("func_flow","mean_k25")
+coefs_sd_kouba25 = read.csv(file.path(data_dir,"kouba_et_al_2025_flow_metrics_sd_for_zscore.csv"))
+colnames(coefs_sd_kouba25)=c("func_flow","sd_k25")
+zscore_k25 = merge(coefs_mean_kouba25, coefs_sd_kouba25, by = "func_flow")
+
+
 
 # FUNCTIONAL FLOWS TAKE 1, OLD CALCULATOR
 
