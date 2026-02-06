@@ -11,8 +11,7 @@ bibliography: library.bib
 
 ---
 
-# Fish-Farm Results of 4 HB function formulations
-
+# Fish-Farm Results from all four Hydrologic Benefit Function formulations
 
 While MARSS models were used as a tool for identifying important functional flows in [@KoubaEtAlWatershedSpecific2025], they are unsuitable for this hydrologic scenario outcome forecasting purpose, because they are autoregressive in nature: the forecasting of future fish outcomes requires historical observations of fish outcomes. Therefore, to use MARSS models in estimating the ecological effects of flow changes under different management scenarios, it would be necessary to have historical fish records collected under the different management scenarios, which are not possible. 
 
@@ -88,9 +87,9 @@ capmaker_all_models = model_name_to_coefs_df(model_names)
 ```{r coefTab01, echo = FALSE, results = 'asis'}
 
 # model_name = "chinook_lasso_jps_on_hydro"
-# model_name = "chinook_lasso_juv_on_hydro"
+model_name = "chinook_lasso_juv_on_hydro"
 # model_name = "coho_lasso_jps_on_hydro"
-model_name = "coho_lasso_juv_on_hydro"
+# model_name = "coho_lasso_juv_on_hydro"
 
 
 coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
@@ -173,28 +172,31 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 
 
 
-```{r benefitByWY01, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , fig.height=8.3, fig.width=7, warning=F}
+```{r benefitByWY01, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , warning=F}
+
+y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
-  png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
+  png(filename = fig_path, width = 8, height = 7.5, units = "in", res = 300)
 
   # plot_scenarios = scenario_tab$scenario_id
   plot_scenarios1 = c("basecase", "alf_curtail_08.15", "alf_curtail_07.31",
                       "alf_curtail_07.15")
-  plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
-                      "grain_12k")
+  # plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
+  #                     "grain_12k")
 
-  par(mfcol = c(4,1))
+  par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
                     cols = get_palette(c("black","dodgerblue",
                                          "green4","darkgoldenrod"),
                                        length(plot_scenarios1)),
-                    panel_labels = c("A","B"))
-  plot_obj_fn_by_wy(plot_scenarios = plot_scenarios2,
-                    cols = sequential_hcl(n=length(plot_scenarios1),
-                                          palette = "Red-Blue"),
-                    panel_labels = c("C","D"))
+                    panel_labels = c("A","B"),
+                    y_val_label = y_val_x_axis_label)
+  # plot_obj_fn_by_wy(plot_scenarios = plot_scenarios2,
+  #                   cols = sequential_hcl(n=length(plot_scenarios1),
+  #                                         palette = "Red-Blue"),
+  #                   panel_labels = c("C","D"))
   dev.off()
 }
 
@@ -209,6 +211,7 @@ fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
   farm_fish_tradeoff_fig(scenario_tab = scenario_tab,
+                         y_val_label = y_val_x_axis_label,
                          plot_title = "Environmental vs Agricultural Benefit \n Mean of annual values, 1991-2025")
   dev.off()
 }
@@ -217,10 +220,88 @@ fig_i = fig_i + 1
 
 #Make blank axes for slides
 if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure ",fig_i,".png")), width = 8, height = 8, units = "in", res = 300)
-  farm_fish_tradeoff_blank(scenario_tab = scenario_tab)
+  farm_fish_tradeoff_blank(scenario_tab = scenario_tab,
+                           y_val_label = y_val_x_axis_label)
   fig_i = fig_i +1; dev.off()}
 
 ```
+
+
+\blandscape
+
+```{r scenarioResultsTab, echo = FALSE, results = 'asis'}
+# attach low-coho year numbers to scenario table
+
+
+
+# Calculate efficiency - HB gained to ET lost
+# scenario_tab$hb_et_ratio = round(scenario_tab$HBF_mean / scenario_tab$et_mean * 10^6 * -1, 1)
+# scenario_tab$et_hb_ratio = round(scenario_tab$et_mean / 10^6 * -1 / scenario_tab$HBF_mean, 1)
+bc_sel = scenario_tab$scenario_id=="basecase"
+hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
+et_bc_mean = scenario_tab$et_mean[bc_sel]
+scenario_tab$hb_gained = (scenario_tab$HBF_mean - hb_bc_mean)/hb_bc_mean
+scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1# / 10^6 *-1*-1
+# scenario_tab$et_lost[scenario_tab$et_lost < 0] = 0
+scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
+
+
+# subset desired columns
+scen_tab = scenario_tab[,c("scenario_id", "scenario_category", "feas_cat", 
+                           "HBF_mean", "et_mean", "pareto_opt", "hb_gained_to_et_lost")]
+scen_tab$HBF_mean = round(scen_tab$HBF_mean / 1000, 2)
+scen_tab$et_mean = round(scen_tab$et_mean)
+# remove the negative efficiencies - that means ET was gained, not lost, so it doesn't apply
+scen_tab$hb_gained_to_et_lost = round(scen_tab$hb_gained_to_et_lost, 2)
+# scen_tab$hb_gained_to_et_lost_lc = round(scen_tab$hb_gained_to_et_lost_lc, 1)
+scen_tab$hb_gained_to_et_lost[scenario_tab$hb_gained <=0 | 
+                                scenario_tab$et_lost <=0 |
+                                !is.finite(scen_tab$hb_gained_to_et_lost) |
+                                scen_tab$scenario_id == "basecase" ] = "--"
+# scen_tab$hb_gained_to_et_lost_lc[scen_tab$hb_gained_to_et_lost_lc<=0 | 
+#                                    !is.finite(scen_tab$hb_gained_to_et_lost_lc) |
+#                                     scen_tab$scenario_id == "basecase"] = "--"
+scen_tab$et_mean = round(scenario_tab$et_mean * (-1 / 10^6), 2)
+# scen_tab$et_mean_lc = round(scenario_tab$et_mean_lc * (-1 / 10^6), 2)
+
+# Exclude attribution scenarios
+scen_tab = scen_tab[scen_tab$scenario_category != "Attr",]
+
+#Create caption and column labels
+caption_text = "Scenario attributes for 25 scenarios. Units for Hydrologic Benefit (HB) value are coho smolt per female-equivalent; for ET are million cubic meters; both are averages of 35 annual values. Efficiency not calculated for scenarios with no average ET loss."
+column_labels = c("Scenario ID", "Category", "Feas.", "Mean HB / 1,000", "Mean ET",  "Pareto", "Efficiency")
+
+scen_tab_for_ft = scen_tab
+colnames(scen_tab_for_ft) = column_labels
+
+st_ft = flextable(scen_tab_for_ft)
+st_ft = set_caption(st_ft, caption = caption_text)
+
+st_ft = flextable::fontsize(st_ft,j=1,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=2,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=3,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=4,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=5,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=6,  size = 10)
+st_ft = flextable::fontsize(st_ft,j=7,  size = 10)
+
+# st_ft = flextable::rotate(st_ft, rotation="btlr",j=1:8)
+st_ft = flextable::width(st_ft,j=1,  width = 1.7)
+st_ft = flextable::width(st_ft,j=2,  width = 1)
+st_ft = flextable::width(st_ft,j=3,  width = .7)
+st_ft = flextable::width(st_ft,j=4,  width = .7)
+st_ft = flextable::width(st_ft,j=5,  width = .7)
+st_ft = flextable::width(st_ft,j=6,  width = .8)
+st_ft = flextable::width(st_ft,j=7,  width = .8)
+
+# st_ft = flextable::autofit(st_ft)
+st_ft
+
+
+``` 
+
+
+\elandscape
 
 
 ```{r efficiency, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average HB value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Basecase, Reservoir scenarios and Enhanced Recharge scenarios are not included as they have on average no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
@@ -401,3 +482,8 @@ fig_i = fig_i + 1
 
 
 <!-- ``` -->
+
+
+\newpage
+
+# References

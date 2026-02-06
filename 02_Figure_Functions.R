@@ -730,6 +730,14 @@ results8_cap_maker = function(attr){
   )
 }
 
+model_name_to_y_val_label = function(model_name){
+  if(grepl(pattern = "coho", x = model_name, ignore.case = T)){species = "coho"}
+  if(grepl(pattern = "Chinook", x = model_name, ignore.case = T)){species = "Chinook"}
+  if(grepl(pattern = "juv", x = model_name, ignore.case = T)){units = "juv. abun."}
+  if(grepl(pattern="jps", x =model_name, ignore.case = T)){units = "juv. per spawner"}
+  return(paste(species, units))
+}
+
 # figure functions --------------------------------------------------------
 
 
@@ -1129,7 +1137,8 @@ annual_swbm_budget_fig = function(scen_id = "basecase",
 plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"),
                              dry_years = c(1991, 1992, 1994, 2001,
                                            2009, 2013, 2014, 2018,
-                                           2020, 2021, 2022)) {
+                                           2020, 2021, 2022),
+                             y_val_label) {
   n_scen = length(plot_scenarios)
   if(sum(is.na(cols))>1){cols = my_colors = colorblind_pal()(length(plot_scenarios))}
   cols[1] = basecase_col
@@ -1141,13 +1150,14 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
 
   # panel 1, hbv
   par(mar = c(3,4,1,2))
-  y_range_hb = range(obj_fn_wy$hb_val, na.rm=T)
+  scens_selector = obj_fn_wy$scenario %in% plot_scenarios
+  y_range_hb = range(obj_fn_wy$hb_val[scens_selector], na.rm=T)
   dy = diff(y_range_hb)
   plot(x = NA, y = NA,
        ylim = y_range_hb,
        xlim = range(wys),
        # main = scen,
-       ylab = "HB value (coho smolt-equiv.)", xlab = "")
+       ylab = paste0("HB value (", y_val_label,"-equiv.)"), xlab = "")
   grid()
 
   # add dry year highlights
@@ -1176,7 +1186,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   y_range_et = range(obj_fn_wy$et_tot / 10^6 * -1)
   plot(x = NA, y = NA,
        xlim = range(wys), ylim = y_range_et,
-       ylab = "Crop ET (million m 3)", xlab = "")
+       ylab = "Crop ET (million m 3)", xlab = "Salmon cohort brood year")
   grid()
   # add dry year highlights
   for(dry_yr in dry_years){
@@ -1240,12 +1250,13 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
 
 
 
-farm_fish_tradeoff_blank = function(scenario_tab, add_st_dev_bars = F){
+farm_fish_tradeoff_blank = function(scenario_tab, y_val_label,
+                                    add_st_dev_bars = F){
   par(mar = c(5,4,5,2))
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1,
        pch = 19, cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        col =  NA,
-       xlab = "Mean Hydrologic Benefit Value (coho smolt-equiv.)",
+       xlab = paste0("Mean Hydrologic Benefit Value (",y_val_label,"-equiv.)"),
        ylab = "Mean Annual Crop ET (million cubic m)",
        main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values, 1991-2025")
   grid()
@@ -1255,14 +1266,15 @@ farm_fish_tradeoff_blank = function(scenario_tab, add_st_dev_bars = F){
 farm_fish_tradeoff_fig = function(scenario_tab, n_years = 35,
                                   add_st_dev_bars = F,
                                   legend_position = "bottomleft",#"topright",
-                                  plot_title){
+                                  plot_title,
+                                  y_val_label){
   par(mar = c(5,4,5,2))
   plot(scenario_tab$HBF_mean, scenario_tab$et_mean / 1E6 * -1, # convert to + number in mill. m^3
        pch = scenario_tab$symbol,# pch = 21,
        cex = 2, #ylim = c(-0.20,0.02), #xlim = c(8.4,13),
        bg = scenario_tab$color,
        ylim = c(0,125),# xlim = c(3.5, 4.5), # ylim = c(0,113), xlim = c(55, 67),
-       xlab = "Hydrologic Benefit Function (coho smolt-equiv)",
+       xlab = paste0("Mean Hydrologic Benefit Value (",y_val_label,"-equiv.)"),
        ylab = "Mean Annual Crop ET (million cubic m)",
        # main = "Environmental vs Agricultural Benefit of Suite of Management Actions \n Mean and Standard Error for annual values"
        main = plot_title)
@@ -1383,8 +1395,8 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
   plot(
     x = as.numeric(as.factor(plot_2_scen$scenario_category)), 
     y = (plot_2_scen$hb_gained_to_et_lost), pch = plot_2_scen$symbol,
-    bg = plot_2_scen$color, cex = 2,
-    main = "Trade-off efficiency: HB gained per ET lost",
+    bg = plot_2_scen$color, cex = 2, #ylim = c(0,1),
+    main = "Trade-off efficiency: Hyd. Ben. gained per ET lost",
     ylab = "Avg. efficiency (1991-2025)", xlab = "Scenario Category",
     xaxt = "n"
   )
@@ -1401,7 +1413,8 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
   
   sct2 = scen_cat_tab[(scen_cat_tab$category %in% c("basecase",unique(plot_2_scen$scenario_category))),]
 
-  legend(x = "right", pch=sct2$symbol, cex = .8, pt.cex = 1.5, #ncol = 2,
+  legend(x = "topright", pch=sct2$symbol, cex = .7,
+         pt.cex = 1.5, ncol = 2,
          pt.bg = sct2$color,
          legend = sct2$category_long)
 }
