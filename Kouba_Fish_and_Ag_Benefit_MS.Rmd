@@ -21,46 +21,23 @@ library(sf)
 library(terra)
 library(geodata)
 library(rpostgis)
-# library(rgeos)
-# library(postGIStools)
-# library(httr)
-# library(stringr)
-# library(rstudioapi)
-# library(readxl)
 library(tidyr)
-# library(soilDB) #ssurgo
-# library(aqp) #ssurgo
 library(plyr) #ssurgo and climate data
 library(data.table) #fread function
 library(dataRetrieval) # USGS flow data
-# library(readr) # for parsing downloaded NOAA data
-# library(devtools); devtools::install_github("flowwest/CDECRetrieve") # This line only needs to be run once to install the CDECRetrieve package (which is not available on CRAN)
-# library(CDECRetrieve) # for CDEC data
 library(MARSS)
 
-
-
 library(lubridate)
-# library(rgdal)
-# library(rpostgis)
-# library(postGIStools)
 library(httr)
 library(stringr)
 library(rstudioapi)
 library(dataRetrieval) # for usgs data
 library(data.table) #month function
 library(zoo) # rolling means
-# library(plyr)  # for barplots for climate fig
 library(rgl) # plot3d
-# library(ggplot2) # water budget bar chart
-#spatial data libraries
-# library(rgeos)
-# library(maptools)
 library(RANN)
 library(tmap)
 library(RColorBrewer)
-# library(raster)
-# library(xtable)
 library(flextable)
 library(scales) # for alpha() color function
 library(ggthemes) # for colorblind_pal()
@@ -90,7 +67,7 @@ if(!file.exists(file.path(ms_dir,"manuscript_data.RData"))){
   
 load(file.path(ms_dir, "manuscript_data.RData")) # Load data layers/tables
 start_date = as.Date("1990-10-01")
-INCLUDE_SUPP = T
+INCLUDE_SUPP = F
 
 ```
 
@@ -585,6 +562,8 @@ colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
 colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
 
 ```
+
+
 
 
 
@@ -1141,24 +1120,24 @@ While MARSS models were used as a tool for identifying important functional flow
 
 Consequently, only LASSO models dependent on hydrologic variables were evaluated as potential tools to forecast the outcomes of flow change on fish reproduction.
 
-## Coho, juvenile abundance
+<!-- ## Coho, juvenile abundance -->
 
-```{r varDeclaration1, echo=F, include=F}
-model_name = "coho_lasso_juv_on_hydro"
-```
+<!-- ```{r varDeclaration1, echo=F, include=F} -->
+<!-- model_name = "coho_lasso_juv_on_hydro" -->
+<!-- ``` -->
 
-```{r call_supplement1, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'}
-```
+<!-- ```{r call_supplement1, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'} -->
+<!-- ``` -->
 
-## Coho, juveniles per spawner
+<!-- ## Coho, juveniles per spawner -->
 
-```{r varDeclaration2, echo=F, include=F}
-model_name = "coho_lasso_jps_on_hydro"
+<!-- ```{r varDeclaration2, echo=F, include=F} -->
+<!-- model_name = "coho_lasso_jps_on_hydro" -->
 
-```
+<!-- ``` -->
 
-```{r call_supplement2, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'}
-```
+<!-- ```{r call_supplement2, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'} -->
+<!-- ``` -->
 
 <!-- ## Chinook, juvenile abundance -->
 

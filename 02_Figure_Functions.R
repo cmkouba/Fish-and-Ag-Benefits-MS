@@ -1151,7 +1151,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   # panel 1, hbv
   par(mar = c(3,4,1,2))
   scens_selector = obj_fn_wy$scenario %in% plot_scenarios
-  y_range_hb = range(obj_fn_wy$hb_val[scens_selector], na.rm=T)
+  y_range_hb = range(obj_fn_wy$hbf_total[scens_selector], na.rm=T)
   dy = diff(y_range_hb)
   plot(x = NA, y = NA,
        ylim = y_range_hb,
@@ -1174,9 +1174,9 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   for(i in 1:n_scen){
     scen = plot_scenarios[i]
     scen_selector = obj_fn_wy$scenario==scen
-    points(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hb_val[scen_selector],
+    points(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hbf_total[scen_selector],
            col = cols[i], pch = pchs[i], cex = 1.8, lwd = 2)
-    lines(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hb_val[scen_selector],
+    lines(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hbf_total[scen_selector],
           col = cols[i])
   }
   text(x = 1991, y = 10, labels = panel_labels[1]) # Panel label
@@ -1227,13 +1227,13 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   #   par(mfrow = c(2,1))
   #   # panel 1, hbv
   #   plot(x = NA, y = NA,
-  #        ylim = range(obj_fn_wy$hb_val, na.rm=T),
+  #        ylim = range(obj_fn_wy$hbf_total, na.rm=T),
   #        main = scen, ylab = "HB value (coho smolt-equiv.)", xlab = "Water Year")
   #   grid()
   # for(i in 1:length(plot_scenarios)){
   #   scen = plot_scenarios[i]
   #   scen_selector = obj_fn_wy$scenario==scen
-  #   points(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hb_val[scen_selector],
+  #   points(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hbf_total[scen_selector],
   #        type = "o",col = hbv_col, pch = 19)
   # }
   #   # panel 2, et
@@ -1421,6 +1421,32 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
          legend = sct2$category_long)
 }
 
+
+hbf_comp_fig = function(obj_fn_wy, scen_id){
+  obj_fn_scen = obj_fn_wy[obj_fn_wy$scenario==scen_id,]
+  remove_cols = c("scenario","hbf_total","et_tot")
+  dat_for_plot = obj_fn_scen[,!(colnames(obj_fn_scen) %in% remove_cols)]
+  colnames(dat_for_plot) = gsub(pattern = "_comp", 
+                                x = colnames(dat_for_plot), replacement = "")
+  comp_names = colnames(dat_for_plot)[-which(colnames(dat_for_plot)=="wy")]
+  dat_for_plot_long = reshape(dat_for_plot, idvar = "wy", 
+                              ids = wy,
+                              times = comp_names, timevar = "Component",
+                              varying = list(comp_names), direction = "long")
+  # rename column with component value
+  rename_col_i = which(!(colnames(dat_for_plot_long) %in% c("wy", "Component")))
+  colnames(dat_for_plot_long)[rename_col_i] = "Hyd. Ben. value"
+  
+  ggplot(data = dat_for_plot_long, 
+         aes(fill = Component, x = wy,
+             y = `Hyd. Ben. value`)) +
+    geom_bar(position = "stack", stat = "identity") +
+    scale_fill_manual(labels = comp_names, 
+                      values = rainbow_hcl(n=length(comp_names))) +
+    scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), labels = month.abb[c(10:12, 1:9)]) +
+    theme_bw() +
+    theme(legend.position = "bottom")
+}
 
 # Table functions ---------------------------------------------------------
 
@@ -1953,20 +1979,21 @@ calc_LASSO_hbf_tab_feb2026 = function(#thresholds_hbf,
   hbf_tab$Int = as.numeric(weights$Value[weights$Predictor=="Intercept"])# add intercept term
   
   for(i in 1:length(ff_ids)){
-    hbf_colname_i = paste0("comp",i)
+    ff_id = weights$Predictor[i+1]
+    hbf_colname_i = paste0(ff_id,"_comp")
     # ff_colname = paste0(weights$Predictor[i+1],"_log10")
-    ff_colname = paste0(weights$Predictor[i+1],"_zscore")
+    ff_colname = paste0(ff_id,"_zscore")
     # multiply metric values by coefficient
     hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights$Value[i+1])
   }
   
-  if(length(ff_ids)>1){ 
+  # if(length(ff_ids)>1){ 
     hbf_tab$hbf_total = hbf_tab$Int + 
       rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
-  }
-  if(length(ff_ids)==1){
-    hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
-  }
+  # }
+  # if(length(ff_ids)==1){
+  #   hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
+  # }
   
   return(hbf_tab)
 }
@@ -2050,7 +2077,7 @@ calc_scen_crop_ET_all_scen=function(scenario_tab = scenario_tab,
   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
                          wy = rep(start_wy:end_wy, n_scen),
-                         # hb_val = NA, 
+                         # hbf_total = NA, 
                          et_tot = NA)
   
   for(i in 1:length(scenarios)){
@@ -2096,7 +2123,7 @@ calc_scen_crop_ET=function(scenario_tab = scenario_tab,
   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
                          wy = rep(start_wy:end_wy, n_scen),
-                         # hb_val = NA, 
+                         # hbf_total = NA, 
                          et_tot = NA)
   
   for(i in 1:length(scenarios)){
@@ -2144,9 +2171,12 @@ get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab,
   # Initialize tables for results with full water years
   n_years = length(start_wy:end_wy)
   n_scen = length(scenarios)
+  ff_ids_wts = lasso_weights$Predictor[-grepl("Intercept",lasso_weights$Predictor)]
+  ff_id_names = paste0(ff_ids_wts,"_comp")
   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
-                         wy = rep(start_wy:end_wy, n_scen),
-                         hb_val = NA, et_tot = NA)
+                         wy = rep(start_wy:end_wy, n_scen))
+  # add 
+  by_wy_tab[,c(ff_id_names,"hbf_total","et_tot")] = NA
   
   for(i in 1:length(scenarios)){
     scenario_id = scenarios[i]#; print(scenario_id)
@@ -2171,7 +2201,7 @@ get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab,
 
     
     # 2. calculate benefit value distribution
-    if(!is.null(lasso_weights)){
+    # if(!is.null(lasso_weights)){
       hbf_tab = calc_LASSO_hbf_tab_feb2026(
         #flow_tab_for_hbf = fj_flow_scen,
         func_flows = ff,
@@ -2179,23 +2209,29 @@ get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab,
         # mod_i = mod_i, cov_i = cov_i,
         # thresholds_hbf = re_and_discon_thresh, 
         scen_id = scenario_id)
-    } else {
-      # marss_predict_plot_single_covars(metrics_tab=ff, 
-      #                                  pred_yrs = yval_yrs, 
-      #                                  y_val,
-      #                                  cov_i = cov_i,
-      #                                  mod_i = mod_i)
-      
-      hbf_tab = calc_MARSS_hbf_tab(
-        metrics_tab = ff,
-        mod_i = mod_i, cov_i = cov_i,
-        # scen_id = scenario_id,
-        yval_yrs = yval_yrs)
-    }
-    
+    # } else {
+    #   # marss_predict_plot_single_covars(metrics_tab=ff, 
+    #   #                                  pred_yrs = yval_yrs, 
+    #   #                                  y_val,
+    #   #                                  cov_i = cov_i,
+    #   #                                  mod_i = mod_i)
+    #   
+    #   hbf_tab = calc_MARSS_hbf_tab(
+    #     metrics_tab = ff,
+    #     mod_i = mod_i, cov_i = cov_i,
+    #     # scen_id = scenario_id,
+    #     yval_yrs = yval_yrs)
+    # }
+    # 
     # 2a) Add HBF values to the water year table
     by_wy_selector = by_wy_tab$scenario == scenario_id
-    by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$brood_year)]
+    assign_cols = c(ff_id_names, "hbf_total")
+    for(val_col in assign_cols){
+      by_wy_tab[by_wy_selector, val_col] = 
+        hbf_tab[match(by_wy_tab$wy[by_wy_selector], hbf_tab$brood_year),
+                val_col]
+      
+    }
     
     # 1b) Clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
     # if(scenario_id == "curtail_start_aug15"){
@@ -2272,7 +2308,7 @@ get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab,
 #   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
 #   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
 #                          wy = rep(start_wy:end_wy, n_scen),
-#                          hb_val = NA#, et_tot = NA
+#                          hbf_total = NA#, et_tot = NA
 #                          )
 #   
 #   for(i in 1:length(scenarios)){
@@ -2308,7 +2344,7 @@ get_HBF_and_crop_ET_columns=function(scenario_tab = scenario_tab,
 #     
 #     # 1a) Add HBF values to the water year table
 #     by_wy_selector = by_wy_tab$scenario == scenario_id
-#     by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
+#     by_wy_tab$hbf_total[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
 #     
 #     # 1c) Assign HBF mean value to scenario_tab
 #     # # filter for dry years only if selected
@@ -2390,7 +2426,7 @@ calculate_HBF_and_crop_ET_may2023=function(scenario_tab = scenario_tab, weights,
   n_years = length(start_wy:end_wy); n_scen = length(scenarios)
   by_wy_tab = data.frame(scenario = sort(rep(scenarios, n_years)),
                          wy = rep(start_wy:end_wy, n_scen),
-                         hb_val = NA, et_tot = NA)
+                         hbf_total = NA, et_tot = NA)
   
   for(i in 1:length(scenarios)){
     scenario_id = scenarios[i]
@@ -2417,7 +2453,7 @@ calculate_HBF_and_crop_ET_may2023=function(scenario_tab = scenario_tab, weights,
                                    scen_id = scenario_id)
     # 1a) Add HBF values to the water year table
     by_wy_selector = by_wy_tab$scenario == scenario_id
-    by_wy_tab$hb_val[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
+    by_wy_tab$hbf_total[by_wy_selector] = hbf_tab$hbf_total[match(by_wy_tab$wy[by_wy_selector], hbf_tab$water_year)]
     
     # 1b) Clean up some specific scenarios manually; i guess the algorithm gets fooled on some of these scenarios (kinda randomly)
     if(scenario_id == "curtail_start_aug15"){

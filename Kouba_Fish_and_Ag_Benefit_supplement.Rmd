@@ -298,3 +298,21 @@ fig_i = fig_i + 1
 
 
 ```
+
+
+
+```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} HB COMPONENTS." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 8, height = 6, units = "in", res = 300)
+  hbf_comp_fig(obj_fn_wy, scen_id = "basecase")
+  dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+
+hbf_comp_fig(obj_fn_wy, scen_id = "basecase")
+
+```
