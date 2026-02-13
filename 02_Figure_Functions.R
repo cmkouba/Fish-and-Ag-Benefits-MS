@@ -1157,7 +1157,8 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
        ylim = y_range_hb,
        xlim = range(wys),
        # main = scen,
-       ylab = paste0("HB value (", y_val_label,"-equiv.)"), xlab = "")
+       ylab = paste0("HB value (", y_val_label,"-equiv.)"),
+       xlab = "Salmon cohort brood year")
   grid()
 
   # add dry year highlights
@@ -1186,7 +1187,8 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
   y_range_et = range(obj_fn_wy$et_tot / 10^6 * -1)
   plot(x = NA, y = NA,
        xlim = range(wys), ylim = y_range_et,
-       ylab = "Crop ET (million m 3)", xlab = "Salmon cohort brood year")
+       ylab = "Crop ET (million m 3)", 
+       xlab = "Salmon cohort brood year")
   grid()
   # add dry year highlights
   for(dry_yr in dry_years){

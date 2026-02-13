@@ -1,7 +1,7 @@
 ---
-title: "Multi-objective assessment of stakeholder-defined portfolio of management options clarifies trade-offs in an active local water planning process"
+title: "Farms, fish, and cost: Locally-tailored objective functions expand utility of watershed model results and clarify trade-offs in an active local water planning process, northern California"
 author: "Claire Kouba"
-date: "2025-11-12"
+date: "2026-02-13"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -90,7 +90,7 @@ if(!file.exists(file.path(ms_dir,"manuscript_data.RData"))){
   
 load(file.path(ms_dir, "manuscript_data.RData")) # Load data layers/tables
 start_date = as.Date("1990-10-01")
-INCLUDE_SUPP = F
+INCLUDE_SUPP = T
 
 ```
 
@@ -107,7 +107,7 @@ save_landuse_figure = F
 
 # Abstract {-}
 
-In the rural  American West, water needs of agriculture and ecosystems are often in competition. Furthermore, in places with interconnected surface- and groundwater systems, stream-aquifer exchange increases the difficulty of tracking impacts of diverse water users on each other and on the system as a whole. Hydrologic models can estimate the impacts of water uses and management actions on groundwater elevation and streamflow, but may provide overwhelming amounts of information and/or may be challenging for stakeholders to interpret. In this study, we address these challenges and aim to increase utility of hydrologic model results for a case study jurisdiction in northern California, which is in the process of implementing a long-term Groundwater Sustainability Plan (GSP). We developed a summary statistic or proxy for each of the three primary policy considerations in the GSP (environmental, agricultural, and project cost). We then used them to summarize the results of 25 management scenarios developed for the GSP, which were simulated using an existing integrated surface- and groundwater model. We found that a trade-off in benefits for fish and farms was evident in every category of infrastructure investment (a proxy for project cost), though greater infrastructure investment can achieve some reductions in this trade-off. Additionally, although the GSP management priorities emphasized infrastructure investments, both infrastructure-based and regulatory approaches fell within the Pareto-optimal set of management options under a strict application of these objective functions. Finally, regarding regulatory actions, management interventions targeted at low-flow periods produced a more efficient gain in environmental flow value per cost in agricultural productivity. This work demonstrates that basin-specific, stakeholder-informed objective functions can increase stakeholder-salience of existing hydrologic model results, and can help clarify trade-offs in ongoing local water planning efforts.
+In the rural  American West, water needs of agriculture and ecosystems are often in competition. Furthermore, in places with interconnected surface- and groundwater systems, stream-aquifer exchange increases the difficulty of tracking impacts of diverse water users on each other and on the system as a whole. Hydrologic models can estimate the impacts of water uses and management actions on groundwater elevation and streamflow, but may provide overwhelming amounts of information and/or may be challenging for stakeholders to interpret. In this study, we address these challenges and aim to increase utility of hydrologic model results for a case study jurisdiction in northern California, which is in the process of implementing a long-term Groundwater Sustainability Plan (GSP). We developed a summary statistic or proxy for each of the three primary policy considerations in the GSP (environmental, agricultural, and project cost). We then used them to summarize the results of 25 management scenarios developed for the GSP, which were simulated using an existing integrated surface- and groundwater model. **We found that a trade-off in benefits for fish and farms was evident in every category of infrastructure investment (a proxy for project cost), though greater infrastructure investment can achieve some reductions in this trade-off. Additionally, although the GSP management priorities emphasized infrastructure investments, both infrastructure-based and regulatory approaches fell within the Pareto-optimal set of management options under a strict application of these objective functions.** Finally, **regarding regulatory actions, management interventions targeted at low-flow periods produced a more efficient gain in environmental flow value per cost in agricultural productivity.** This work demonstrates that basin-specific, stakeholder-informed objective functions can increase *stakeholder-salience of existing hydrologic model results*, and can help clarify trade-offs in ongoing local water planning efforts.
 
 
 <!-- # LIT REVIEW -->
@@ -368,7 +368,7 @@ The Scott Valley Groundwater Sustainability Plan (GSP) was developed by the Sisk
 
 SGMA requires each local GSA to define sustainability in the negative, by quantifying and then avoiding "undesirable results" that would be "significant and unreasonable". The central undesirable result in Scott Valley is streamflow depletion due to groundwater pumping. Consequently, a central challenge of GSP development was deciding the amount of (estimated) streamflow depletion that the GSA should aim to reverse, accounting for environmental water demand and what degree of water security was owed to local agriculture.
 
-During GSP development, the authors of this study simulated dozens of land and water use scenarios to facilitate the comparison of management alternatives that could reduce streamflow depletion to various degrees. Simulations were conducted with a spatially explicit, integrated surface water-groundwater model [@TolleyEtAlSensitivity2019], as described below.
+During GSP development, the authors of this study simulated dozens of land and water use scenarios to facilitate the comparison of management alternatives that could reduce streamflow depletion to various degrees. Simulations were conducted with a spatially explicit, integrated surface water-groundwater model [@TolleyEtAlSensitivity2019], as described below in Section 3.3.
 
 # Methods
 
@@ -413,42 +413,9 @@ mo_tab_ft
 
 ```{r read_HB_coefs, echo = F}
 
-# coefs_tab = read.csv(file.path(data_dir,"kouba_et_al_2025_lasso_coeffs.csv"), header = T)
-# 
-# 
-# cols_for_expl = c("Predictor", "Value", "Greater.Hydrologic.Benefit.value.associated.with")
-# coefs_hb_co = coefs_tab[coefs_tab$species == "coho" &
-#                             coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
-# coefs_hb_co_2 = coefs_tab[coefs_tab$species == "coho" & 
-#                             coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
-# coefs_hb_co_3 = coefs_tab[coefs_tab$species == "coho" & 
-#                             coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
-#                           cols_for_expl]
-# 
-# coefs_hb_ch = coefs_tab[coefs_tab$species == "chinook" & 
-#                             coefs_tab$method == "lasso_juv_on_hydro", cols_for_expl]
-# 
-# coefs_hb_ch_2 = coefs_tab[coefs_tab$species == "chinook" & 
-#                             coefs_tab$method == "lasso_jps_on_hydro", cols_for_expl]
-# coefs_hb_ch_3 = coefs_tab[coefs_tab$species == "chinook" & 
-#                             coefs_tab$method == "lasso_juv_on_hydro_and_spawners",
-#                           cols_for_expl]
-
-# attempt 2
-# cols_for_expl = c("Predictor", "ensemble_mean_coef", "Greater.Hydrologic.Benefit.value.associated.with")
-# # 
-# # coefs_tab_co = read.csv(file.path(data_dir,"kouba_et_al_2025_ensemble_coefs_coho.csv"))
-# # coefs_tab_co = coefs_tab_co[,cols_for_expl]
-# # 
-# # coefs_tab_ch = read.csv(file.path(data_dir,"kouba_et_al_2025_ensemble_coefs_chinook.csv"))
-# # coefs_tab_ch = coefs_tab_ch[,cols_for_expl]
-# # # remove spawner predictor
-# # coefs_tab_ch = coefs_tab_ch[coefs_tab_ch$Predictor!="chinook_spawners_zscored",]
-# 
 coefs_tab = read.csv(file.path(data_dir, "kouba_et_al_2025_ensemble_coefs_chinook and coho.csv"))
-
-# coefs_tab = coefs_tab[,cols_for_expl]
-# coefs_tab = coefs_tab[coefs_tab$Predictor!="chinook_spawners_zscored",]
+model_names = colnames(coefs_tab)[2:13]
+capmaker_all_models = model_name_to_coefs_df(model_names)
 
 ```
 
@@ -462,36 +429,23 @@ Specifically, the HB function predicts a higher number of coho smolt produced (c
 
 For each species, across all statistical methods, the coefficients for any single predictor were consistently negative or positive; e.g., 
 
-
-<!-- HB_{wy} = b + m_{1}*metric_{1,~wy} + ... + m_{4}*metric_{4,~wy} -->
-
-
-```{r coefTab, echo = FALSE, results = 'asis'}
-
-# coef_tab = coefs_hb_co_2
-# coef_tab = coefs_tab_co
+```{r coefTabMainText, echo = FALSE, results = 'asis'}
 
 model_name = "coho_lasso_juv_on_hydro"
+# model_name = "coho_lasso_jps_on_hydro"
+# model_name = "chinook_lasso_juv_on_hydro"
+# model_name = "chinook_lasso_jps_on_hydro"
+
+
 coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
 coef_tab = coef_tab[coef_tab[,model_name] != 0,]
 
-
-
-
-
 #Create caption and column labels
-caption_text = "Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to coho salmon by specific functional flows. The predicted value is in units of log10(coho smolt) produced due to hydrologic factors (expressed as Z-score transformed functional flow metrics; see Kouba et al. 2025 for more details)."
+attr = model_name_to_coefs_df(model_name)
+caption_text = results8_cap_maker(attr)
 column_labels = c("Predictor", "Value", "Greater Hydrologic Benefit value associated with")
 
 colnames(coef_tab) = column_labels
-
-#declare xtable object, assign formatted column labels, and print to latex object
-# mo_xtab = xtable(mo_tab, label = "tab:objFunctionTable",
-#                  caption = caption_text,align = "lp{6cm}p{6cm}")#, digits = c(NA, NA, NA))
-# names(mo_xtab) = column_labels
-# print.xtable(mo_xtab, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F, hline.after = 0:3)
-# #caption.placement = "top",
-
 
 hb_ft = flextable(data = coef_tab)
 hb_ft = set_caption(hb_ft, caption = caption_text)
@@ -502,22 +456,6 @@ hb_ft
 
 ```
 
-
-
-
-<!-- $HB_{wy}$ is the Hydrologic Benefit value for a given water year (predicted coho spf or coho spf equivalent) -->
-
-<!-- $b = 87.4$ coho spf equiv. -->
-
-<!-- $m_{1} = -0.030$ coho spf equiv. per day of reconnection after Aug. 31 (100 cfs) -->
-
-<!-- $m_{2} = -0.365$ coho spf equiv. per day of reconnection after Aug. 31 (200 cfs) -->
-
-<!-- $m_{3} = 0.033$ coho spf equiv. per day of disconnection after Aug. 31 (200 cfs) -->
-
-<!-- $m_{4} = -0.191$ coho spf equiv. per day of reconnection after Aug. 31 (8 cfs) -->
-
-<!-- $m_{5} = -0.004$ coho spf equiv. per cubic meter of lower dry season flow magnitude -->
 
 The HB function was formulated based on functional flow metrics of the observed daily average flow record of the FJ gauge ($FJ_{obs}$). One key result of the historical basecase scenario is a simulated estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$); however, although SVIHM was extensively calibrated [@TolleyEtAlSensitivity2019], because all models involve structural simplifications of a full-scale watershed, $FJ_{sim,~basecase}$ sometimes over- or under-estimates $FJ_{obs}$. As a result of these differences, HB values calculated from flow metrics of $FJ_{sim,~basecase}$ tend to be higher than HB values derived from $FJ_{obs}$ by a mean of **4.5** coho spf-equiv.
 
@@ -597,13 +535,6 @@ scen_cat_tab = get_scen_cat_tab()
 scen_cat_tab_for_ft = scen_cat_tab #make a copy for modifying for display
 colnames(scen_cat_tab_for_ft) = column_labels
 
-# #declare xtable object, assign formatted column labels, and print to latex object
-# scen_cat_xtab = xtable(scen_cat_tab, label = "tab:scenCategoryTab",
-#                  caption = caption_text, digits = c(NA, NA, NA,0,0,NA) )#,align = "lp{6cm}p{6cm}"))
-# names(scen_cat_xtab) = column_labels
-# print.xtable(scen_cat_xtab, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F)#, hline.after = 0:3)
-#caption.placement = "top",
-
 scen_cat_tab_ft = flextable(data = scen_cat_tab_for_ft)
 scen_cat_tab_ft = set_caption(scen_cat_tab_ft, caption = caption_text)
 scen_cat_tab_ft = flextable::width(scen_cat_tab_ft,j=1,  width = 1.2)
@@ -622,37 +553,18 @@ scen_cat_tab_ft
 
 # Results
 
-
-```{r farmerFishTradeoffTable, echo = F, warning =F}
-
+```{r farmerFishTradeoffTableMainText, echo = F, warning =F}
 
 scenario_tab_init = get_scenario_tab_init()
-
-# Calculate weights based on best models
-
-# Read in slopes table for all predictors
-# coef_tab = read.csv(file.path(fig_dir,
-#                               "Hydrologic Benefit model coefficients table_2024 nov.csv"))
-
+scenario_tab_init = scenario_tab_init[scenario_tab_init$scenario_category!="Attr",]
 coef_tab = coef_tab[, c("Predictor", "Value")]
 
-# Calculate mean of 28 years of hydrologic benefit value and ET 
-obj_fn_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
-                                        weights = coef_tab,
-                                        include_years = "all")
+# Calculate mean of 35 years of hydrologic benefit value and ET
+obj_fn_results = get_HBF_and_crop_ET_columns(scenario_tab = scenario_tab_init,
+                                        lasso_weights = coef_tab)
 
 scenario_tab = obj_fn_results$scenario_tab
 obj_fn_wy = obj_fn_results$obj_fn_results_by_wy
-
-# unzscore_data = function(x, mean_x, sd_x){
-#   return((x * sd_x) + mean_x)
-# }
-
-# zscore_column_na_rm = function(x){
-#   mean_x = mean(x, na.rm=T)
-#   sd_x = sd(x, na.rm=T)
-#   return((x - mean_x) / sd_x)
-# }
 
 # replace transformed data with straight abundance data for better interpretability
 
@@ -660,11 +572,11 @@ obj_fn_wy = obj_fn_results$obj_fn_results_by_wy
 scenario_tab$hb_untrans_mean = 10^scenario_tab$HBF_mean
 scenario_tab$hb_untrans_stdev = 10^scenario_tab$HBF_stdev
 
-colnames(scenario_tab) = gsub(pattern = "HBF", 
-                              replacement = "HBF_log10", 
+colnames(scenario_tab) = gsub(pattern = "HBF",
+                              replacement = "HBF_log10",
                               x = colnames(scenario_tab))
-colnames(scenario_tab) = gsub(pattern = "hb_untrans", 
-                              replacement = "HBF", 
+colnames(scenario_tab) = gsub(pattern = "hb_untrans",
+                              replacement = "HBF",
                               x = colnames(scenario_tab))
 
 # for obj_fn_wy
@@ -673,6 +585,8 @@ colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
 colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
 
 ```
+
+
 
 As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value (in units of **predicted coho smolt production per spawning female, or coho spf-equivalent**) and a total crop ET volume was calculated for each water year in the 28-year simulation period, for each scenario. Each scenario has also been given an infrastructure feasibility proxy (Table \@ref(tab:scenarioResultsTab)).
 
@@ -727,9 +641,10 @@ natveg_et_percent = scenario_tab$et_mean[grep(pattern = "natveg",
 ```
 
 
-```{r scenario_tab_plot_columns, echo = F, warning=F}
+```{r scenario_tab_plot_columnsMainText, echo = F, warning=F}
 
 # Plot specs
+scen_cat_tab = get_scen_cat_tab()
 scen_cat_tab = add_plot_cols_to_scen_cat_tab(scen_cat_tab_1 = scen_cat_tab)
 
 # Assign category featurs to full scenario table
@@ -746,29 +661,24 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 ```
 
 
+```{r benefitByWYMainText, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are basecase (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and Native Vegetation (Low ET). Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22." , warning=F}
 
-```{r benefitByWY, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , fig.height=8.3, fig.width=7, warning=F}
+y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
-  png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
-  
-  # plot_scenarios = scenario_tab$scenario_id
-  plot_scenarios1 = c("basecase", "alf_curtail_08.15", "alf_curtail_07.31", 
-                      "alf_curtail_07.15")
-  plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
-                      "grain_12k")
-  
-  par(mfcol = c(4,1))
+  png(filename = fig_path, width = 8, height = 7.5, units = "in", res = 300)
+
+  plot_scenarios1 = c("basecase", "maxMAR_fields2024",
+                      "grain_12k", "natveg_low_8k")
+
+  par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
                     cols = get_palette(c("black","dodgerblue",
                                          "green4","darkgoldenrod"),
                                        length(plot_scenarios1)),
-                    panel_labels = c("A","B"))
-  plot_obj_fn_by_wy(plot_scenarios = plot_scenarios2, 
-                    cols = sequential_hcl(n=length(plot_scenarios1), 
-                                          palette = "Red-Blue"),
-                    panel_labels = c("C","D"))
+                    panel_labels = c("A","B"),
+                    y_val_label = y_val_x_axis_label)
   dev.off()
 }
 
@@ -777,12 +687,13 @@ fig_i = fig_i + 1
 
 ```
 
-```{r farmerFishTradeoffFigure, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 39 management scenarios. Symbol x and y coordinates are the average of 28 annual HB and ET values for each scenario over the full model period (water years 1991-2018). Whiskers show standard error of the 28 years of annual HB values; standard errors in the direction of the y-axis are smaller than the height covered by each symbol." , fig.height=8, fig.width=7, warning=F}
+```{r farmerFishTradeoffFigureMainText, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for exampe time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 8, units = "in", res = 300)
-  farm_fish_tradeoff_fig(scenario_tab = scenario_tab, 
+  farm_fish_tradeoff_fig(scenario_tab = scenario_tab,
+                         y_val_label = y_val_x_axis_label,
                          plot_title = "Environmental vs Agricultural Benefit \n Mean of annual values, 1991-2025")
   dev.off()
 }
@@ -791,7 +702,8 @@ fig_i = fig_i + 1
 
 #Make blank axes for slides
 if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure ",fig_i,".png")), width = 8, height = 8, units = "in", res = 300)
-  farm_fish_tradeoff_blank(scenario_tab = scenario_tab)
+  farm_fish_tradeoff_blank(scenario_tab = scenario_tab,
+                           y_val_label = y_val_x_axis_label)
   fig_i = fig_i +1; dev.off()}
 
 ```
@@ -812,108 +724,50 @@ The key geographic feature in the NatVeg and NatVegET scenarios is the "Intercon
 
 On average, area-normalized ET from native vegetation is `r round(et_nv_depth_m*100)` cm/year (`r round(et_nv_depth_m/et_crop_depth_m*100)`% of average annual crop ET).  Simulating native vegetation in place of irrigated acreage results in a greater proportion of water leaving the SVIHM model domain via surface flows rather than as transpiration. Consequently the NatVeg and NatVeg ET scenarios generate higher simulated FJ streamflow in most months of the model period. The first category (NatVeg) assumes a native vegetation crop coefficient of 0.6, while the second category (NatVegET) assumes a native vegetation crop coefficient of 1.0 and a maximum rooting depth of 4.5 m. The first category could be interpreted as chaparral or sage scrub-type vegetation cover, while the second category could represent a mixed bunchgrass and clover prairie with extensive riparian vegetation corridors and wetlands. (See *Supplemental Material* for more details on this scenario design.)
 
-```{r farmer_fish_tradeoff_lc, echo = F, include = F, warning=F}
-
-# calculate dry water years (by quartiles over 1942-2021)
-# fj_wy_type = fj_wy_type_tab(fjd = fj_flow)
-# dry_years = fj_wy_type$wy[fj_wy_type$type == "Dry"]
-# Actually, that's not my discussion frame. Find the low-coho basecase years and frame it around that.
-# find low-coho years
-# threshold_hb = 3.7
-# bc_selector =  obj_fn_wy$scenario=="basecase"
-# low_bc_hb_yrs = obj_fn_wy$wy[bc_selector & obj_fn_wy$hb_val < threshold_hb]
-# lc_years = low_bc_hb_yrs
-# 
-# # Calculate mean of 28 years of hydrologic benefit value and ET
-# lc_wy_results = calculate_HBF_and_crop_ET(scenario_tab = scenario_tab_init,
-#                                         weights = coef_tab,
-#                                         include_years = lc_years)
-# 
-# scenario_tab_lc = lc_wy_results$scenario_tab
-# scenario_tab_lc$color = scen_cat_tab$color[match(scenario_tab_lc$scenario_category,
-#                                                     scen_cat_tab$category)]
-# scenario_tab_lc$feas_cat = scen_cat_tab$feas_cat[match(scenario_tab_lc$scenario_category,
-#                                                     scen_cat_tab$category)]
-# scenario_tab_lc$symbol = scen_cat_tab$symbol[match(scenario_tab_lc$scenario_category,
-#                                                     scen_cat_tab$category)]
-# scenario_tab_lc = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab_lc)
-
-
-```
-
 
 \blandscape
 
-```{r scenarioResultsTab, echo = FALSE, results = 'asis'}
-# attach low-coho year numbers to scenario table
+```{r scenarioResultsTabMainText, echo = FALSE, results = 'asis'}
 
-
-
-# Calculate efficiency - HB gained to ET lost
-# scenario_tab$hb_et_ratio = round(scenario_tab$HBF_mean / scenario_tab$et_mean * 10^6 * -1, 1)
-# scenario_tab$et_hb_ratio = round(scenario_tab$et_mean / 10^6 * -1 / scenario_tab$HBF_mean, 1)
 bc_sel = scenario_tab$scenario_id=="basecase"
 hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
 et_bc_mean = scenario_tab$et_mean[bc_sel]
 scenario_tab$hb_gained = (scenario_tab$HBF_mean - hb_bc_mean)/hb_bc_mean
-scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1# / 10^6 *-1*-1
-# scenario_tab$et_lost[scenario_tab$et_lost < 0] = 0
+scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1
+
 scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
 
-# Calculate efficiency - HB gained per ET lost for low-coho years
-# scenario_tab_lc$hb_et_ratio = round(scenario_tab_lc$HBF_mean / scenario_tab_lc$et_mean * 10^6 * -1, 1)
-# scenario_tab_lc$et_hb_ratio = round(scenario_tab_lc$et_mean / 10^6 * -1 / scenario_tab_lc$HBF_mean, 1)
-# bc_sel_lc = scenario_tab_lc$scenario_id=="basecase"
-# hb_bc_lc_mean = scenario_tab_lc$HBF_mean[bc_sel_lc]
-# et_bc_mean_lc = scenario_tab_lc$et_mean[bc_sel_lc]
-# scenario_tab_lc$hb_gained = (scenario_tab_lc$HBF_mean - hb_bc_lc_mean)/hb_bc_lc_mean
-# scenario_tab_lc$et_lost = (scenario_tab_lc$et_mean - et_bc_mean_lc)/et_bc_mean_lc *-1*-1# / 10^6 *-1*-1
-# scenario_tab_lc$hb_gained = scenario_tab_lc$HBF_mean - scenario_tab_lc$HBF_mean[bc_sel]
-# scenario_tab_lc$et_lost = (scenario_tab_lc$et_mean - scenario_tab_lc$et_mean[bc_sel]) / 10^6 *-1*-1
-# # scenario_tab_lc$et_lost[scenario_tab_lc$et_lost < 0] = 0
-# scenario_tab_lc$hb_gained_to_et_lost = round(scenario_tab_lc$hb_gained /
-#                                                scenario_tab_lc$et_lost, 2)
-
-# Add low-coho year columns to scenario tab
-# scenario_tab$HBF_mean_lc = scenario_tab_lc$HBF_mean
-# scenario_tab$et_mean_lc = scenario_tab_lc$et_mean
-# scenario_tab$pareto_opt_lc = scenario_tab_lc$pareto_opt
-# scenario_tab$hb_gained_to_et_lost_lc = scenario_tab_lc$hb_gained_to_et_lost
 
 # subset desired columns
 scen_tab = scenario_tab[,c("scenario_id", "scenario_category", "feas_cat", 
-                           "HBF_mean", "et_mean", "pareto_opt", "hb_gained_to_et_lost")]
-scen_tab$HBF_mean = round(scen_tab$HBF_mean / 1000, 2)
+                           "HBF_mean", "et_mean", "pareto_opt",
+                           "hb_gained_to_et_lost")]
+if(max(scen_tab$HBF_mean) > 2000){
+  scen_tab$HBF_mean = round(scen_tab$HBF_mean / 1000, 2)
+  mean_HB_text = "Mean HB / 1000"
+} else {
+  scen_tab$HBF_mean = round(scen_tab$HBF_mean, 2)
+  mean_HB_text = "Mean HB"
+}
+
 scen_tab$et_mean = round(scen_tab$et_mean)
 # remove the negative efficiencies - that means ET was gained, not lost, so it doesn't apply
 scen_tab$hb_gained_to_et_lost = round(scen_tab$hb_gained_to_et_lost, 2)
-# scen_tab$hb_gained_to_et_lost_lc = round(scen_tab$hb_gained_to_et_lost_lc, 1)
 scen_tab$hb_gained_to_et_lost[scenario_tab$hb_gained <=0 | 
                                 scenario_tab$et_lost <=0 |
                                 !is.finite(scen_tab$hb_gained_to_et_lost) |
                                 scen_tab$scenario_id == "basecase" ] = "--"
-# scen_tab$hb_gained_to_et_lost_lc[scen_tab$hb_gained_to_et_lost_lc<=0 | 
-#                                    !is.finite(scen_tab$hb_gained_to_et_lost_lc) |
-#                                     scen_tab$scenario_id == "basecase"] = "--"
 scen_tab$et_mean = round(scenario_tab$et_mean * (-1 / 10^6), 2)
-# scen_tab$et_mean_lc = round(scenario_tab$et_mean_lc * (-1 / 10^6), 2)
 
 # Exclude attribution scenarios
 scen_tab = scen_tab[scen_tab$scenario_category != "Attr",]
 
 #Create caption and column labels
-caption_text = "Scenario attributes for 25 scenarios. Units for Hydrologic Benefit (HB) value are coho smolt per female-equivalent; for ET are million cubic meters; both are averages of 35 annual values. Efficiency not calculated for scenarios with no average ET loss."
-column_labels = c("Scenario ID", "Category", "Feas.", "Mean HB / 1.000", "Mean ET",  "Pareto", "Efficiency")
+caption_text = "Scenario attributes for 25 scenarios. Values in the Mean Hydrologic Benefit (HB) and Mean ET columns are averages of 35 annual values for each scenario. Efficiency not calculated for scenarios with no average ET loss."
+column_labels = c("Scenario ID", "Category", "Feas.", mean_HB_text, "Mean ET",  "Pareto", "Efficiency")
 
 scen_tab_for_ft = scen_tab
 colnames(scen_tab_for_ft) = column_labels
-
-# #declare xtable object, assign formatted column labels, and print to latex object
-# scen_xtable = xtable(scen_tab, label = "tab:scenarioResultsTab",
-#                  caption = caption_text, digits = c(NA, NA, NA, 0, 1, 1, NA, 1, 1))
-# names(scen_xtable) = column_labels
-# print.xtable(scen_xtable, comment = F,type = "latex", format.args = list(big.mark = ","), include.rownames = F, size="\\fontsize{9pt}{10pt}\\selectfont")
-# #caption.placement = "top",
 
 st_ft = flextable(scen_tab_for_ft)
 st_ft = set_caption(st_ft, caption = caption_text)
@@ -935,34 +789,11 @@ st_ft = flextable::width(st_ft,j=5,  width = .7)
 st_ft = flextable::width(st_ft,j=6,  width = .8)
 st_ft = flextable::width(st_ft,j=7,  width = .8)
 
-# st_ft = flextable::autofit(st_ft)
 st_ft
 
 
 ``` 
 
-
-```{r ft_tester, echo = FALSE, results = 'asis'}
-
-# 
-# ft_1 <- flextable(head(iris))
-# 
-# ft_1 <- rotate(ft_1, j = 1:4, align = "bottom", rotation = "tbrl", part = "header")
-# ft_1 <- rotate(ft_1, j = 5, align = "bottom", rotation = "btlr", part = "header")
-# 
-# # if output is docx or pptx, think about (1) set header heights
-# # and (2) set rule "exact" for rows heights because Word
-# # and PowerPoint don't handle auto height with rotated headers
-# ft_1 <- height(ft_1, height = 1.2, part = "header")
-# ft_1 <- hrule(ft_1, i = 1, rule = "exact", part = "header")
-# 
-# ft_1
-
-
-``` 
-
-
-\elandscape
 
 
 <!-- ## 4.2 Agricultural-environmental trade-off efficiency -->
@@ -1024,7 +855,7 @@ For all other scenarios, trade-off efficiencies ranged from `r ef_min` to `r ef_
 Four scenario categories form a "low-efficiency" cluster, with all-years efficiencies of less than 1: Crop Change, Curtailment, and the two Natural Vegetation categories (Figure \@ref(fig:efficiency)). These scenarios can produce substantial HB gains (ranging from `r hb_gain_range_low_eff[1]` to `r hb_gain_range_low_eff[2]`) coho spf-equiv., but result in severe agricultural productivity reductions  (`r et_cost_range_low_eff_percent[1]`% to `r et_cost_range_low_eff_percent[2]`%). The "high-efficiency" scenarios, which have an all-years trade-off efficiency greater than 1 (the Enhanced Recharge, Low Flow Diversion Limits, Irrigation Efficiency and Alfalfa Irrigation scenarios), tend to be associated with a small ET cost relative to basecase (`r et_cost_range_high_eff[1]` to `r et_cost_range_high_eff[2]` million m^3^, or `r et_cost_range_high_eff_percent[1]` to `r et_cost_range_high_eff_percent[2]` percent of basecase crop ET).
 
 
-```{r efficiency, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average HB value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Basecase, Reservoir scenarios and Enhanced Recharge scenarios are not included as they have on average no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
+```{r efficiencyMainText, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average Hydrologic Benefit value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Some scenarios are excluded if they have no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
 
 
 
@@ -1300,6 +1131,51 @@ Objective functions summarizing the predicted consequences of management actions
 
 \newpage
 
-```{r call_supplement, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'}
+# Supplement: Fish-Farm Results from all four Hydrologic Benefit function formulations
+
+The Hydrologic Benefit (HB) function is intended to estimate the ecological value (in units of fish production) provided to fish by specific flow values (e.g., timing of fall flow increase; magnitude of dry season flow). This is expressed in conceptual mathematical terms as $fish = b + m_1 * flow_1 + m_1*flow_2~{\cdots}$; see methods in  @KoubaEtAlWatershedSpecific2025 for more details. It's important to note that, in this dataset, only 40-60% of variation in fish outcome was explained in models based on flow data, and the HB function does not constitute a prediction of the number of fish outmigrating in a given year. 
+
+Specifically, the results below are based on statistical models, using LASSO regression, of reproductive output for two species of salmon (coho and Chinook) in the Scott River stream system. Reproductive output is expressed in units of outmigrating juvenile abundance and normalized juveniles-per-adult spawner; two reproductive units for two species yields the four HB function formulations. 
+
+While MARSS models were used as a tool for identifying important functional flows in [@KoubaEtAlWatershedSpecific2025], they are unsuitable for this hydrologic scenario outcome forecasting purpose, because they are autoregressive in nature: the forecasting of future fish outcomes requires historical observations of fish outcomes. Therefore, to use MARSS models in estimating the ecological effects of flow changes under different management scenarios, it would be necessary to have historical fish records collected in an alternate reality under the different management scenarios, which is not possible. Similarly, LASSO models which included spawner abundance as a predictor were also not included in this exercise. 
+
+Consequently, only LASSO models dependent on hydrologic variables were evaluated as potential tools to forecast the outcomes of flow change on fish reproduction.
+
+## Coho, juvenile abundance
+
+```{r varDeclaration1, echo=F, include=F}
+model_name = "coho_lasso_juv_on_hydro"
 ```
 
+```{r call_supplement1, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'}
+```
+
+## Coho, juveniles per spawner
+
+```{r varDeclaration2, echo=F, include=F}
+model_name = "coho_lasso_jps_on_hydro"
+
+```
+
+```{r call_supplement2, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'}
+```
+
+<!-- ## Chinook, juvenile abundance -->
+
+<!-- ```{r varDeclaration3, echo=F, include=F} -->
+<!-- model_name = "chinook_lasso_juv_on_hydro" -->
+
+<!-- ``` -->
+
+<!-- ```{r call_supplement3, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'} -->
+<!-- ``` -->
+
+<!-- ## Chinook, juveniles per spawner -->
+
+<!-- ```{r varDeclaration4, echo=F, include=F} -->
+<!-- model_name = "chinook_lasso_jps_on_hydro" -->
+
+<!-- ``` -->
+
+<!-- ```{r call_supplement4, child=if (INCLUDE_SUPP) 'Kouba_Fish_and_Ag_Benefit_supplement.Rmd'} -->
+<!-- ``` -->

@@ -1,7 +1,7 @@
 ---
-title: "Multi-objective assessment of a stakeholder-defined portfolio of groundwater and stream management actions in an agricultural basin"
+title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 author: "Claire Kouba"
-date: "2025-11-12"
+date: "2026-02-13"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -11,16 +11,22 @@ bibliography: library.bib
 
 ---
 
-# Fish-Farm Results from all four Hydrologic Benefit Function formulations
+```{r modelNamer, echo = FALSE, results = 'asis'}
 
-While MARSS models were used as a tool for identifying important functional flows in [@KoubaEtAlWatershedSpecific2025], they are unsuitable for this hydrologic scenario outcome forecasting purpose, because they are autoregressive in nature: the forecasting of future fish outcomes requires historical observations of fish outcomes. Therefore, to use MARSS models in estimating the ecological effects of flow changes under different management scenarios, it would be necessary to have historical fish records collected under the different management scenarios, which are not possible. 
+# "Supplement A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
+# "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
+# "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+"Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 
-Consequently, only LASSO models dependent on hydrologic variables (and not including spawner abundance as a predictor) were evaluated as potential tools to forecast the outcomes of flow change on fish reproduction.
-
+# model_name = "coho_lasso_juv_on_hydro"
+# model_name = "coho_lasso_jps_on_hydro"
+# model_name = "chinook_lasso_juv_on_hydro"
+model_name = "chinook_lasso_jps_on_hydro"
+```
 
 ```{r setup_supp, echo = FALSE, warning=F, comment=F}
 
-dev_mode = T#F
+dev_mode = T
 if(dev_mode){
   knitr::opts_chunk$set(echo = TRUE)
   
@@ -72,25 +78,15 @@ if(dev_mode){
 
 if(dev_mode){
   coefs_tab = read.csv(file.path(data_dir, "kouba_et_al_2025_ensemble_coefs_chinook and coho.csv"))
-}
-model_names = colnames(coefs_tab)[2:13]
+  model_names = colnames(coefs_tab)[2:13]
 capmaker_all_models = model_name_to_coefs_df(model_names)
+}
 
 ```
 
 
 
-## Models of coho reproductive success
-
-### LASSO model, juvenile abundance
-
 ```{r coefTab01, echo = FALSE, results = 'asis'}
-
-# model_name = "chinook_lasso_jps_on_hydro"
-model_name = "chinook_lasso_juv_on_hydro"
-# model_name = "coho_lasso_jps_on_hydro"
-# model_name = "coho_lasso_juv_on_hydro"
-
 
 coef_tab = coefs_tab[,c("Predictor",model_name, "Greater.Hydrologic.Benefit.value.associated.with")]
 coef_tab = coef_tab[coef_tab[,model_name] != 0,]
@@ -143,11 +139,6 @@ obj_fn_wy$hb_val_untrans = 10^obj_fn_wy$hb_val
 colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
 colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
 
-# # Add ET columns from ET table
-# scenario_tab$et_mean = scen_tab_et$et_mean[match(scenario_tab$scenario_id,
-#                                                  scen_tab_et$scenario_id)]
-# scenario_tab$et_stdev = scen_tab_et$et_stdev[match(scenario_tab$scenario_id,
-#                                                  scen_tab_et$scenario_id)]
 ```
 
 
@@ -172,7 +163,7 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 
 
 
-```{r benefitByWY01, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (HB and ET, representing environmental and agricultural objectives, respectively), in the basecase (black circles) and management scenarios (diamond, cross or x symbols) for water years 1991-2025. Panels A and B show comparisons between basecase and one example scenario in each of three categories: Enhanced Recharge, Low Flow Diversion Limits, and Curtailment. Panels A and B show comparisons between basecase and different cutoff dates within the Alfalfa Irrigation category: July 15th, July 31st and August 15th. Dry-type water years (vertical bars) are 1991, '92, '94, 2001, '09, '13, '14, '18, and '20-'22." , warning=F}
+```{r benefitByWY01, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are basecase (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and Native Vegetation (Low ET). Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22." , warning=F}
 
 y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
@@ -180,11 +171,8 @@ fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 7.5, units = "in", res = 300)
 
-  # plot_scenarios = scenario_tab$scenario_id
-  plot_scenarios1 = c("basecase", "alf_curtail_08.15", "alf_curtail_07.31",
-                      "alf_curtail_07.15")
-  # plot_scenarios2 = c("basecase", "maxMAR_fields2024", "eflows25_div_lims",
-  #                     "grain_12k")
+  plot_scenarios1 = c("basecase", "maxMAR_fields2024",
+                      "grain_12k", "natveg_low_8k")
 
   par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
@@ -193,10 +181,6 @@ if(print_for_slides==T){
                                        length(plot_scenarios1)),
                     panel_labels = c("A","B"),
                     y_val_label = y_val_x_axis_label)
-  # plot_obj_fn_by_wy(plot_scenarios = plot_scenarios2,
-  #                   cols = sequential_hcl(n=length(plot_scenarios1),
-  #                                         palette = "Red-Blue"),
-  #                   panel_labels = c("C","D"))
   dev.off()
 }
 
@@ -205,7 +189,7 @@ fig_i = fig_i + 1
 
 ```
 
-```{r farmerFishTradeoffFigure01, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 39 management scenarios. Symbol x and y coordinates are the average of 28 annual HB and ET values for each scenario over the full model period (water years 1991-2018). Whiskers show standard error of the 28 years of annual HB values; standard errors in the direction of the y-axis are smaller than the height covered by each symbol." , fig.height=8, fig.width=7, warning=F}
+```{r farmerFishTradeoffFigure01, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for exampe time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -227,49 +211,46 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 ```
 
 
-\blandscape
+\newpage
 
-```{r scenarioResultsTab, echo = FALSE, results = 'asis'}
-# attach low-coho year numbers to scenario table
+```{r scenarioResultsTab01, echo = FALSE, results = 'asis'}
 
-
-
-# Calculate efficiency - HB gained to ET lost
-# scenario_tab$hb_et_ratio = round(scenario_tab$HBF_mean / scenario_tab$et_mean * 10^6 * -1, 1)
-# scenario_tab$et_hb_ratio = round(scenario_tab$et_mean / 10^6 * -1 / scenario_tab$HBF_mean, 1)
 bc_sel = scenario_tab$scenario_id=="basecase"
 hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
 et_bc_mean = scenario_tab$et_mean[bc_sel]
 scenario_tab$hb_gained = (scenario_tab$HBF_mean - hb_bc_mean)/hb_bc_mean
-scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1# / 10^6 *-1*-1
-# scenario_tab$et_lost[scenario_tab$et_lost < 0] = 0
+scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1
+
 scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
 
 
 # subset desired columns
 scen_tab = scenario_tab[,c("scenario_id", "scenario_category", "feas_cat", 
-                           "HBF_mean", "et_mean", "pareto_opt", "hb_gained_to_et_lost")]
-scen_tab$HBF_mean = round(scen_tab$HBF_mean / 1000, 2)
+                           "HBF_mean", "et_mean", "pareto_opt",
+                           "hb_gained_to_et_lost")]
+if(max(scen_tab$HBF_mean) > 2000){
+  scen_tab$HBF_mean = round(scen_tab$HBF_mean / 1000, 2)
+  mean_HB_text = "Mean HB / 1000"
+} else {
+  scen_tab$HBF_mean = round(scen_tab$HBF_mean, 2)
+  mean_HB_text = "Mean HB"
+}
+
 scen_tab$et_mean = round(scen_tab$et_mean)
 # remove the negative efficiencies - that means ET was gained, not lost, so it doesn't apply
 scen_tab$hb_gained_to_et_lost = round(scen_tab$hb_gained_to_et_lost, 2)
-# scen_tab$hb_gained_to_et_lost_lc = round(scen_tab$hb_gained_to_et_lost_lc, 1)
 scen_tab$hb_gained_to_et_lost[scenario_tab$hb_gained <=0 | 
                                 scenario_tab$et_lost <=0 |
                                 !is.finite(scen_tab$hb_gained_to_et_lost) |
                                 scen_tab$scenario_id == "basecase" ] = "--"
-# scen_tab$hb_gained_to_et_lost_lc[scen_tab$hb_gained_to_et_lost_lc<=0 | 
-#                                    !is.finite(scen_tab$hb_gained_to_et_lost_lc) |
-#                                     scen_tab$scenario_id == "basecase"] = "--"
 scen_tab$et_mean = round(scenario_tab$et_mean * (-1 / 10^6), 2)
-# scen_tab$et_mean_lc = round(scenario_tab$et_mean_lc * (-1 / 10^6), 2)
 
 # Exclude attribution scenarios
 scen_tab = scen_tab[scen_tab$scenario_category != "Attr",]
 
 #Create caption and column labels
-caption_text = "Scenario attributes for 25 scenarios. Units for Hydrologic Benefit (HB) value are coho smolt per female-equivalent; for ET are million cubic meters; both are averages of 35 annual values. Efficiency not calculated for scenarios with no average ET loss."
-column_labels = c("Scenario ID", "Category", "Feas.", "Mean HB / 1,000", "Mean ET",  "Pareto", "Efficiency")
+caption_text = "Scenario attributes for 25 scenarios. Values in the Mean Hydrologic Benefit (HB) and Mean ET columns are averages of 35 annual values for each scenario. Efficiency not calculated for scenarios with no average ET loss."
+column_labels = c("Scenario ID", "Category", "Feas.", mean_HB_text, "Mean ET",  "Pareto", "Efficiency")
 
 scen_tab_for_ft = scen_tab
 colnames(scen_tab_for_ft) = column_labels
@@ -294,17 +275,13 @@ st_ft = flextable::width(st_ft,j=5,  width = .7)
 st_ft = flextable::width(st_ft,j=6,  width = .8)
 st_ft = flextable::width(st_ft,j=7,  width = .8)
 
-# st_ft = flextable::autofit(st_ft)
 st_ft
 
 
 ``` 
 
 
-\elandscape
-
-
-```{r efficiency, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average HB value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Basecase, Reservoir scenarios and Enhanced Recharge scenarios are not included as they have on average no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
+```{r efficiency01, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average Hydrologic Benefit value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Some scenarios are excluded if they have no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
 
 
 
@@ -321,169 +298,3 @@ fig_i = fig_i + 1
 
 
 ```
-
-<!-- ### MARSS model, juvenile abundance -->
-
-
-
-<!-- ```{r MARSS_models_single_covar, echo = F} -->
-<!-- # Specify MARSS model ------------------------------------------------------------------ -->
-
-<!-- model_list_file = "single cov MARSS models.rds" -->
-<!-- coef_tab_file = "single cov marss coefs.csv" -->
-<!-- aicc_tab_file = "single cov MARSS AICc tab.csv" -->
-
-<!-- if(file.exists(file.path(data_dir, model_list_file))){ -->
-<!--   list_of_mods = readRDS(file.path(data_dir, model_list_file)) -->
-<!--   aicc_tab = read.csv(file.path(data_dir, aicc_tab_file)) -->
-<!--   coef_tab = read.csv(file.path(data_dir, coef_tab_file)) -->
-
-<!-- } else { -->
-<!--   print("Error: MARSS files missing. Retrieve MARSS files from Kouba et al 2025 repository.") -->
-<!-- } -->
-
-
-<!-- ## The code in the functions called below follows the R script -->
-<!-- ## Baruch_2023_Putah_Creek_MARSS.R, published in support of: -->
-<!-- ## Baruch et al., 2024. "Mimicking Functional Elements of the Natural Flow Regime -->
-<!-- ## Promotes Native Fish Recovery in a Regulated River." https://doi.org/10.1002/eap.3013. -->
-
-
-<!-- ``` -->
-
-
-
-<!-- ```{r MARSSSingleCovarTableCoho, echo = F, warning =F, message = F, results = 'asis'} -->
-
-<!-- yvlt = kouba_2025_y_val_label_tab() -->
-
-<!-- y_val = "coho_smolt_abun_est" -->
-<!-- # y_val = "coho_smolt_per_fem" -->
-<!-- # y_val = "chinook_juvenile_abundance" -->
-<!-- # y_val = "chinook_juv_per_adult" -->
-
-<!-- aicc_order = order(aicc_tab[,y_val]) -->
-<!-- # view predictors in order of AICc value (smallest first) -->
-<!-- results_y = data.frame(pred = aicc_tab[aicc_order, "pred"]) -->
-<!-- results_y$coef = round(coef_tab[aicc_order, y_val], 3) -->
-<!-- results_y$aicc = round(aicc_tab[aicc_order, y_val], 2) -->
-<!-- colnames(results_y) = c("Covariate", "Coefficient", "AICc") -->
-<!-- # make table for display -->
-<!-- results_y_ft = results_y -->
-<!-- didnt_model = is.na(results_y_ft$AICc) -->
-<!-- results_y_ft$AICc[didnt_model] = "--"; results_y_ft$Coefficient[didnt_model] = "--" -->
-
-<!-- caption_text = paste0("Each row corresponds to a MARSS model predicting the time series of ", yvlt$y_val_title[yvlt$y_val==y_val], " observations using itself (up to time t) and one hydrologic metric covariate. Coefficient sign and value indicate the direction and strength of the influence of the hydrologic metric; i.e., a negative coefficient for hydrologic metric f1_recon_120 indicates that an earlier first fall river reconnection (120 cfs) is associated with a greater ", yvlt$y_val_title[yvlt$y_val==y_val], " value. Models are listed in order from best (lowest AICc value) to worst.  Values marked with -- indicate that gaps in the time series for the hydrologic metric prevented the calculation of a model using that covariate.") -->
-
-<!-- co_tab_ft = flextable(data=results_y_ft) -->
-<!-- co_tab_ft = set_caption(co_tab_ft, caption = caption_text) -->
-<!-- co_tab_ft = flextable::width(co_tab_ft,j=1,  width = 2) -->
-<!-- co_tab_ft = flextable::width(co_tab_ft,j=2,  width = 1) -->
-<!-- co_tab_ft = flextable::width(co_tab_ft,j=3,  width = 1) -->
-<!-- co_tab_ft -->
-
-
-<!-- ``` -->
-
-
-
-
-<!-- ```{r MARSSSingleCovars, echo = F, warning = F, fig.height = 8, fig.cap = "Results of the three best single-hydrologic-covariate MARSS models to predict log-transformed Chinook and coho juvenile-per-spawners ratios with Z-scored hydrologic metrics.\\label{fig:MARSSSingleCovars}"} -->
-
-<!-- # pull or read in metrics tabs from all scenarios -->
-
-<!-- scenario_tab_init = get_scenario_tab_init() -->
-<!-- scenario_tab_init = scenario_tab_init[scenario_tab_init$scenario_category!="Attr",] -->
-
-
-<!-- # scenarios = scenario_tab_init$scenario_id -->
-<!-- # i=1 -->
-
-
-<!-- # # For MARSS auto-prediction: add y values to scenario-derived func flow metrics tab -->
-<!-- metrics_tab_orig = read.csv(file.path(data_dir, "kouba_et_al_2025 Supplemental Table B. Flow Metrics by Brood Year.csv")) -->
-<!-- # # add log-transformed eco y-value metrics -->
-<!-- # ff_bc = ffs_scenarios[["basecase"]] -->
-<!-- eco_y_vals = metrics_tab_orig[,c("brood_year",yvlt$y_val)] -->
-<!-- eco_y_vals_log10 = eco_y_vals -->
-<!-- eco_obs_yrs = list() -->
-<!-- for(i in 1:nrow(yvlt)){ -->
-<!--   y_val_i = yvlt$y_val[i] -->
-<!--   # ff_bc[,y_val] = log10(eco_y_vals[match(ff_scen$Brood_Year, -->
-<!--                                      # eco_y_vals$brood_year), y_val]) -->
-<!--   eco_y_vals_log10[,y_val] = log10(eco_y_vals[ , y_val_i]) -->
-<!--   metrics_tab_orig[,y_val_i] = log10(metrics_tab_orig[, y_val_i]) -->
-<!--   non_nas = eco_y_vals_log10$brood_year[which(!is.na(eco_y_vals_log10[,y_val]))] -->
-<!--   eco_obs_yrs[[y_val_i]] = min(non_nas):max(non_nas) -->
-<!--   # names(eco_obs_yrs[[i]]) = y_val_i -->
-<!-- } -->
-
-<!-- pred_cols = colnames(metrics_tab_orig)[ -->
-<!--   !(colnames(metrics_tab_orig) %in% c("brood_year", "smolt_year", yvlt$y_val))] -->
-<!-- for(i in 1:length(pred_cols)){ -->
-<!--   pred_col = pred_cols[i] -->
-<!--   z_mean = mean(metrics_tab_orig[,pred_col], na.rm=T) -->
-<!--   z_sd = sd(metrics_tab_orig[,pred_col], na.rm=T) -->
-<!--   metrics_tab_orig[,pred_col] = (metrics_tab_orig[,pred_col] - z_mean)/z_sd -->
-<!-- } -->
-
-<!-- mod_num = 1# for plot -->
-<!-- cov_i = results_y$Covariate[order(results_y$AICc)][mod_num] -->
-<!-- mod_i = list_of_mods[[paste0(y_val, "__", cov_i)]] -->
-<!-- yval_yrs = eco_obs_yrs[[y_val]] -->
-
-<!-- # for troubleshooting marss y predictions -->
-<!-- marss_predict_plot_single_covars(metrics_tab=metrics_tab_orig, -->
-<!--                                  pred_yrs = yval_yrs, -->
-<!--                                  y_val, -->
-<!--                                  cov_i = cov_i, -->
-<!--                                  mod_i = mod_i) -->
-
-<!-- # Calculate mean of 35 years of hydrologic benefit value and ET -->
-
-<!-- obj_fn_results = get_HBF_and_crop_ET_columns(scenario_tab = scenario_tab_init, -->
-<!--                                              # metrics_tab = ff_scen, -->
-<!--                                              y_val = y_val,  -->
-<!--                                              cov_i = cov_i, -->
-<!--                                              mod_i = mod_i, -->
-<!--                                              yval_yrs = yval_yrs) -->
-
-<!--   # calculate_MARSS_HBF(scenario_tab = scenario_tab_init, -->
-<!--   #                                         metrics_tab = ff_scen, -->
-<!--   #                                pred_yrs_i = pred_yrs_i, -->
-<!--   #                                y_val = y_val,  -->
-<!--   #                                cov_i = cov_i, -->
-<!--   #                                mod_i = mod_i) -->
-
-<!-- scenario_tab = obj_fn_results$scenario_tab -->
-<!-- obj_fn_wy = obj_fn_results$obj_fn_results_by_wy -->
-
-
-
-
-
-
-<!-- fig_path = file.path(save_figs_here, paste0("Figure S",fig_i,".png")) -->
-<!-- if(save_imgs == TRUE){ -->
-<!--   png(filename = fig_path, width = 7, height = 8, units = "in", res = res_dpi) -->
-
-<!--   # par(mfrow = c(2,1)) -->
-
-
-<!--   # marss_predict_plot_single_covars(metrics_tab = metrics_tab, -->
-<!--   #                                  pred_yrs_i = pred_yrs_i_ch, -->
-<!--   #                                  y_val = y_val_chinook, cov_i = cov_i_ch, -->
-<!--   #                                  mod_i = mod_is_ch)   -->
-
-<!--   dev.off() -->
-<!-- } -->
-<!-- if(include_figs==T){knitr::include_graphics(fig_path)} -->
-<!-- fig_i = fig_i +1 -->
-
-
-<!-- ``` -->
-
-
-\newpage
-
-# References
