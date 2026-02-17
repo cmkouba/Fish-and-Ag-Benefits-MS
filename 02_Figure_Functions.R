@@ -1422,9 +1422,10 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
 }
 
 
-hbf_comp_fig = function(obj_fn_wy, scen_id){
+hbf_comp_fig = function(obj_fn_wy, scen_id,
+                        y_val_label){
   obj_fn_scen = obj_fn_wy[obj_fn_wy$scenario==scen_id,]
-  remove_cols = c("scenario","hbf_total","et_tot")
+  remove_cols = c("scenario","hbf_total","et_tot", "hbf_total_log10")
   dat_for_plot = obj_fn_scen[,!(colnames(obj_fn_scen) %in% remove_cols)]
   colnames(dat_for_plot) = gsub(pattern = "_comp", 
                                 x = colnames(dat_for_plot), replacement = "")
@@ -1435,17 +1436,58 @@ hbf_comp_fig = function(obj_fn_wy, scen_id){
                               varying = list(comp_names), direction = "long")
   # rename column with component value
   rename_col_i = which(!(colnames(dat_for_plot_long) %in% c("wy", "Component")))
-  colnames(dat_for_plot_long)[rename_col_i] = "Hyd. Ben. value"
-  
-  ggplot(data = dat_for_plot_long, 
-         aes(fill = Component, x = wy,
-             y = `Hyd. Ben. value`)) +
-    geom_bar(position = "stack", stat = "identity") +
-    scale_fill_manual(labels = comp_names, 
-                      values = rainbow_hcl(n=length(comp_names))) +
-    scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), labels = month.abb[c(10:12, 1:9)]) +
-    theme_bw() +
-    theme(legend.position = "bottom")
+  colnames(dat_for_plot_long)[rename_col_i] = 
+    paste0("Contrib. to Hyd. Ben. value (log10 of ",y_val_label,")")
+    
+  if(y_val_label=="coho juv. per spawner"){
+    plot_obj = ggplot(data = dat_for_plot_long, 
+           aes(fill = Component, x = wy,
+               y = `Contrib. to Hyd. Ben. value (log10 of coho juv. per spawner)`)) +
+      geom_bar(position = "stack", stat = "identity") +
+      scale_fill_manual(labels = comp_names, 
+                        values = rainbow_hcl(n=length(comp_names))) +
+      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
+                       labels = month.abb[c(10:12, 1:9)]) +
+      theme_bw() +
+      theme(legend.position = "bottom")
+  }
+  if(y_val_label=="coho juv. abun."){
+    plot_obj = ggplot(data = dat_for_plot_long, 
+           aes(fill = Component, x = wy,
+               y = `Contrib. to Hyd. Ben. value (log10 of coho juv. abun.)`)) +
+      geom_bar(position = "stack", stat = "identity") +
+      scale_fill_manual(labels = comp_names, 
+                        values = rainbow_hcl(n=length(comp_names))) +
+      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
+                       labels = month.abb[c(10:12, 1:9)]) +
+      theme_bw() +
+      theme(legend.position = "bottom")
+  }
+  if(y_val_label=="Chinook juv. per spawner"){
+    plot_obj = ggplot(data = dat_for_plot_long, 
+           aes(fill = Component, x = wy,
+               y = `Contrib. to Hyd. Ben. value (log10 of Chinook juv. per spawner)`)) +
+      geom_bar(position = "stack", stat = "identity") +
+      scale_fill_manual(labels = comp_names, 
+                        values = rainbow_hcl(n=length(comp_names))) +
+      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
+                       labels = month.abb[c(10:12, 1:9)]) +
+      theme_bw() +
+      theme(legend.position = "bottom")
+  }
+  if(y_val_label=="Chinook juv. abun."){
+    plot_obj = ggplot(data = dat_for_plot_long, 
+           aes(fill = Component, x = wy,
+               y = `Contrib. to Hyd. Ben. value (log10 of Chinook juv. abun.)`)) +
+      geom_bar(position = "stack", stat = "identity") +
+      scale_fill_manual(labels = comp_names, 
+                        values = rainbow_hcl(n=length(comp_names))) +
+      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
+                       labels = month.abb[c(10:12, 1:9)]) +
+      theme_bw() +
+      theme(legend.position = "bottom")
+  }
+  return(plot_obj)
 }
 
 # Table functions ---------------------------------------------------------
@@ -1987,13 +2029,15 @@ calc_LASSO_hbf_tab_feb2026 = function(#thresholds_hbf,
     hbf_tab[,hbf_colname_i] = hbf_tab[, ff_colname] * as.numeric(weights$Value[i+1])
   }
   
-  # if(length(ff_ids)>1){ 
+  if(length(ff_ids)>1){
     hbf_tab$hbf_total = hbf_tab$Int + 
       rowSums(hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))], na.rm=T)
-  # }
-  # if(length(ff_ids)==1){
-  #   hbf_tab$hbf_total = hbf_tab$Int + hbf_tab$comp1
-  # }
+  }
+  if(length(ff_ids)==1){
+    tab_for_rowsum = data.frame(Int = hbf_tab$Int, 
+                                comp = hbf_tab[,grep(pattern = "comp", x = colnames(hbf_tab))])
+    hbf_tab$hbf_total = rowSums(tab_for_rowsum , na.rm=T)
+  }
   
   return(hbf_tab)
 }

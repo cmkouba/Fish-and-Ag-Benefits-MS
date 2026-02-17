@@ -557,9 +557,9 @@ colnames(scenario_tab) = gsub(pattern = "hb_untrans",
                               x = colnames(scenario_tab))
 
 # for obj_fn_wy
-obj_fn_wy$hb_val_untrans = 10^obj_fn_wy$hb_val
-colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
-colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
+obj_fn_wy$hbf_total_untrans = 10^obj_fn_wy$hbf_total
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hbf_total"] = "hbf_total_log10"
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hbf_total_untrans"] = "hbf_total"
 
 ```
 
@@ -999,13 +999,13 @@ scen6_selector = obj_fn_wy$scenario=="alf_curtail_07.15"
 # years selector
 # low_hb_selector = obj_fn_wy$wy %in% low_bc_hb_yrs
 # 
-# bc_hb_lc = obj_fn_wy$hb_val[bc_selector & low_hb_selector]
-# scen1_hb = obj_fn_wy$hb_val[scen1_selector & low_hb_selector]
-# scen2_hb = obj_fn_wy$hb_val[scen2_selector & low_hb_selector]
-# scen3_hb = obj_fn_wy$hb_val[scen3_selector & low_hb_selector]
-# scen4_hb = obj_fn_wy$hb_val[scen4_selector & low_hb_selector]
-# scen5_hb = obj_fn_wy$hb_val[scen5_selector & low_hb_selector]
-# scen6_hb = obj_fn_wy$hb_val[scen6_selector & low_hb_selector]
+# bc_hb_lc = obj_fn_wy$hbf_total[bc_selector & low_hb_selector]
+# scen1_hb = obj_fn_wy$hbf_total[scen1_selector & low_hb_selector]
+# scen2_hb = obj_fn_wy$hbf_total[scen2_selector & low_hb_selector]
+# scen3_hb = obj_fn_wy$hbf_total[scen3_selector & low_hb_selector]
+# scen4_hb = obj_fn_wy$hbf_total[scen4_selector & low_hb_selector]
+# scen5_hb = obj_fn_wy$hbf_total[scen5_selector & low_hb_selector]
+# scen6_hb = obj_fn_wy$hbf_total[scen6_selector & low_hb_selector]
 # 
 bc_et = obj_fn_wy$et_tot[bc_selector]
 scen1_et = obj_fn_wy$et_tot[scen1_selector]

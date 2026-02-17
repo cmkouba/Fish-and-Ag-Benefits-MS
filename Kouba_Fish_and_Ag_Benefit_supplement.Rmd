@@ -1,5 +1,5 @@
 ---
-title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+title: "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
 author: "Claire Kouba"
 date: "2026-02-13"
 output: 
@@ -14,14 +14,18 @@ bibliography: library.bib
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
 # "Supplement A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
-# "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
-# "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
-"Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
-
 # model_name = "coho_lasso_juv_on_hydro"
+
+# "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
 # model_name = "coho_lasso_jps_on_hydro"
-# model_name = "chinook_lasso_juv_on_hydro"
-model_name = "chinook_lasso_jps_on_hydro"
+
+# "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+model_name = "chinook_lasso_juv_on_hydro"
+
+# "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+# model_name = "chinook_lasso_jps_on_hydro"
+
+
 ```
 
 ```{r setup_supp, echo = FALSE, warning=F, comment=F}
@@ -135,9 +139,9 @@ colnames(scenario_tab) = gsub(pattern = "hb_untrans",
                               x = colnames(scenario_tab))
 
 # for obj_fn_wy
-obj_fn_wy$hb_val_untrans = 10^obj_fn_wy$hb_val
-colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val"] = "hb_val_log10"
-colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hb_val_untrans"] = "hb_val"
+obj_fn_wy$hbf_total_untrans = 10^obj_fn_wy$hbf_total
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hbf_total"] = "hbf_total_log10"
+colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hbf_total_untrans"] = "hbf_total"
 
 ```
 
@@ -301,18 +305,18 @@ fig_i = fig_i + 1
 
 
 
-```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} HB COMPONENTS." , warning=F}
+```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} Contributions to annual Hydrologic Benefit function values, by functional flow metric (intercept values not shown)." , warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
-  png(filename = fig_path, width = 8, height = 6, units = "in", res = 300)
-  hbf_comp_fig(obj_fn_wy, scen_id = "basecase")
-  dev.off()
+  plot_obj = hbf_comp_fig(obj_fn_wy, 
+               scen_id = "basecase",
+               y_val_label = y_val_x_axis_label)
+  ggsave(filename = fig_path, plot = plot_obj, width = 8, height = 6, units = "in"
+    )
 }
 knitr::include_graphics(fig_path)
 fig_i = fig_i + 1
 
-
-hbf_comp_fig(obj_fn_wy, scen_id = "basecase")
-
 ```
+
