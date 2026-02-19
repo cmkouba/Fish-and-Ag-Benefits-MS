@@ -1,5 +1,5 @@
 ---
-title: "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 author: "Claire Kouba"
 date: "2026-02-13"
 output: 
@@ -20,7 +20,7 @@ bibliography: library.bib
 # model_name = "coho_lasso_jps_on_hydro"
 
 # "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
-model_name = "chinook_lasso_juv_on_hydro"
+# model_name = "chinook_lasso_juv_on_hydro"
 
 # "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 # model_name = "chinook_lasso_jps_on_hydro"

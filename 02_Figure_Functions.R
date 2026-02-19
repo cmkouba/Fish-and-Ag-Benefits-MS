@@ -1424,6 +1424,7 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
 
 hbf_comp_fig = function(obj_fn_wy, scen_id,
                         y_val_label){
+  # Prep data for plot
   obj_fn_scen = obj_fn_wy[obj_fn_wy$scenario==scen_id,]
   remove_cols = c("scenario","hbf_total","et_tot", "hbf_total_log10")
   dat_for_plot = obj_fn_scen[,!(colnames(obj_fn_scen) %in% remove_cols)]
@@ -1438,52 +1439,45 @@ hbf_comp_fig = function(obj_fn_wy, scen_id,
   rename_col_i = which(!(colnames(dat_for_plot_long) %in% c("wy", "Component")))
   colnames(dat_for_plot_long)[rename_col_i] = 
     paste0("Contrib. to Hyd. Ben. value (log10 of ",y_val_label,")")
-    
+  colnames(dat_for_plot_long)[colnames(dat_for_plot_long)=="wy"] = "Brood Year"
+  
   if(y_val_label=="coho juv. per spawner"){
     plot_obj = ggplot(data = dat_for_plot_long, 
-           aes(fill = Component, x = wy,
+           aes(fill = Component, x = `Brood Year`,
                y = `Contrib. to Hyd. Ben. value (log10 of coho juv. per spawner)`)) +
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(labels = comp_names, 
                         values = rainbow_hcl(n=length(comp_names))) +
-      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
-                       labels = month.abb[c(10:12, 1:9)]) +
       theme_bw() +
       theme(legend.position = "bottom")
   }
   if(y_val_label=="coho juv. abun."){
     plot_obj = ggplot(data = dat_for_plot_long, 
-           aes(fill = Component, x = wy,
+           aes(fill = Component, x = `Brood Year`,
                y = `Contrib. to Hyd. Ben. value (log10 of coho juv. abun.)`)) +
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(labels = comp_names, 
                         values = rainbow_hcl(n=length(comp_names))) +
-      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
-                       labels = month.abb[c(10:12, 1:9)]) +
       theme_bw() +
       theme(legend.position = "bottom")
   }
   if(y_val_label=="Chinook juv. per spawner"){
     plot_obj = ggplot(data = dat_for_plot_long, 
-           aes(fill = Component, x = wy,
+           aes(fill = Component, x = `Brood Year`,
                y = `Contrib. to Hyd. Ben. value (log10 of Chinook juv. per spawner)`)) +
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(labels = comp_names, 
                         values = rainbow_hcl(n=length(comp_names))) +
-      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
-                       labels = month.abb[c(10:12, 1:9)]) +
       theme_bw() +
       theme(legend.position = "bottom")
   }
   if(y_val_label=="Chinook juv. abun."){
     plot_obj = ggplot(data = dat_for_plot_long, 
-           aes(fill = Component, x = wy,
+           aes(fill = Component, x = `Brood Year`,
                y = `Contrib. to Hyd. Ben. value (log10 of Chinook juv. abun.)`)) +
       geom_bar(position = "stack", stat = "identity") +
       scale_fill_manual(labels = comp_names, 
                         values = rainbow_hcl(n=length(comp_names))) +
-      scale_x_discrete(name = "Water Years 1991-2025", breaks = c(10:12,1:9), 
-                       labels = month.abb[c(10:12, 1:9)]) +
       theme_bw() +
       theme(legend.position = "bottom")
   }
