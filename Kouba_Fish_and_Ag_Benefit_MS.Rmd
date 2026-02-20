@@ -467,7 +467,7 @@ The annual crop ET volume, which is explicitly simulated in the hydrologic model
 
 Additionally, for alfalfa and pasture, which continue growing as long as water is available, a strong relationship between crop ET and yield is assumed [@CarterSheafferAlfalfa1983]. The assumption that crop ET is consistently related to yield or revenue breaks down for a management scenario that includes changing crops; this is explored further in the Discussion section. But on the merits of these options, annual crop ET was selected to represent agricultural benefit. 
 
-We assume that grain, another important local crop, has a different relationship than alfalfa between ET and revenue, as grain is harvested once per year in mid-to-late summer and alfalfa is harvested three to four times per year in this region [@HarterHines2008]. This makes interpretation of the agricultural objective functions more complicated for three crop change scenarios in which alfalfa is converted to grain; see additional discussion in Section 5.
+We assume that grain, another important local crop, has a different relationship than alfalfa between ET and revenue, as grain is harvested once per year in mid-to-late summer and alfalfa is harvested three to four times per year in this region [@HarterHinesSCOTT2008]. This makes interpretation of the agricultural objective functions more complicated for three crop change scenarios in which alfalfa is converted to grain; see additional discussion in Section 5.
 
 ### Proxy for scenario infrastructure investment
 
@@ -586,7 +586,7 @@ colnames(obj_fn_wy)[colnames(obj_fn_wy)=="hbf_total_untrans"] = "hbf_total"
 
 ```
 
-As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value in units of predicted smolt abundance for coho, and a total crop ET volume was calculated for each water year in the 35-year simulation period, for each scenario. (See Supplemental Material for these results calculated for an HB function with the other three units: coho smolt produced per adult spawner, Chinook smolt abundance, or Chinook smolt per adult.) In addition to the two objective functions, each scenario has been assigned an infrastructure feasibility category (Table \@ref(tab:scenarioResultsTabMainText)). 
+As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. A Hydrologic Benefit (HB) value in units of predicted smolt abundance for coho and a total crop ET volume was calculated for each water year in the 35-year simulation period, for each scenario. (See Supplemental Material for these results calculated for an HB function with the other three units: coho smolt per adult spawner, Chinook smolt abundance, or Chinook smolt per adult.) In addition to the two objective functions, each scenario has been assigned an infrastructure feasibility category (Table \@ref(tab:scenarioResultsTabMainText)). 
 
 <!-- ## 4.1 Environmental and agricultural objective function values -->
 ## Environmental and agricultural objective function values
@@ -654,12 +654,13 @@ scenario_tab$mgmt_cat = scen_cat_tab$mgmt_cat[match(scenario_tab$scenario_catego
                                                     scen_cat_tab$category)]
 scenario_tab$symbol = scen_cat_tab$symbol[match(scenario_tab$scenario_category,
                                                     scen_cat_tab$category)]
-scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
+scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab,
+                                          yes_size = 15, no_size = 10)
 
 ```
 
 
-```{r benefitByWYMainText, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are basecase (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and Native Vegetation (Low ET). Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22." , warning=F}
+```{r benefitByWYMainText, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are basecase (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and eight thousand acres of irrigated crops converted to low-ET Native Vegetation. Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22. Shown also in Supplement A." , warning=F}
 
 y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
@@ -710,9 +711,39 @@ The aggregate hydrologic impact of each management scenario can be compared agai
 
 **results bullet points**
 
-* for HB over time, not a lot of difference between scenarios some years
-* 
+* High-importance flows selected in LASSO regression and corroboration by other statistical approaches (Table \@ref(tab:coefTabMainText)). 
+  + Because predictor values were standardized (Z-score transformed) before the statistical modeling exercise, absolute values of coefficients for flow metrics can be interpreted as relative degree of influence on the relevant ecological outcome.
+  + For coho, in both absolute and spawner-normalized smolt units, LASSO regression identified at fall-to-wet season transition metrics as of high importance for predicting coho outcomes; for units of absolute smolt abundance, the spring recession rate was also selected (Supplements A and B, Table 1). 
+  + For Chinook, in both absolute and spawner-normalized smolt units, the wet season baseflow median magnitude was of greatest importance; for normalized smolt units, maximum spring recession rate was also selected (Supplements C and D, Table 1).  
+  + Effectively, in the context of LASSO regression, the flows that explain the most variation in smolt production (without overfitting, as determined by k-fold validation) were related to, for coho, the timing of wet season onset and the magnitude of changes in fall flows; and for Chinook, the wet season baseflow.
+  + The importance of wet season baseflows to Chinook and fall flows to coho is corroborated by the other statistical modeling approaches, i.e., LASSO regression predicting smolt production based on hydrology and spawner abundance, as well as MARSS regression models predicting smolt production with single hydrologic covariates [@KoubaEtAlWatershedSpecific2025]. However, other metrics were also highlighted: **summarize hydro+spawner and MARSS results** [@KoubaEtAlWatershedSpecific2025].
+  
+* for HB over time  (Figure \@ref(fig:benefitByWYMainText) and also Supplement A, Figure 1:
+  + Generally a uniform effect on ET, shifting it by about the same amount each year. Conversely, scenario effect on HB function is variable. (Supplements A-D, Figure 1)
+  + For HB over time, not a lot of difference between scenarios some years. Some scenarios may not change the component flows relative to basecase (Supplements A-D, Figure 2) 
 
+* For HB components (SUpplements A-D, Figure 2):
+  + For coho juvenile abundance, in the basecase scenario, it seems that when the HB function predicts a particularly good year (**numerical definition**), it is driven by a large magnitude fall flow difference, or fall pulse. Conversely, in the years where the HB function predicts a particularly bad year, it is driven by a rapid first spring recession rate (Supplement A, Figure 2). 
+  + Conversely, for coho juveniles per spawner (basecase), both good and bad years seem to be largely driven by wet season onset timing (Supplement B, Figure 2)
+  + In both cases for coho, 2nd fall flow difference makes minor contributions (Supplements A and B, Figure 2), and is assigned a negative coefficient. This suggests higher flows in the second fall (for juvenile overwintering coho) are consistently associated with lower smolt production, but other factors such as first fall flow difference and wet season timing seem to exert greater overall influence.
+  + For Chinook, predictions of both high and low smolt production are driven by wet season baseflow magnitude (with a small contribution from maximum spring recession rate for juveniles per adult): high wet season flows are associated with lower smolt abundance. 
+
+
+* Tradeoff plot (Figure \@ref(fig:farmerFishTradeoffFigureMainText).
+  + Chinook plots of fish vs farmer tradeoffs are effectively meaningless, since wet season median flows are largely beyond human control in this undammed watershed. (**for discussion?**) 
+  + Highest-HB value is total conversion of irrigated agriculture to native vegetation. (High-ET vegetation endmember for Chinook and low-ET for coho).
+  + reservoir scenarios don't help coho much at all: small reservoirs just don't have capacity to add fall flow during dry years when baseflows are lowest. Surprisingly, reservoir scenarios seem to help Chinook significantly more: even a small reservoir on one tributary can dampen wet season stormflows enough to benefit Chinook.
+  + In all four HB formulations, Enhanced Recharge produces virtually no change in either fish benefit or farmer cost relative to basecase (Supplements A-D, Figure 3). The lack of farmer cost is by design; this management strategy is intended to minimize any impacts on growing season operations. But the lack of any fish benefit may reflect limitations of current surface water diversion permit rules; the maximum amount permitted winter diversions may not be sufficient to generate baseflow increases at the end of the following dry season.
+  + For coho, Enhanced Recharge and Reservoir scenarios produce virtually no farmer cost. 
+  + Irrigation efficiency seems
+  
+**check - is alf_curtail_07.31 actually alf_curtail_08.15?**
+
+* Efficiency plot (Figure \@ref(fig:efficiencyMainText)
+  + For coho, 
+  
+* 3-D results figure  (Figure \@ref(fig:farmerFishInfraFigure3D)
+  + For coho, trade-off curves in every category.
  
 Four scenario categories fall in a cluster with relatively high ET values, indicating that these scenarios conserve nearly all the basecase economic benefits for local growers: Enhanced Recharge, Expanded Enhanced Recharge, Irrigation Efficiency, and Small Reservoir (Figure \@ref(fig:farmerFishTradeoffFigure)). The scenarios in this group all require some degree of infrastructure investment, and they have a minimal impact on crop ET: the mean ET values of scenarios in this cluster are `r round(top_2_et_range[1])` to `r round(top_2_et_range[2])` million m^3^, or `r round(top_2_et_worse[1]/bc_et_mean*100)` percent less to `r round(top_2_et_worse[2]/bc_et_mean,3)*-1*100` percent more than basecase. Their mean improvement in HB values over the basecase ranges from `r round(top_2_hbf_improve[1])` to `r round(top_2_hbf_improve[2])` coho spf-equivalent.
 
@@ -732,15 +763,6 @@ On average, area-normalized ET from native vegetation is `r round(et_nv_depth_m*
 \blandscape
 
 ```{r scenarioResultsTabMainText, echo = FALSE, results = 'asis'}
-
-bc_sel = scenario_tab$scenario_id=="basecase"
-hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
-et_bc_mean = scenario_tab$et_mean[bc_sel]
-scenario_tab$hb_gained = (scenario_tab$HBF_mean - hb_bc_mean)/hb_bc_mean
-scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1
-
-scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
-
 
 # subset desired columns
 scen_tab = scenario_tab[,c("scenario_id", "scenario_category", "feas_cat", 
@@ -861,6 +883,14 @@ Four scenario categories form a "low-efficiency" cluster, with all-years efficie
 
 ```{r efficiencyMainText, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average Hydrologic Benefit value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Some scenarios are excluded if they have no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
 
+bc_sel = scenario_tab$scenario_id=="basecase"
+hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
+et_bc_mean = scenario_tab$et_mean[bc_sel]
+scenario_tab$hb_gained = (scenario_tab$HBF_mean - hb_bc_mean)/hb_bc_mean
+scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1
+
+scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
+
 
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
@@ -905,14 +935,15 @@ if(save_3d_plot == T){
 plot3d(x = scenario_tab$HBF_mean, 
        y = scenario_tab$et_mean / (-1 * 10^6), 
        z = scenario_tab$feas_cat,
-       type = "s", col = scenario_tab$color, radius = scenario_tab$size_3d,
+       type = "s", col = scenario_tab$color, 
+       radius = scenario_tab$size_3d,
        xlab = "HB",#"Hyd. Ben Value",
        ylab = "ET vol.",
        zlab = "Infrastructure")
 }
 #This only works to manually orient it and take a screen shot; do this if you need to redo this graph
 
-scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2025.11.04.jpg")
+scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2026.02.19.jpg")
 knitr::include_graphics(scatter3d_filename)
 
 ```

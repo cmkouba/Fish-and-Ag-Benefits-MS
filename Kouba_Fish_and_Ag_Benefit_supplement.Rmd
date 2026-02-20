@@ -14,7 +14,7 @@ bibliography: library.bib
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
 # "Supplement A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
-# model_name = "coho_lasso_juv_on_hydro"
+model_name = "coho_lasso_juv_on_hydro"
 
 # "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
 # model_name = "coho_lasso_jps_on_hydro"
@@ -193,6 +193,22 @@ fig_i = fig_i + 1
 
 ```
 
+```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} Contributions to annual Hydrologic Benefit function values, by functional flow metric (intercept values not shown)." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  plot_obj = hbf_comp_fig(obj_fn_wy, 
+               scen_id = "irr_eff_0.1",#"basecase",
+               y_val_label = y_val_x_axis_label)
+  ggsave(filename = fig_path, plot = plot_obj, width = 8, height = 6, units = "in"
+    )
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
+
+
 ```{r farmerFishTradeoffFigure01, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for exampe time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
@@ -215,9 +231,8 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 ```
 
 
-\newpage
+```{r efficiency01, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average Hydrologic Benefit value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Some scenarios are excluded if they have no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
 
-```{r scenarioResultsTab01, echo = FALSE, results = 'asis'}
 
 bc_sel = scenario_tab$scenario_id=="basecase"
 hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
@@ -227,6 +242,27 @@ scenario_tab$et_lost = (scenario_tab$et_mean - et_bc_mean)/et_bc_mean *-1
 
 scenario_tab$hb_gained_to_et_lost = round(scenario_tab$hb_gained / scenario_tab$et_lost, 2)
 
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 8, height = 6, units = "in", res = 300)
+  tradeoff_efficiency_fig_nov2025(scenario_tab = scenario_tab)
+  dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+
+
+
+```
+
+
+
+
+
+\newpage
+
+```{r scenarioResultsTab01, echo = FALSE, results = 'asis'}
 
 # subset desired columns
 scen_tab = scenario_tab[,c("scenario_id", "scenario_category", "feas_cat", 
@@ -283,40 +319,4 @@ st_ft
 
 
 ``` 
-
-
-```{r efficiency01, echo = F, fig.cap="\\label{fig:efficiency} Scenario trade-off efficiencies, or average Hydrologic Benefit value (a proxy for environmental benefit) gained per crop ET value lost (a proxy for farmer cost) (normalized to average basecase HB and ET values, respectively), in all 35 years. Some scenarios are excluded if they have no or negative ET loss, producing infinite or negative efficiency values." , warning=F}
-
-
-
-fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
-if(print_for_slides==T){
-  png(filename = fig_path, width = 8, height = 6, units = "in", res = 300)
-  tradeoff_efficiency_fig_nov2025(scenario_tab = scenario_tab)
-  dev.off()
-}
-knitr::include_graphics(fig_path)
-fig_i = fig_i + 1
-
-
-
-
-```
-
-
-
-```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} Contributions to annual Hydrologic Benefit function values, by functional flow metric (intercept values not shown)." , warning=F}
-
-fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
-if(print_for_slides==T){
-  plot_obj = hbf_comp_fig(obj_fn_wy, 
-               scen_id = "basecase",
-               y_val_label = y_val_x_axis_label)
-  ggsave(filename = fig_path, plot = plot_obj, width = 8, height = 6, units = "in"
-    )
-}
-knitr::include_graphics(fig_path)
-fig_i = fig_i + 1
-
-```
 

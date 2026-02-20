@@ -1316,7 +1316,7 @@ farm_fish_tradeoff_fig = function(scenario_tab, n_years = 35,
   # add legend
   legend(x = legend_position, pch=scen_cat_tab$symbol, cex = .8, pt.cex = 1.5,
          title = "Mgmt. Action Category",# (# of scenarios)",
-         pt.bg = scen_cat_tab$color,
+         pt.bg = scen_cat_tab$color, bty ="n",#bg=NA,
          legend = scen_cat_tab$category_long)
 }
 
@@ -1416,7 +1416,7 @@ tradeoff_efficiency_fig_nov2025 = function(scenario_tab){
   sct2 = scen_cat_tab[(scen_cat_tab$category %in% c("basecase",unique(plot_2_scen$scenario_category))),]
 
   legend(x = "topright", pch=sct2$symbol, cex = .7,
-         pt.cex = 1.5, ncol = 2,
+         pt.cex = 1.5, ncol = 2, bty="n",#bg=NA,
          pt.bg = sct2$color,
          legend = sct2$category_long)
 }
@@ -2427,7 +2427,9 @@ add_plot_cols_to_scen_cat_tab = function(scen_cat_tab_1){
   return(scen_cat_tab_2)
 }
 
-add_pareto_col_to_scen_tab = function(scenario_tab){
+add_pareto_col_to_scen_tab = function(scenario_tab,
+                                      no_size = 1,
+                                      yes_size = 1.5){
   scenario_tab$pareto_opt = "--"
   for(i in 1:nrow(scenario_tab)){
 
@@ -2446,8 +2448,8 @@ add_pareto_col_to_scen_tab = function(scenario_tab){
     if(length(scens_better_all3) ==0){scenario_tab$pareto_opt[i] = "Yes"}
   }
 
-  scenario_tab$size_3d = 1
-  scenario_tab$size_3d[scenario_tab$pareto_opt=="Yes"] = 1.5
+  scenario_tab$size_3d = no_size
+  scenario_tab$size_3d[scenario_tab$pareto_opt=="Yes"] = yes_size
 
   return(scenario_tab)
 }
