@@ -175,14 +175,17 @@ fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 7.5, units = "in", res = 300)
 
-  plot_scenarios1 = c("basecase", "maxMAR_fields2024",
-                      "grain_12k", "natveg_low_8k")
-
+  plot_scenarios1 = c("basecase", 
+                      # "maxMAR_fields2024",
+                      # "grain_12k",# "natveg_low_8k",
+                       "alf_curtail_08.15","alf_curtail_07.31","alf_curtail_07.15")
+  # scen_cols = get_palette(c("black","brown4","green4","cyan3","skyblue4"),k=5)
+  scen_cols = get_palette(c("black",#"brown4",
+                            # "red3",
+                            "goldenrod","green4","dodgerblue3"),k=5)
   par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
-                    cols = get_palette(c("black","dodgerblue",
-                                         "green4","darkgoldenrod"),
-                                       length(plot_scenarios1)),
+                    cols = scen_cols,
                     panel_labels = c("A","B"),
                     y_val_label = y_val_x_axis_label)
   dev.off()
@@ -198,14 +201,84 @@ fig_i = fig_i + 1
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   plot_obj = hbf_comp_fig(obj_fn_wy, 
-               scen_id = "irr_eff_0.1",#"basecase",
+               scen_id = "basecase",#"alf_curtail_07.31",#"basecase",
                y_val_label = y_val_x_axis_label)
+  fig_path
   ggsave(filename = fig_path, plot = plot_obj, width = 8, height = 6, units = "in"
     )
 }
 knitr::include_graphics(fig_path)
 fig_i = fig_i + 1
 
+```
+
+```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Simulated FJ daily average flow (basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename=fig_path,width=7,height=5,unit="in",res=300)
+  
+  plot_start = as.Date("2002-07-01"); plot_end = as.Date("2005-01-01")
+  plot_start =  as.Date("1991-10-01"); plot_end = as.Date("2025-09-30")
+  plot_start = as.Date("2000-07-01"); plot_end = as.Date("2005-01-01")
+  
+  scen_id = "basecase"
+  fj_scen = scen_fj_out[,c("Date",scen_id)]
+  fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
+  plot(x = fj_plot$Date, y=fj_plot$basecase, type = "l",
+       ylim = c(min(fj_plot[,scen_id]), max(fj_plot[,scen_id]*10)),
+       xlab = "Date", ylab = "FJ Sim. Flow (cfs)",
+       log="y", yaxt="n")
+  if((plot_end-plot_start)/365 < 5){
+    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
+                 to=ceiling_date(x=plot_end, unit = "year"),
+                 by="quarter")
+  } else {
+    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
+                 to=ceiling_date(x=plot_end, unit = "year"),
+                 by="year")
+  }
+  
+  y_orders = floor(log10(min(fj_plot[,scen_id]))):
+               (1+ceiling(log10(max(fj_plot[,scen_id]))))
+  horz = 10^(y_orders)
+  abline(v=verts, h=horz, col = "gray", lty = 2)
+  axis(side=2,at=horz, labels = as.character(horz))
+  axis(side=2,at=rep(1:9,length(y_orders))*sort(rep(10^y_orders,9)),
+       tck=-.015, labels =NA)
+  
+  for(i in 2:length(plot_scenarios1)){
+    scen_id = plot_scenarios1[i]
+    fj_scen = scen_fj_out[,c("Date",scen_id)]
+    fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
+    lines(x=fj_plot$Date, y=fj_plot[,scen_id], col = scen_cols[i])
+  }
+
+  legend(x="topright",ncol=3,legend =plot_scenarios1, cex=.8,
+         # bty="n",
+         col = scen_cols, lwd=2)  
+
+dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+# but the functional flows?? why is fall flow diff weird for the 3 alf categories?
+show_this =F
+if(show_this){
+  plot_scenarios1
+  ff_scen = ffs_scenarios[[scen_id]]
+  ff_scen$f1_FA_Dif_num
+  
+  FA_dif = data.frame(brood_year = ffs_scenarios[["basecase"]]$Brood_Year,
+                      basecase = ffs_scenarios[["basecase"]]$f1_FA_Dif_num,
+                      alf_curtail_08.15 = ffs_scenarios[["alf_curtail_08.15"]]$f1_FA_Dif_num,
+                      alf_curtail_07.31 = ffs_scenarios[["alf_curtail_07.31"]]$f1_FA_Dif_num,
+                      alf_curtail_07.15 = ffs_scenarios[["alf_curtail_07.15"]]$f1_FA_Dif_num)
+  
+  FA_dif[FA_dif$brood_year %in% 2000:2006,]
+  
+}
 ```
 
 

@@ -607,7 +607,7 @@ svihm_dir = file.path(file.path(data_dir, "SVIHM Model Results_2025.10.13"))
 # FJ flow out
 scen_fj_out = read.csv(file.path(svihm_dir, "scen_combined_fj.csv"))
 colnames(scen_fj_out) = gsub(pattern = "_update_2025.09.30", replacement = "", x = colnames(scen_fj_out))
-
+scen_fj_out$Date=as.Date(scen_fj_out$Date)
 
 # Scenario parameter summary
 scen_params = read.csv(file.path(svihm_dir, "scenarios_param_summary.csv"))

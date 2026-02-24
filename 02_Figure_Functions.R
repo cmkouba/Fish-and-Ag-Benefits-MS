@@ -297,8 +297,9 @@ get_swbm_tab_with_separated_et = function(scen_id,
   return(swbm_monthly)
 }
 get_simulated_fj_outflow = function(scenario_id = "basecase",
-                                    start_date = as.Date("1990-10-01"), end_date = as.Date("2018-09-30"),
-                                    start_wy = 1991, end_wy = 2018){
+                                    start_date = as.Date("1990-10-01"), 
+                                    end_date = as.Date("2025-09-30"),
+                                    start_wy = 1991, end_wy = 2025){
 
   # 3. if not found, look for scenario dir on external drive
   fj_flow_file_path = file.path(svihm_results_dir,

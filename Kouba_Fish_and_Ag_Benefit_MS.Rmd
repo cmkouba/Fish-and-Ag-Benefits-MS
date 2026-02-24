@@ -634,7 +634,7 @@ natveg_et_percent = scenario_tab$et_mean[grep(pattern = "natveg",
 
 ```
 
-As described above, objective functions were used to quantitatively summarize the achievement of environmental and agricultural goals for the basecase and `r nrow(scenario_tab) - 1` management scenarios. For the agricultural objective (total crop ET volume) and for the environmental objective (a Hydrologic Benefit [HB] value in units of predicted smolt abundance for coho) were calculated for each water year in the 35-year simulation period, for each scenario (Table \@ref(tab:scenarioResultsTabMainText)). (See Supplemental Material for these results calculated for an HB function with three different units: coho smolt per adult spawner, Chinook smolt abundance, or Chinook smolt per adult; Table  \@ref(tab:HBUnitsLocationTab).) In addition to the two objective functions, each scenario has been assigned an infrastructure feasibility category (Tables  \@ref(tab:scenCategoryTab) and \@ref(tab:scenarioResultsTabMainText)).
+The degree to which the basecase and `r nrow(scenario_tab) - 1` scenarios achieved local management goals was summarized using two objective functions. A summary value for the agricultural objective (total crop ET volume) and for the environmental objective (a Hydrologic Benefit [HB] value in units of predicted smolt abundance for coho) were calculated for each water year/brood year in the 35-year simulation period, for each scenario (Table \@ref(tab:scenarioResultsTabMainText)). (See Supplemental Material for HB function results in different units; Table  \@ref(tab:HBUnitsLocationTab).) In addition to the two objective functions, each scenario has been assigned an infrastructure feasibility category (Tables  \@ref(tab:scenCategoryTab) and \@ref(tab:scenarioResultsTabMainText)).
 
 <!-- The aggregate hydrologic impact of each management scenario can be compared against the historical basecase using the annual objective function values over the full 35-year record (e.g., Figure \@ref(fig:benefitByWYMainText)) or using the 35-year mean values for each scenario (Figure \@ref(fig:farmerFishTradeoffFigureMainText); Table \@ref(tab:scenarioResultsTabMainText)).  -->
 
@@ -666,9 +666,7 @@ supp_tab_ft
 
 
 
-In the basecase scenario, the 35-year mean annual ET volume is `r round(bc_et_mean)` million m^3^ of water, and the 35-year mean of annual HB values is `r round(bc_hb_mean)` coho spf-equivalent (Table \@ref(tab:scenarioResultsTabMainText)). Annual ET volume is relatively stable over the model period of water years 1991-2025, while annual HB values are much more variable (Figure \@ref(fig:benefitByWYMainText)). Among the `r nrow(scenario_tab) - 1` management scenarios, mean ET values ranged from `r round(scen_et_range[1])` (for a no-irrigated-agriculture scenario) to `r round(scen_et_range[2])` million m^3^ of water, while HB values ranged from `r round(scen_hb_range[1])` to `r round(scen_hb_range[2])` coho smolt-equivalent.
-
-<!-- ## 4.1 Environmental and agricultural objective function values -->
+In the basecase scenario, the 35-year mean annual ET volume is `r round(bc_et_mean)` million m^3^ of water, and the 35-year mean of annual HB values is `r round(bc_hb_mean)` coho spf-equivalent (Table \@ref(tab:scenarioResultsTabMainText)). Annual ET volume is relatively stable over the model period of water years 1991-2025, while about annual HB values are more variable, with about 10% being high outliers (Figure \@ref(fig:benefitByWYMainText)). Among the `r nrow(scenario_tab) - 1` management scenarios, mean ET values ranged from `r round(scen_et_range[1])` (i.e., no irrigated agriculture) to `r round(scen_et_range[2])` million m^3^ of water (i.e., no reduction from basecase crop ET), while HB values ranged from `r round(scen_hb_range[1])` to `r round(scen_hb_range[2])` coho smolt-equivalent.
 
 
 ```{r scenario_tab_plot_columnsMainText, echo = F, warning=F}
@@ -743,36 +741,47 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 
 ## Hydrologic Benefit function basis: selected functional flows
 
-As stated above, the environmental objective (HB function) results can be interpreted as a prediction of the ~50% of variation in coho smolt production that is empirically *associated with* and appears to be *supported by* hydrologic factors. Because predictor values were standardized (Z-score transformed) before the statistical modeling exercise, absolute values of HB function coefficients for flow metrics can be interpreted as relative degree of influence on the relevant ecological outcome (Table \@ref(tab:coefTabMainText)).
+As stated above, the environmental objective (HB function) results can be interpreted as a prediction of the 40% to 60% of variation in coho smolt production that is empirically *associated with* and appears to be *supported by* hydrologic factors; correspondingly, it is assumed that the remaining variation in observed smolt abundance is due to non-hydrologic factors like water quality or population dynamics [@KoubaEtAlWatershedSpecific2025]. 
+
+Because functional flow values were standardized (Z-score transformed) before the statistical modeling exercise, absolute values of HB function coefficients for flow metrics can be interpreted as relative degree of influence on the relevant ecological outcome (Table \@ref(tab:coefTabMainText)).
 
 <!-- * High-importance flows selected in LASSO regression and corroboration by other statistical approaches (Table \@ref(tab:coefTabMainText)).  -->
 
-For coho, in both absolute and spawner-normalized smolt units, the high-importance flows were fall-to-wet season transition metrics; for units of absolute smolt abundance, the spring recession rate was also important (Supplements A and B, Table 1). For Chinook, in both absolute and spawner-normalized smolt units, the wet season baseflow median magnitude was of greatest importance; for normalized smolt units, maximum spring recession rate was also selected (Supplements C and D, Table 1). Effectively, in the context of LASSO regression, the flows that explain the most variation in smolt production (without overfitting, as determined by k-fold validation) were related to, for coho, the timing of wet season onset and the magnitude of changes in fall flows; and for Chinook, the wet season baseflow.
+The HB formulations represent four ways of answering the question, "how good was this water year for this species?" For coho, in both absolute and spawner-normalized smolt units, the high-importance flows were fall-to-wet season transition metrics; for units of absolute smolt abundance, the spring recession rate was also important (Supplements A and B, Table 1). For Chinook, in both absolute and spawner-normalized smolt units, the wet season baseflow median magnitude was of greatest importance; for normalized smolt units, maximum spring recession rate was also selected (Supplements C and D, Table 1). Effectively, in the context of LASSO regression, the flows that explain the most variation in smolt production (without overfitting, as determined by k-fold validation) were related to, for coho, the timing of wet season onset and the magnitude of changes in fall flows; and for Chinook, the wet season baseflow.
 
 <!-- The importance of wet season baseflows to Chinook and fall flows to coho is corroborated by the other statistical modeling approaches, i.e., LASSO regression predicting smolt production based on hydrology and spawner abundance, as well as MARSS regression models predicting smolt production with single hydrologic covariates [@KoubaEtAlWatershedSpecific2025]. However, other metrics were also highlighted: **summarize hydro+spawner and MARSS results** [@KoubaEtAlWatershedSpecific2025]. -->
   
 ## Objective function results over time
 
-Generally different management scenarios tended to have a uniform effect on total ET over time, shifting it by about the same amount each year (Figure \@ref(fig:benefitByWYMainText). Conversely, in some years, many scenarios seem to have very little effect on HB function, though this is variable over time, regardless of which HB units are used (Figure \@ref(fig:benefitByWYMainText and Supplements A-D, Figure 1). 
+Management scenarios tended to have a uniform effect on total ET over time, shifting it by about the same amount each year relative to basecase (Figure \@ref(fig:benefitByWYMainText)). Conversely, in some years, many scenarios seem to have very little effect on HB function, though this is variable over time, regardless of which HB units are used (Figure \@ref(fig:benefitByWYMainText) and Supplements A-D, Figure 1). 
 
-The small effect of some scenarios on HB values implies that these scenarios do not alter the component flows relative to basecase (Supplements A-D, Figure 2). 
+The small effect of some scenarios on HB values implies that these scenarios do not alter the HB function component flows relative to basecase (Supplements A-D, Figure 2). For coho juvenile abundance, in the basecase scenario, it seems that when the HB function predicts a particularly good year (i.e., > 20,000 coho smolt-equiv.), it is driven by a large magnitude fall flow difference, or fall pulse. Conversely, in the years where the HB function predicts a particularly bad year (i.e., '95, '98, '04), it is driven by a rapid first spring recession rate (Supplement A, Figure 2). Conversely, for coho juveniles per spawner (basecase), both good and bad years seem to be largely driven by wet season onset timing (Supplement B, Figure 2). 
 
-**CURRENTLY HERE** 
+In both cases for coho, second fall flow difference makes minor contributions (Supplements A and B, Figure 2), and is assigned a negative coefficient (Table \@ref(tab:coefTabMainText)). This suggests higher flows in the second fall (for juvenile overwintering coho) are consistently associated with lower smolt production, but other factors such as first fall flow difference and wet season timing seem to exert greater overall influence.
 
-* For HB components (SUpplements A-D, Figure 2):
-  + For coho juvenile abundance, in the basecase scenario, it seems that when the HB function predicts a particularly good year (**numerical definition**), it is driven by a large magnitude fall flow difference, or fall pulse. Conversely, in the years where the HB function predicts a particularly bad year, it is driven by a rapid first spring recession rate (Supplement A, Figure 2). 
-  + Conversely, for coho juveniles per spawner (basecase), both good and bad years seem to be largely driven by wet season onset timing (Supplement B, Figure 2)
-  + In both cases for coho, 2nd fall flow difference makes minor contributions (Supplements A and B, Figure 2), and is assigned a negative coefficient. This suggests higher flows in the second fall (for juvenile overwintering coho) are consistently associated with lower smolt production, but other factors such as first fall flow difference and wet season timing seem to exert greater overall influence.
-  + For Chinook, predictions of both high and low smolt production are driven by wet season baseflow magnitude (with a small contribution from maximum spring recession rate for juveniles per adult): high wet season flows are associated with lower smolt abundance. 
+For Chinook, predictions of both high and low smolt production are driven by wet season baseflow magnitude (with a small contribution from maximum spring recession rate for juveniles per adult): high wet season flows are associated with lower smolt abundance (Supplements C and D, Figure 2). 
 
 
 ## Environmental-agricultural tradeoffs and efficiency
 
-* Tradeoff plot (Figure \@ref(fig:farmerFishTradeoffFigureMainText).
-  
-  + Highest-HB value is total conversion of irrigated agriculture to native vegetation. (High-ET vegetation endmember for Chinook and low-ET for coho).
-  + reservoir scenarios don't help coho much at all: small reservoirs just don't have capacity to add fall flow during dry years when baseflows are lowest. Surprisingly, reservoir scenarios seem to help Chinook significantly more: even a small reservoir on one tributary can dampen wet season stormflows enough to benefit Chinook.
-  + In all four HB formulations, Enhanced Recharge produces virtually no change in either fish benefit or farmer cost relative to basecase (Supplements A-D, Figure 3). The lack of farmer cost is by design; this management strategy is intended to minimize any impacts on growing season operations. But the lack of any fish benefit may reflect limitations of current surface water diversion permit rules; the maximum amount permitted winter diversions may not be sufficient to generate baseflow increases at the end of the following dry season.
+The 35-year mean values of HB and ET can be used to map all scenarios on one two-dimensional landscape, which is useful for evaluating trade-offs between objectives (Figure \@ref(fig:farmerFishTradeoffFigureMainText). 
+
+In units of coho smolt abundance, three management scenarios actually produce poorer fish outcomes, but the majority of scenarios produce more favorable flows for smolt production relative to basecase (Figure \@ref(fig:farmerFishTradeoffFigureMainText).
+
+<!-- The scenario producing the single highest mean HB value is total conversion of irrigated agriculture to native vegetation (high-ET vegetation endmember for Chinook and low-ET for coho; Supplements A-D, Figure 3). To be clear, no  -->
+
+
+**rephrase to avoid "Helps" language?**
+Somewhat contrary to expectations, reservoir scenarios don't help coho much, relative to other management options: small reservoirs may not have capacity to add fall flow during dry years when baseflows are lowest (Figure \@ref(fig:farmerFishTradeoffFigureMainText and Supplements A and B, Figure 3). Surprisingly, reservoir scenarios seem to help Chinook significantly more than coho: even a small reservoir on one tributary appears to dampen wet season stormflows enough to benefit Chinook (Supplements C and D, Figure 3).
+
+In all four HB formulations, Enhanced Recharge produces virtually no change in either fish benefit or farmer cost relative to basecase (Figure \@ref(fig:farmerFishTradeoffFigureMainText and Supplements A-D, Figure 3). The lack of farmer cost is by design; this management strategy is intended to avoid any impacts on growing season operations. But the lack of any fish benefit may reflect limitations of current surface water diversion regulations; i.e., the maximum amount permitted winter diversions may not be sufficient to generate baseflow increases at the end of the following dry season.
+
+The category of scenarios that Cease Alfalfa Irrigation Early illustrates . **CURRENTLY HERE**. Remake Supplements. analyze FA_Dif and hb_By_wy and component graphs. **make explanation for why one alf_irr scenario is worse than basecase.**
+
+The Crop Change category is somewhat more difficult to interpret
+
+Curtailment
+Native Veg
   + For coho, Enhanced Recharge and Reservoir scenarios produce virtually no farmer cost. 
   + Irrigation efficiency seems
   
