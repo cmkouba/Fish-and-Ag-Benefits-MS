@@ -296,45 +296,45 @@ get_swbm_tab_with_separated_et = function(scen_id,
   
   return(swbm_monthly)
 }
-get_simulated_fj_outflow = function(scenario_id = "basecase",
-                                    start_date = as.Date("1990-10-01"), 
-                                    end_date = as.Date("2025-09-30"),
-                                    start_wy = 1991, end_wy = 2025){
-
-  # 3. if not found, look for scenario dir on external drive
-  fj_flow_file_path = file.path(svihm_results_dir,
-                                paste(scenario_id, "FJ outflow.csv"))
-
-  # 1. look for files on local disk. if found, read csv.
-  if(file.exists(fj_flow_file_path)){
-    FJ_Outflow = read.csv(fj_flow_file_path)
-    FJ_Outflow$Date = as.Date(FJ_Outflow$Date)
-  }
-
-  # 2. if not, need to digest files. look for scenario dir on local disk
-  if(!file.exists(fj_flow_file_path)){
-    scenario_dir = file.path(svihm_scenarios_dir, scenario_id)
-    if(!file.exists(file.path(scenario_dir,'Streamflow_FJ_SVIHM.dat'))){
-      scenario_dir = file.path(svihm_scenarios_backup_dir, scenario_id)
-    }
-
-    #3. Digest water budgets from scenario directory and save to local drive
-
-    FJ_Outflow = read.table(file.path(scenario_dir,'Streamflow_FJ_SVIHM.dat'), skip = 2)[,3]
-    cfs_to_m3d = 1/35.3147 * 86400 # 1 m3/x ft3 * x seconds/day
-    FJ_Outflow = data.frame(Date = seq(start_date, end_date, by = 'day'),
-                            fj_flow_m3d = FJ_Outflow,
-                            Flow = FJ_Outflow / cfs_to_m3d)
-    # add water year
-    FJ_Outflow$wy = year(FJ_Outflow$Date)
-    FJ_Outflow$wy[month(FJ_Outflow$Date) > 9] =
-      year(FJ_Outflow$Date[month(FJ_Outflow$Date) > 9]) + 1
-
-    write.csv(x = FJ_Outflow, file = fj_flow_file_path, quote = F, row.names = F)
-  }
-  return(FJ_Outflow)
-}
-
+# get_simulated_fj_outflow = function(scenario_id = "basecase",
+#                                     start_date = as.Date("1990-10-01"), 
+#                                     end_date = as.Date("2025-09-30"),
+#                                     start_wy = 1991, end_wy = 2025){
+# 
+#   # 3. if not found, look for scenario dir on external drive
+#   fj_flow_file_path = file.path(svihm_results_dir,
+#                                 paste(scenario_id, "FJ outflow.csv"))
+# 
+#   # 1. look for files on local disk. if found, read csv.
+#   if(file.exists(fj_flow_file_path)){
+#     FJ_Outflow = read.csv(fj_flow_file_path)
+#     FJ_Outflow$Date = as.Date(FJ_Outflow$Date)
+#   }
+# 
+#   # 2. if not, need to digest files. look for scenario dir on local disk
+#   if(!file.exists(fj_flow_file_path)){
+#     scenario_dir = file.path(svihm_scenarios_dir, scenario_id)
+#     if(!file.exists(file.path(scenario_dir,'Streamflow_FJ_SVIHM.dat'))){
+#       scenario_dir = file.path(svihm_scenarios_backup_dir, scenario_id)
+#     }
+# 
+#     #3. Digest water budgets from scenario directory and save to local drive
+# 
+#     FJ_Outflow = read.table(file.path(scenario_dir,'Streamflow_FJ_SVIHM.dat'), skip = 2)[,3]
+#     cfs_to_m3d = 1/35.3147 * 86400 # 1 m3/x ft3 * x seconds/day
+#     FJ_Outflow = data.frame(Date = seq(start_date, end_date, by = 'day'),
+#                             fj_flow_m3d = FJ_Outflow,
+#                             Flow = FJ_Outflow / cfs_to_m3d)
+#     # add water year
+#     FJ_Outflow$wy = year(FJ_Outflow$Date)
+#     FJ_Outflow$wy[month(FJ_Outflow$Date) > 9] =
+#       year(FJ_Outflow$Date[month(FJ_Outflow$Date) > 9]) + 1
+# 
+#     write.csv(x = FJ_Outflow, file = fj_flow_file_path, quote = F, row.names = F)
+#   }
+#   return(FJ_Outflow)
+# }
+# 
 
 
 
@@ -738,6 +738,7 @@ model_name_to_y_val_label = function(model_name){
   if(grepl(pattern="jps", x =model_name, ignore.case = T)){units = "juv. per spawner"}
   return(paste(species, units))
 }
+
 
 # figure functions --------------------------------------------------------
 
@@ -1484,6 +1485,48 @@ hbf_comp_fig = function(obj_fn_wy, scen_id,
   }
   return(plot_obj)
 }
+
+fj_flow_scen_plot = function(plot_scenarios1, scen_cols){
+  plot_start = as.Date("2002-07-01"); plot_end = as.Date("2005-01-01")
+  plot_start =  as.Date("1991-10-01"); plot_end = as.Date("2025-09-30")
+  plot_start = as.Date("2000-07-01"); plot_end = as.Date("2005-01-01")
+  
+  scen_id = plot_scenarios1[1]#"basecase"
+  fj_scen = scen_fj_out[,c("Date",scen_id)]
+  fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
+  plot(x = fj_plot$Date, y=fj_plot$basecase, type = "l",
+       ylim = c(min(fj_plot[,scen_id]), max(fj_plot[,scen_id]*10)),
+       xlab = "Date", ylab = "FJ Sim. Flow (cfs)",
+       log="y", yaxt="n")
+  if((plot_end-plot_start)/365 < 5){
+    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
+                   to=ceiling_date(x=plot_end, unit = "year"),
+                   by="quarter")
+  } else {
+    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
+                   to=ceiling_date(x=plot_end, unit = "year"),
+                   by="year")
+  }
+  
+  y_orders = floor(log10(min(fj_plot[,scen_id]))):
+    (1+ceiling(log10(max(fj_plot[,scen_id]))))
+  horz = 10^(y_orders)
+  abline(v=verts, h=horz, col = "gray", lty = 2)
+  axis(side=2,at=horz, labels = as.character(horz))
+  axis(side=2,at=rep(1:9,length(y_orders))*sort(rep(10^y_orders,9)),
+       tck=-.015, labels =NA)
+  
+  for(i in 2:length(plot_scenarios1)){
+    scen_id = plot_scenarios1[i]
+    fj_scen = scen_fj_out[,c("Date",scen_id)]
+    fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
+    lines(x=fj_plot$Date, y=fj_plot[,scen_id], col = scen_cols[i])
+  }
+  
+  legend(x="topright",ncol=3,legend =plot_scenarios1, cex=.8,
+         # bty="n",
+         col = scen_cols, lwd=2)  
+}  
 
 # Table functions ---------------------------------------------------------
 
@@ -2455,6 +2498,43 @@ add_pareto_col_to_scen_tab = function(scenario_tab,
   return(scenario_tab)
 }
 
+
+ff_tab_builder = function(scen_ids, coef_tab){
+  ffs = coef_tab$Predictor[coef_tab$Predictor != "Intercept"]
+  #initialize table
+  fftab1 = data.frame(brood_year = ffs_scenarios[[scen_ids[1]]][,"Brood_Year"])
+  fftabs = vector(mode="list",length=0)
+  for(i in 1:length(ffs)){
+    ff = ffs[i]
+    fftab = fftab1
+    for(j in 1:length(scen_ids)){
+      scen_id = scen_ids[j]
+      
+      if(grepl("recon",ff) | grepl("discon",ff)){
+        thresh=as.numeric(unlist(strsplit(ff,split="_"))[3])
+        fj_flow_scen = scen_fj_out[,c("Date", scen_id)]
+        colnames(fj_flow_scen) = c("Date","Flow")
+        conn_tab = re_and_disconnect_date_tab(thresholds = thresh,
+                                                 fj_flow = fj_flow_scen)
+        if(grepl("recon",ff)){conn_tab_colname = colnames(conn_tab)[grep("recon",colnames(conn_tab))]}
+        if(grepl("discon",ff)){conn_tab_colname = colnames(conn_tab)[grep("discon",colnames(conn_tab))]}
+        fftab$ffj_sceni = conn_tab[match(fftab$brood_year, ff_i_scen_j$brood_year),
+                                      conn_tab_colname]
+      } else {
+        ff_i_scen_j = data.frame(brood_year = ffs_scenarios[["basecase"]]$Brood_Year,
+                                 scen_ff = ffs_scenarios[[scen_id]][ff])
+        fftab$ffj_sceni = ff_i_scen_j[match(fftab$brood_year, ff_i_scen_j$brood_year),
+                                      ff]
+      }
+      
+      
+      colnames(fftab)[ncol(fftab)] = scen_id
+    }
+    fftabs[[i]] = fftab
+    names(fftabs)[i]=ff
+  }
+  return(fftabs)
+}
 
 # Old HBF Functions (to revise June 2024) ---------------------------------
 

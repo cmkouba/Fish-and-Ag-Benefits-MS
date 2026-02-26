@@ -101,6 +101,9 @@ save_landuse_figure = F
 In the rural  American West, water needs of agriculture and ecosystems are often in competition. Furthermore, in places with interconnected surface- and groundwater systems, stream-aquifer exchange increases the difficulty of tracking impacts of diverse water users on each other and on the system as a whole. Hydrologic models can estimate the impacts of water uses and management actions on groundwater elevation and streamflow, but may provide overwhelming amounts of information and/or may be challenging for stakeholders to interpret. In this study, we address these challenges and aim to increase utility of hydrologic model results for a case study jurisdiction in northern California, which is in the process of implementing a long-term Groundwater Sustainability Plan (GSP). We developed a summary statistic or proxy for each of the three primary policy considerations in the GSP (environmental, agricultural, and project cost). We then used them to summarize the results of 25 management scenarios developed for the GSP, which were simulated using an existing integrated surface- and groundwater model. **We found that a trade-off in benefits for fish and farms was evident in every category of infrastructure investment (a proxy for project cost), though greater infrastructure investment can achieve some reductions in this trade-off. Additionally, although the GSP management priorities emphasized infrastructure investments, both infrastructure-based and regulatory approaches fell within the Pareto-optimal set of management options under a strict application of these objective functions.** Finally, **regarding regulatory actions, management interventions targeted at low-flow periods produced a more efficient gain in environmental flow value per cost in agricultural productivity.** This work demonstrates that basin-specific, stakeholder-informed objective functions can increase *stakeholder-salience of existing hydrologic model results*, and can help clarify trade-offs in ongoing local water planning efforts.
 
 
+**TO DO**
+
+* Supplement E - scenario design info. MAR map
 <!-- # LIT REVIEW -->
 
 <!-- * [@SaleEtAlApproach1982]: reservoir op.  relat between bio instream flow needs and more traditional water project objectives. IFN performance objective: index of physical habitat conditions called weighted usable area (WUA) dev. by USFW. Hydraulic  method. "There exists a strong need for developing new methods which are capable of integrating ecological considerations into water resources decision-making" -->
@@ -743,11 +746,11 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 
 As stated above, the environmental objective (HB function) results can be interpreted as a prediction of the 40% to 60% of variation in coho smolt production that is empirically *associated with* and appears to be *supported by* hydrologic factors; correspondingly, it is assumed that the remaining variation in observed smolt abundance is due to non-hydrologic factors like water quality or population dynamics [@KoubaEtAlWatershedSpecific2025]. 
 
-Because functional flow values were standardized (Z-score transformed) before the statistical modeling exercise, absolute values of HB function coefficients for flow metrics can be interpreted as relative degree of influence on the relevant ecological outcome (Table \@ref(tab:coefTabMainText)).
+Because functional flow values were standardized (Z-score transformed) before the statistical modeling exercise, absolute values of HB function coefficients for flow metrics can be interpreted as relative degree of influence on the relevant ecological outcome (Table \@ref(tab:coefTabMainText); see Supplement A for tabulated, untransformed functional flow values).
 
 <!-- * High-importance flows selected in LASSO regression and corroboration by other statistical approaches (Table \@ref(tab:coefTabMainText)).  -->
 
-The HB formulations represent four ways of answering the question, "how good was this water year for this species?" For coho, in both absolute and spawner-normalized smolt units, the high-importance flows were fall-to-wet season transition metrics; for units of absolute smolt abundance, the spring recession rate was also important (Supplements A and B, Table 1). For Chinook, in both absolute and spawner-normalized smolt units, the wet season baseflow median magnitude was of greatest importance; for normalized smolt units, maximum spring recession rate was also selected (Supplements C and D, Table 1). Effectively, in the context of LASSO regression, the flows that explain the most variation in smolt production (without overfitting, as determined by k-fold validation) were related to, for coho, the timing of wet season onset and the magnitude of changes in fall flows; and for Chinook, the wet season baseflow.
+The HB formulations represent four ways of answering the question, "how good was this water year for this species, and which flows matter?" For coho, in both absolute and spawner-normalized smolt units, the high-importance flows were fall-to-wet season transition metrics; for units of absolute smolt abundance, the spring recession rate was also important (Supplements A and B, Table 1). For Chinook, in both absolute and spawner-normalized smolt units, the wet season baseflow median magnitude was of greatest importance; for normalized smolt units, maximum spring recession rate was also selected (Supplements C and D, Table 1). Effectively, in the context of LASSO regression, the flows that explain the most variation in smolt production (without overfitting, as determined by k-fold validation) were related to, for coho, the timing of wet season onset and the magnitude of changes in fall flows; and for Chinook, the wet season baseflow.
 
 <!-- The importance of wet season baseflows to Chinook and fall flows to coho is corroborated by the other statistical modeling approaches, i.e., LASSO regression predicting smolt production based on hydrology and spawner abundance, as well as MARSS regression models predicting smolt production with single hydrologic covariates [@KoubaEtAlWatershedSpecific2025]. However, other metrics were also highlighted: **summarize hydro+spawner and MARSS results** [@KoubaEtAlWatershedSpecific2025]. -->
   
@@ -762,38 +765,67 @@ In both cases for coho, second fall flow difference makes minor contributions (S
 For Chinook, predictions of both high and low smolt production are driven by wet season baseflow magnitude (with a small contribution from maximum spring recession rate for juveniles per adult): high wet season flows are associated with lower smolt abundance (Supplements C and D, Figure 2). 
 
 
-## Environmental-agricultural tradeoffs and efficiency
+## Environmental-agricultural tradeoffs within and scenario categories
 
-The 35-year mean values of HB and ET can be used to map all scenarios on one two-dimensional landscape, which is useful for evaluating trade-offs between objectives (Figure \@ref(fig:farmerFishTradeoffFigureMainText). 
+The 35-year mean values of HB and ET can be used to map all scenarios on one two-dimensional landscape, which is useful for evaluating trade-offs between objectives (Figure \@ref(fig:farmerFishTradeoffFigureMainText)). 
 
-In units of coho smolt abundance, three management scenarios actually produce poorer fish outcomes, but the majority of scenarios produce more favorable flows for smolt production relative to basecase (Figure \@ref(fig:farmerFishTradeoffFigureMainText).
-
+In units of coho smolt abundance, three management scenarios actually produce poorer fish outcomes than basecase, but the majority of scenarios produce more favorable flows for smolt production (Figure \@ref(fig:farmerFishTradeoffFigureMainText)). We expect that this is due to scenario impacts on the largest single component of the HB function for coho smolt abundance, first fall flow difference or `f1_FA_Dif_num`. This metric is calculated as the difference between dry season median discharge and peak fall pulse discharge; in years with no detectable fall pulse flow, this value is set to 0 [@CarpenterAccurately2024; @BaruchEtAlMimicking2024] (see also Supplement A, Figure 5 and Table 3). The high degree of correlation between this flow and coho smolt abundance is corroborated by the species' natural history: fall run timing is somewhat more flexible for coho than Chinook, and coho seem to respond strongly to pulse flows, possibly due to olfactory signals from their natal streams [**CITE**]. Because changes in water use can affect both the dry season minimum and the magnitude of a fall pulse flow, management scenarios may have positive or negative effect on this functional flow, which in turn will influence the total calculated HB value.
 <!-- The scenario producing the single highest mean HB value is total conversion of irrigated agriculture to native vegetation (high-ET vegetation endmember for Chinook and low-ET for coho; Supplements A-D, Figure 3). To be clear, no  -->
 
 
-**rephrase to avoid "Helps" language?**
-Somewhat contrary to expectations, reservoir scenarios don't help coho much, relative to other management options: small reservoirs may not have capacity to add fall flow during dry years when baseflows are lowest (Figure \@ref(fig:farmerFishTradeoffFigureMainText and Supplements A and B, Figure 3). Surprisingly, reservoir scenarios seem to help Chinook significantly more than coho: even a small reservoir on one tributary appears to dampen wet season stormflows enough to benefit Chinook (Supplements C and D, Figure 3).
+* Chinook plots of fish vs farmer tradeoffs are effectively meaningless, since wet season median flows are largely beyond human control in this undammed watershed. (**for discussion?**) 
 
-In all four HB formulations, Enhanced Recharge produces virtually no change in either fish benefit or farmer cost relative to basecase (Figure \@ref(fig:farmerFishTradeoffFigureMainText and Supplements A-D, Figure 3). The lack of farmer cost is by design; this management strategy is intended to avoid any impacts on growing season operations. But the lack of any fish benefit may reflect limitations of current surface water diversion regulations; i.e., the maximum amount permitted winter diversions may not be sufficient to generate baseflow increases at the end of the following dry season.
+### Reservoir 
 
-The category of scenarios that Cease Alfalfa Irrigation Early illustrates . **CURRENTLY HERE**. Remake Supplements. analyze FA_Dif and hb_By_wy and component graphs. **make explanation for why one alf_irr scenario is worse than basecase.**
+Reservoir scenarios simulate how flows would change if a small reservoir (9 thousand acre-feet, or `r round(9000*af_to_m3/1000000,1)` 10^6^ m^3^), located in the headwaters on one of 3 tributaries, were operated with the following objectives: retain winter flow until fill (Dec-Mar), pass along growing season flow (Apr-Aug), and supplement dry season flow (Sep-Nov).
 
-The Crop Change category is somewhat more difficult to interpret
+Somewhat contrary to expectations, reservoir scenarios don't help coho much, relative to other management options: small reservoirs may not have capacity to add fall flow during dry years when baseflows are lowest (Figure \@ref(fig:farmerFishTradeoffFigureMainText) and Supplements A and B, Figure 3). Surprisingly, reservoir scenarios seem to help Chinook significantly more than coho: even a small reservoir on one tributary appears to dampen wet season stormflows enough to benefit Chinook (Supplements C and D, Figure 3).
 
-Curtailment
-Native Veg
-  + For coho, Enhanced Recharge and Reservoir scenarios produce virtually no farmer cost. 
-  + Irrigation efficiency seems
-  
-  + Chinook plots of fish vs farmer tradeoffs are effectively meaningless, since wet season median flows are largely beyond human control in this undammed watershed. (**for discussion?**) 
-  
-**check - is alf_curtail_07.31 actually alf_curtail_08.15?**
+### Enhanced Recharge
 
-* Efficiency plot (Figure \@ref(fig:efficiencyMainText)
-  + For coho, 
-  
-* 3-D results figure  (Figure \@ref(fig:farmerFishInfraFigure3D)
-  + For coho, trade-off curves in every category.
+The Enhanced Recharge scenario simulates a Managed Aquifer Recharge (MAR) program diverting **XXX** maximum total water volume from the Scott River, Jan-March, and applying it as winter recharge on **X** fields covering **XXX** acres (**XXXX** m^2^; see **Supplement E** for map of recharge areas).
+
+In all four HB formulations, Enhanced Recharge produces virtually no change in either fish benefit or farmer cost relative to basecase (Figure \@ref(fig:farmerFishTradeoffFigureMainText) and Supplements A-D, Figure 3). The lack of farmer cost is by design; this management strategy is intended to avoid any impacts on growing season operations. But the lack of any fish benefit suggests that current maximum permitted surface water diversions are insufficient to improve flow conditions for fish. **for discussion? >** The popularity of this management action points to a need, in Scott Valley, California, and semi-arid agricultural regions more broadly, regarding effective spatial, timing, and water volume elements of an effective MAR program.
+
+### Alfalfa Irrigation
+
+Early cessation of irrigation on alfalfa fields effectively means that growers forgo the harvest of one or more hay cuttings. The irrigation cutoff dates for alfala in this category are Aug 15 (closest to basecase), July 31, and July 15. 
+
+**CURRENTLY HERE.** iNTERPRET Alfalfa, Irr Curt, Crop Change, Irr Eff, and Low Flow Div. Also NatVeg high and low.
+
+### Irrigation Curtailment
+
+### Crop Change
+
+The ET values in the Crop Change category are challenging to compare directly to those in other categories, since the 
+
+; a change in ET in this scenario category may not correspond to a similar change in crop value if commodity prices for grain produce greater economic benefit than for alfalfa.
+
+### Irrigation Efficiency
+
+Irrigation efficiency seems to have a minimal effect on crop ET and a small positive or negative effect on environmental benefit;
+
+### Low Flow Diversion Limits
+
+In the basecase, surface water diversions to meet crop water demand are permitted until the stream volume is totally depleted (which is a common occurrence in some reaches of this ephemeral stream system); conversely, in this scenario, surface water was not diverted if flow fell below minimum tributary flowrates corresponding to the CDFW emergency drought flow regime [@StateWaterResourcesControlBoardEstablishment2024a].
+
+
+
+### Native Vegetation
+
+* two vegetation types simulated
+* high ET obviously increases consumptive use in the valley
+
+
+
+## Trade-off efficiency and considering infrastructure cost
+
+(Figure \@ref(fig:efficiencyMainText)
+
+3-D results figure  (Figure \@ref(fig:farmerFishInfraFigure3D)
+
+For coho, trade-off curves in every category.
+ 
  
 **begin old result text**
 

@@ -14,7 +14,7 @@ bibliography: library.bib
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
 # "Supplement A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
-model_name = "coho_lasso_juv_on_hydro"
+# model_name = "coho_lasso_juv_on_hydro"
 
 # "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
 # model_name = "coho_lasso_jps_on_hydro"
@@ -23,7 +23,7 @@ model_name = "coho_lasso_juv_on_hydro"
 # model_name = "chinook_lasso_juv_on_hydro"
 
 # "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
-# model_name = "chinook_lasso_jps_on_hydro"
+model_name = "chinook_lasso_jps_on_hydro"
 
 
 ```
@@ -72,7 +72,7 @@ if(dev_mode){
   source(file.path(ms_dir,"02_Figure_Functions.R"))   # Load figure functions
   # print figures for slides, yes or no?
   save_figs_here = fig_dir#"C:/Users/Claire/Dropbox/Documents/UCD/Presentations_Talks_Workshops_miniprojects/2022.02.17 Peer Group presentation Ch. 1/figs"
-  print_for_slides=T; fig_i = 1
+  print_for_slides=T; fig_i = 11
   save_landuse_figure = F
   
 }
@@ -88,6 +88,7 @@ capmaker_all_models = model_name_to_coefs_df(model_names)
 
 ```
 
+# HB coefficients, component contributions, and annual values
 
 
 ```{r coefTab01, echo = FALSE, results = 'asis'}
@@ -165,24 +166,18 @@ scenario_tab = add_pareto_col_to_scen_tab(scenario_tab = scenario_tab)
 
 ```
 
-
-
 ```{r benefitByWY01, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are basecase (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and Native Vegetation (Low ET). Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22." , warning=F}
 
+# Plot prep
+plot_scenarios1 = c("basecase",  # "maxMAR_fields2024", "grain_12k",# "natveg_low_8k",
+                    "alf_curtail_08.15","alf_curtail_07.31","alf_curtail_07.15")
+scen_cols = get_palette(c("black","goldenrod","green4","dodgerblue3"),k=4)
 y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
   png(filename = fig_path, width = 8, height = 7.5, units = "in", res = 300)
 
-  plot_scenarios1 = c("basecase", 
-                      # "maxMAR_fields2024",
-                      # "grain_12k",# "natveg_low_8k",
-                       "alf_curtail_08.15","alf_curtail_07.31","alf_curtail_07.15")
-  # scen_cols = get_palette(c("black","brown4","green4","cyan3","skyblue4"),k=5)
-  scen_cols = get_palette(c("black",#"brown4",
-                            # "red3",
-                            "goldenrod","green4","dodgerblue3"),k=5)
   par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
                     cols = scen_cols,
@@ -196,7 +191,7 @@ fig_i = fig_i + 1
 
 ```
 
-```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} Contributions to annual Hydrologic Benefit function values, by functional flow metric (intercept values not shown)." , warning=F}
+```{r HBComponents, echo = F, fig.cap="\\label{fig:hbComponents} For the basecase scenario, contributions to annual Hydrologic Benefit function values, by functional flow metric (see Table 1 above; intercept values not shown)." , warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -212,75 +207,8 @@ fig_i = fig_i + 1
 
 ```
 
-```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Simulated FJ daily average flow (basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
-
-fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
-if(print_for_slides==T){
-  png(filename=fig_path,width=7,height=5,unit="in",res=300)
-  
-  plot_start = as.Date("2002-07-01"); plot_end = as.Date("2005-01-01")
-  plot_start =  as.Date("1991-10-01"); plot_end = as.Date("2025-09-30")
-  plot_start = as.Date("2000-07-01"); plot_end = as.Date("2005-01-01")
-  
-  scen_id = "basecase"
-  fj_scen = scen_fj_out[,c("Date",scen_id)]
-  fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
-  plot(x = fj_plot$Date, y=fj_plot$basecase, type = "l",
-       ylim = c(min(fj_plot[,scen_id]), max(fj_plot[,scen_id]*10)),
-       xlab = "Date", ylab = "FJ Sim. Flow (cfs)",
-       log="y", yaxt="n")
-  if((plot_end-plot_start)/365 < 5){
-    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
-                 to=ceiling_date(x=plot_end, unit = "year"),
-                 by="quarter")
-  } else {
-    verts=seq.Date(from=floor_date(x=plot_start, unit ="year"),
-                 to=ceiling_date(x=plot_end, unit = "year"),
-                 by="year")
-  }
-  
-  y_orders = floor(log10(min(fj_plot[,scen_id]))):
-               (1+ceiling(log10(max(fj_plot[,scen_id]))))
-  horz = 10^(y_orders)
-  abline(v=verts, h=horz, col = "gray", lty = 2)
-  axis(side=2,at=horz, labels = as.character(horz))
-  axis(side=2,at=rep(1:9,length(y_orders))*sort(rep(10^y_orders,9)),
-       tck=-.015, labels =NA)
-  
-  for(i in 2:length(plot_scenarios1)){
-    scen_id = plot_scenarios1[i]
-    fj_scen = scen_fj_out[,c("Date",scen_id)]
-    fj_plot = fj_scen[fj_scen$Date>= plot_start & fj_scen$Date <= plot_end,]
-    lines(x=fj_plot$Date, y=fj_plot[,scen_id], col = scen_cols[i])
-  }
-
-  legend(x="topright",ncol=3,legend =plot_scenarios1, cex=.8,
-         # bty="n",
-         col = scen_cols, lwd=2)  
-
-dev.off()
-}
-knitr::include_graphics(fig_path)
-fig_i = fig_i + 1
-
-# but the functional flows?? why is fall flow diff weird for the 3 alf categories?
-show_this =F
-if(show_this){
-  plot_scenarios1
-  ff_scen = ffs_scenarios[[scen_id]]
-  ff_scen$f1_FA_Dif_num
-  
-  FA_dif = data.frame(brood_year = ffs_scenarios[["basecase"]]$Brood_Year,
-                      basecase = ffs_scenarios[["basecase"]]$f1_FA_Dif_num,
-                      alf_curtail_08.15 = ffs_scenarios[["alf_curtail_08.15"]]$f1_FA_Dif_num,
-                      alf_curtail_07.31 = ffs_scenarios[["alf_curtail_07.31"]]$f1_FA_Dif_num,
-                      alf_curtail_07.15 = ffs_scenarios[["alf_curtail_07.15"]]$f1_FA_Dif_num)
-  
-  FA_dif[FA_dif$brood_year %in% 2000:2006,]
-  
-}
-```
-
+\newpage
+# Trade-offs and efficiency
 
 ```{r farmerFishTradeoffFigure01, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for basecase (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for exampe time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
 
@@ -334,6 +262,8 @@ fig_i = fig_i + 1
 
 
 \newpage
+
+# Scenario Results Table
 
 ```{r scenarioResultsTab01, echo = FALSE, results = 'asis'}
 
@@ -392,4 +322,113 @@ st_ft
 
 
 ``` 
+
+
+\newpage
+# FJ Flow and Functional Flow Metrics (Example Scenarios)
+
+```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Example scenario impacts on river flow: simulated FJ daily average flow (the basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename=fig_path,width=7,height=5,unit="in",res=300)
+  
+  fj_flow_scen_plot( plot_scenarios1 = plot_scenarios1,
+                     scen_cols = scen_cols)  
+
+dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
+
+\newpage
+
+```{r funcFlowValsTab01, echo = FALSE, results = 'asis'}
+
+#Initialize things for all tables
+ff_tab_list = ff_tab_builder(scen_ids = plot_scenarios1, coef_tab = coef_tab)
+predictors = coef_tab$Predictor[coef_tab$Predictor!="Intercept"]
+
+all_func_flows = colnames(ffs_scenarios[['basecase']])[colnames(ffs_scenarios[['basecase']]) != "Brood_Year"]
+ff_digits = data.frame(func_flow = all_func_flows, digits = 0)
+ff_digits$digits[ff_digits$func_flow %in% c("s1_SP_ROC","s1_SP_ROC_Max")] = 3
+ff_digits = rbind(ff_digits,
+                  data.frame(func_flow = "f1_recon_120", digits = 0))
+col_width_uni = 6.5/(length(plot_scenarios1)+1)
+
+# Make table for 1st predictor
+ff_i = predictors[1]
+
+#Create caption and column labels
+  caption_text = paste0("For functional flow ",ff_i,": Annual functional flow values, for example scenarios, based on simulated Fort Jones daily average flow, which influence Hydrologic Benefit Function results.")
+fftab = ff_tab_list[[1]]
+fft_ft = flextable(data = fftab)
+fft_ft = set_caption(fft_ft, caption = caption_text)
+fft_ft = colformat_double(fft_ft, j=2:ncol(fftab), 
+                          digits = ff_digits$digits[ff_digits$func_flow==ff_i])
+fft_ft = colformat_num(fft_ft, j=1, big.mark="")
+fft_ft = width(fft_ft, width=col_width_uni)
+fft_ft
+
+```
+
+\newpage
+
+```{r funcFlowValsTab02, echo = FALSE, results = 'asis'}
+
+if(length(predictors)>1){
+  ff_i = predictors[2]
+  #Create caption and column labels
+  caption_text = paste0("For functional flow ",ff_i,": Annual functional flow values, for example scenarios, based on simulated Fort Jones daily average flow, which influence Hydrologic Benefit Function results.")
+  fftab = ff_tab_list[[2]]
+  fft_ft = flextable(data = fftab)
+  fft_ft = set_caption(fft_ft, caption = caption_text)
+  fft_ft = colformat_double(fft_ft, j=2:ncol(fftab), 
+                          digits = ff_digits$digits[ff_digits$func_flow==ff_i])
+  fft_ft = colformat_num(fft_ft, j=1, big.mark="")
+  fft_ft = width(fft_ft, width=col_width_uni)
+  fft_ft
+}
+
+```
+
+\newpage
+
+```{r funcFlowValsTab03, echo = FALSE, results = 'asis'}
+
+if(length(predictors)>2){
+  ff_i = predictors[3]
+  #Create caption and column labels
+    caption_text = paste0("For functional flow ",ff_i,": Annual functional flow values, for example scenarios, based on simulated Fort Jones daily average flow, which influence Hydrologic Benefit Function results.")
+  fftab = ff_tab_list[[3]]
+  fft_ft = flextable(data = fftab)
+  fft_ft = set_caption(fft_ft, caption = caption_text)
+  fft_ft = colformat_double(fft_ft, j=2:ncol(fftab), 
+                            digits = ff_digits$digits[ff_digits$func_flow==ff_i])
+  fft_ft = colformat_num(fft_ft, j=1, big.mark="")
+  fft_ft = width(fft_ft, width=col_width_uni)
+  fft_ft
+}
+
+```
+
+
+\newpage
+
+```{r funcFlowValsTab04, echo = FALSE, results = 'asis'}
+
+if(length(predictors)>3){
+  ff_i = predictors[4]
+  #Create caption and column labels
+  caption_text = paste0("For functional flow ",ff_i,": Annual functional flow values, based on simulated Fort Jones daily average flow, influencing Hydrologic Benefit Function results.")
+  fftab = ff_tab_list[[4]]
+  fft_ft = flextable(data = fftab)
+  fft_ft = set_caption(fft_ft, caption = caption_text)
+  fft_ft = width(fft_ft, width=col_width_uni)
+  fft_ft
+}
+
+```
 
