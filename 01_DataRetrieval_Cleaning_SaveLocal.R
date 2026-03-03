@@ -432,6 +432,7 @@ colnames(fields_tab) = c("Field_ID",colnames(fields_tab)[2:11])
 mar_fields = read.table(file.path(data_dir,"SVIHM Reference Data","MAR_Fields.txt"),
                         comment.char = "!", skip = 1, header = F)
 names(mar_fields) = c("Field_poly_num", "Max_infil_rate_m_day")
+mar_sp = svihm_fields[svihm_fields$Field_ID %in% mar_fields$Field_poly_num,]
 
 # _Process SVIHM fields  ------------------
 #water source, land use color, overlap with adjudicated zone

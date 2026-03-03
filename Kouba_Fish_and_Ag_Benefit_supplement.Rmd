@@ -325,23 +325,9 @@ st_ft
 
 
 \newpage
-# FJ Flow and Functional Flow Metrics (Example Scenarios)
+# Functional Flow Metrics 
 
-```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Example scenario impacts on river flow: simulated FJ daily average flow (the basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
-
-fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
-if(print_for_slides==T){
-  png(filename=fig_path,width=7,height=5,unit="in",res=300)
-  
-  fj_flow_scen_plot( plot_scenarios1 = plot_scenarios1,
-                     scen_cols = scen_cols)  
-
-dev.off()
-}
-knitr::include_graphics(fig_path)
-fig_i = fig_i + 1
-
-```
+Annual values of the functional flow metrics highlighted in this Hydrologic Benefit function are tabulated below. The basecase and alfalfa irrigation scenarios are used as examples; for a graph of each scenario's impact on simulated Fort Jones daily average flow, see Supplement E, Figure 2. 
 
 \newpage
 

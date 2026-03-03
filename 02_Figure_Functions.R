@@ -16,6 +16,7 @@ in_to_mm = 25.4
 af_to_m3 = 1/3.2808 * (1/3.2808)^2 * 43560# m/ft * m^2/ft^2 * ft^2/acre
 cfs_to_m3sec = 1 / 35.3147
 cfs_to_m3day = 1 / 35.3147 * 60*60*24 # 1 cfs / cubic ft per cubic m * seconds per day
+m2_to_acres = 1 / 4046.86 
 C_to_F_deg = function(deg_C){return(deg_C*9/5+32)}
 mm_to_in = 1/25.4
 

@@ -1,0 +1,124 @@
+---
+title: "Supplement E: Management Scenario Details and Design Elements"
+author: "Claire Kouba"
+date: "2026-02-13"
+output: 
+  bookdown::word_document2:
+    fig_caption: yes
+    number_sections: true
+    global_numbering: true
+bibliography: library.bib
+
+---
+
+```{r setup_suppE, echo = FALSE, warning=F, comment=F}
+
+dev_mode = T
+if(dev_mode){
+  knitr::opts_chunk$set(echo = TRUE)
+  
+  suppressPackageStartupMessages({
+    library(sf)
+    library(terra)
+    library(geodata)
+    library(rpostgis)
+    library(tidyr)
+    library(plyr) #ssurgo and climate data
+    library(data.table) #fread function
+    library(dataRetrieval) # USGS flow data
+    library(lubridate)
+    library(httr)
+    library(stringr)
+    library(rstudioapi)
+    library(dataRetrieval) # for usgs data
+    library(data.table) #month function
+    library(zoo) # rolling means
+    library(rgl) # plot3d
+    library(MARSS)
+    #spatial data libraries
+    library(RANN)
+    library(tmap)
+    library(RColorBrewer)
+    library(flextable)
+    library(scales) # for alpha() color function
+    library(ggthemes) # for colorblind_pal()
+    library(colorspace) # for sequential_hcl()
+    library(ggpubr) # to use get_palette()
+    library(here)
+  }
+  )
+  ms_dir = here::here()
+  data_dir = file.path(here::here(), "Data")
+  fig_dir = file.path(ms_dir, "Graphics and Supplements")
+  load(file.path(ms_dir, "manuscript_data.RData")) # Load data layers/tables
+  
+  source(file.path(ms_dir,"02_Figure_Functions.R"))   # Load figure functions
+  # print figures for slides, yes or no?
+  save_figs_here = fig_dir#"C:/Users/Claire/Dropbox/Documents/UCD/Presentations_Talks_Workshops_miniprojects/2022.02.17 Peer Group presentation Ch. 1/figs"
+  print_for_slides=T; fig_i = 50
+  save_landuse_figure = F
+  
+}
+```
+
+```{r MARFieldsMap, echo = F, fig.cap="\\label{fig:MARFieldsMap} Fields used in the 2024 MAR recharge pilot program. These fields were used to specify areas where winter recharge (Jan-March) was applied each year in the Enhanced Recharge scenario." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 6, height = 7.5, units = "in", res = 300)
+
+  
+  plot(basin$geometry, main = "Scott Valley MAR Recharge Areas for \n Enhanced Recharge Scenario")
+  plot(svihm_fields$geometry, add=T, col = "gray", border = "gray40")
+  plot(mar_sp$geometry, add=T, col = "firebrick3", border = "gray40")
+  plot(riv$geometry, add=T, col = "blue3", lwd=2)
+  dev.off()
+}
+
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
+
+
+```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Example scenario impacts on river flow: simulated FJ daily average flow (the basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
+
+# Plot prep
+plot_scenarios1 = c("basecase",  # "maxMAR_fields2024", "grain_12k",# "natveg_low_8k",
+                    "alf_curtail_08.15","alf_curtail_07.31","alf_curtail_07.15")
+scen_cols = get_palette(c("black","goldenrod","green4","dodgerblue3"),k=4)
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename=fig_path,width=7,height=5,unit="in",res=300)
+  
+  fj_flow_scen_plot( plot_scenarios1 = plot_scenarios1,
+                     scen_cols = scen_cols)  
+
+dev.off()
+}
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
+
+
+
+```{r alfToGrainMaps, echo = F, fig.cap="\\label{fig:alfToGrainMaps} In Crop Change scenarios, these randomly-selected fields were simulated in permanent grain cultivation rather than alfalfa, up to a threshold acreage of 6,000, 12,000, and 14,000 acres." , warning=F}
+
+fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
+if(print_for_slides==T){
+  png(filename = fig_path, width = 6, height = 7.5, units = "in", res = 300)
+
+  
+  plot(basin$geometry, main = "Scott Valley MAR Recharge Areas for \n Enhanced Recharge Scenario")
+  plot(svihm_fields$geometry, add=T, col = "gray", border = "gray40")
+  plot(mar_sp$geometry, add=T, col = "firebrick3", border = "gray40")
+  plot(riv$geometry, add=T, col = "blue3", lwd=2)
+  dev.off()
+}
+
+knitr::include_graphics(fig_path)
+fig_i = fig_i + 1
+
+```
