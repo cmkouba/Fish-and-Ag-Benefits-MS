@@ -2477,6 +2477,7 @@ add_pareto_col_to_scen_tab = function(scenario_tab,
                                       yes_size = 1.5){
   scenario_tab$pareto_opt = "--"
   for(i in 1:nrow(scenario_tab)){
+    scen_id = scenario_tab$scenario_id[i]
 
     hbv = scenario_tab$HBF_mean[i]
     et = scenario_tab$et_mean[i] * -1

@@ -1,5 +1,5 @@
 ---
-title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
 author: "Claire Kouba"
 date: "2026-02-13"
 output: 
@@ -13,17 +13,17 @@ bibliography: library.bib
 
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
-# "Supplement A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
+# "Supplement B: Results with Hydrologic Benefit Function based on coho juvenile abundance"
 # model_name = "coho_lasso_juv_on_hydro"
 
-# "Supplement B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
+# "Supplement C: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
 # model_name = "coho_lasso_jps_on_hydro"
 
-# "Supplement C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
-# model_name = "chinook_lasso_juv_on_hydro"
+# "Supplement D: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+model_name = "chinook_lasso_juv_on_hydro"
 
-# "Supplement D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
-model_name = "chinook_lasso_jps_on_hydro"
+# "Supplement E: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+# model_name = "chinook_lasso_jps_on_hydro"
 
 
 ```
@@ -77,6 +77,18 @@ if(dev_mode){
   
 }
 ```
+# Methodological details of Hydrologic Benefit function formulations (Supplements B-E)
+
+The Hydrologic Benefit (HB) function is intended to estimate the ecological value (in units of fish production) provided to fish by specific flow values (e.g., timing of fall flow increase; magnitude of dry season flow). This is expressed in conceptual mathematical terms as $fish = b + m_1 * flow_1 + m_1*flow_2~{\cdots}$; see methods in  @KoubaEtAlWatershedSpecific2025 for more details. It's important to note that, in this dataset, only 40-60% of variation in fish outcome was explained in models based on flow data, and the HB function does not constitute a prediction of the number of fish outmigrating in a given year. 
+
+Specifically, the results below are based on statistical models, using LASSO regression, of reproductive output for two species of salmon (coho and Chinook) in the Scott River stream system. Reproductive output is expressed in units of outmigrating juvenile abundance and normalized juveniles-per-adult spawner; two reproductive units for two species yields the four HB function formulations. 
+
+While MARSS models were used as a tool for identifying important functional flows in [@KoubaEtAlWatershedSpecific2025], they are unsuitable for this hydrologic scenario outcome forecasting purpose, because they are autoregressive in nature: the forecasting of future fish outcomes requires historical observations of fish outcomes. Therefore, to use MARSS models in estimating the ecological effects of flow changes under different management scenarios, it would be necessary to have historical fish records collected in an alternate reality under the different management scenarios, which is not possible. Similarly, LASSO models which included spawner abundance as a predictor were also not included in this exercise. 
+
+Consequently, only LASSO models dependent on hydrologic variables were evaluated as potential tools to forecast the outcomes of flow change on fish reproduction. 
+
+For each species, across all statistical methods, the coefficients for any single predictor were consistently negative or positive; e.g., more coho reproduction was consistently associated with *earlier* fall reconnection. 
+
 
 ```{r coefTabCaptionMaker, echo = F}
 
@@ -257,6 +269,47 @@ fig_i = fig_i + 1
 
 ```
 
+
+
+
+# Three objectives and Pareto-optimal set
+
+
+```{r farmerFishInfraFigure3DSupp, echo = F, fig.align='center', fig.cap="\\label{fig:farmerFishInfraFigure3D} A three-dimensional scatter plot of the objective function values for basecase and 24 management scenarios, averaged over 35 water years (1991-2025). Larger spheres are shown for the Pareto-optimal set of scenarios. Scenario colors correspond to legend in Supplement Figures 3 and 4. The corner corresponding to optimal values of all objective functions (the 'best' corner) is highlighted with a red arrow." , out.width="80%", warning=F}
+
+
+save_3d_plot = F
+
+if(save_3d_plot == T){
+  # need to run pareto_set_calc R chunk first
+plot3d(x = scenario_tab$HBF_mean/1000000, 
+       y = scenario_tab$et_mean / (-1 * 10^6), 
+       z = scenario_tab$feas_cat,
+       type = "s", col = scenario_tab$color, 
+       radius = scenario_tab$size_3d,
+       xlab = "HB/10^6",#"Hyd. Ben Value",
+       ylab = "ET vol.",
+       zlab = "Infrastructure")
+  
+}
+#This only works to manually orient it and take a screen shot; do this if you need to redo this graph
+
+if(model_name == "coho_lasso_juv_on_hydro"){
+  scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2026.03.06_coho juv.jpg")
+}
+if(model_name == "coho_lasso_jps_on_hydro"){
+  scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2026.03.06_coho jps.jpg")
+}
+if(model_name == "chinook_lasso_juv_on_hydro"){
+  scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2026.03.06_chinook juv.jpg")
+}
+if(model_name == "chinook_lasso_jps_on_hydro"){
+  scatter3d_filename = file.path(fig_dir, "hbf et infra plot3d_2026.03.06_chinook jps.jpg")
+}
+
+knitr::include_graphics(scatter3d_filename)
+
+```
 
 
 

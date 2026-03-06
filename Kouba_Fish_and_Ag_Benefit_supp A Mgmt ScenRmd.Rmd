@@ -1,5 +1,5 @@
 ---
-title: "Supplement E: Management Scenario Details and Design Elements"
+title: "Supplement A: Management Scenario Details"
 author: "Claire Kouba"
 date: "2026-02-13"
 output: 
@@ -61,6 +61,8 @@ if(dev_mode){
 }
 ```
 
+# Scenario Design
+
 ```{r MARFieldsMap, echo = F, fig.cap="\\label{fig:MARFieldsMap} Fields used in the 2024 MAR recharge pilot program. These fields were used to specify areas where winter recharge (Jan-March) was applied each year in the Enhanced Recharge scenario." , warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
@@ -104,21 +106,21 @@ fig_i = fig_i + 1
 
 
 
-```{r alfToGrainMaps, echo = F, fig.cap="\\label{fig:alfToGrainMaps} In Crop Change scenarios, these randomly-selected fields were simulated in permanent grain cultivation rather than alfalfa, up to a threshold acreage of 6,000, 12,000, and 14,000 acres." , warning=F}
+<!-- ```{r alfToGrainMaps, echo = F, fig.cap="\\label{fig:alfToGrainMaps} In Crop Change scenarios, these randomly-selected fields were simulated in permanent grain cultivation rather than alfalfa, up to a threshold acreage of 6,000, 12,000, and 14,000 acres." , warning=F} -->
 
-fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
-if(print_for_slides==T){
-  png(filename = fig_path, width = 6, height = 7.5, units = "in", res = 300)
+<!-- fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png")) -->
+<!-- if(print_for_slides==T){ -->
+<!--   png(filename = fig_path, width = 6, height = 7.5, units = "in", res = 300) -->
 
-  
-  plot(basin$geometry, main = "Scott Valley MAR Recharge Areas for \n Enhanced Recharge Scenario")
-  plot(svihm_fields$geometry, add=T, col = "gray", border = "gray40")
-  plot(mar_sp$geometry, add=T, col = "firebrick3", border = "gray40")
-  plot(riv$geometry, add=T, col = "blue3", lwd=2)
-  dev.off()
-}
 
-knitr::include_graphics(fig_path)
-fig_i = fig_i + 1
+<!--   plot(basin$geometry, main = "Scott Valley MAR Recharge Areas for \n Enhanced Recharge Scenario") -->
+<!--   plot(svihm_fields$geometry, add=T, col = "gray", border = "gray40") -->
+<!--   plot(mar_sp$geometry, add=T, col = "firebrick3", border = "gray40") -->
+<!--   plot(riv$geometry, add=T, col = "blue3", lwd=2) -->
+<!--   dev.off() -->
+<!-- } -->
 
-```
+<!-- knitr::include_graphics(fig_path) -->
+<!-- fig_i = fig_i + 1 -->
+
+<!-- ``` -->
