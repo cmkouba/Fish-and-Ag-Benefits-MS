@@ -1,7 +1,7 @@
 ---
 title: "Supplement A: Management Scenario Details"
 author: "Claire Kouba"
-date: "2026-02-13"
+date: "2026-03-10"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -55,11 +55,13 @@ if(dev_mode){
   source(file.path(ms_dir,"02_Figure_Functions.R"))   # Load figure functions
   # print figures for slides, yes or no?
   save_figs_here = fig_dir#"C:/Users/Claire/Dropbox/Documents/UCD/Presentations_Talks_Workshops_miniprojects/2022.02.17 Peer Group presentation Ch. 1/figs"
-  print_for_slides=T; fig_i = 50
+  print_for_slides=F; fig_i = 11
   save_landuse_figure = F
   
 }
 ```
+
+\newpage
 
 # Scenario Design
 
@@ -82,6 +84,7 @@ fig_i = fig_i + 1
 
 ```
 
+# Scenario Flow Impacts
 
 ```{r FJFlow, echo = F, fig.cap="\\label{fig:fjflow} Example scenario impacts on river flow: simulated FJ daily average flow (the basis for functional flows, which is the basis for HB function values) for multiple scenarios." , warning=F}
 

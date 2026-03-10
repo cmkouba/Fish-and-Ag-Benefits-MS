@@ -1,7 +1,7 @@
 ---
-title: "Supplement D: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+title: "Supplement E: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 author: "Claire Kouba"
-date: "2026-02-13"
+date: "2026-03-10"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -14,16 +14,16 @@ bibliography: library.bib
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
 # "Supplement B: Results with Hydrologic Benefit Function based on coho juvenile abundance"
-# model_name = "coho_lasso_juv_on_hydro"
+# model_name = "coho_lasso_juv_on_hydro"; fig_i = 21
 
 # "Supplement C: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
-# model_name = "coho_lasso_jps_on_hydro"
+# model_name = "coho_lasso_jps_on_hydro"; fig_i = 31
 
 # "Supplement D: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
-model_name = "chinook_lasso_juv_on_hydro"
+# model_name = "chinook_lasso_juv_on_hydro"; fig_i = 41
 
 # "Supplement E: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
-# model_name = "chinook_lasso_jps_on_hydro"
+model_name = "chinook_lasso_jps_on_hydro"; fig_i = 51
 
 
 ```
@@ -72,7 +72,7 @@ if(dev_mode){
   source(file.path(ms_dir,"02_Figure_Functions.R"))   # Load figure functions
   # print figures for slides, yes or no?
   save_figs_here = fig_dir#"C:/Users/Claire/Dropbox/Documents/UCD/Presentations_Talks_Workshops_miniprojects/2022.02.17 Peer Group presentation Ch. 1/figs"
-  print_for_slides=T; fig_i = 11
+  print_for_slides=F#; fig_i = 11
   save_landuse_figure = F
   
 }
