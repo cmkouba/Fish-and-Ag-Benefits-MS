@@ -1,7 +1,7 @@
 ---
 title: "Farms, fish, and cost: stakeholder-driven scenario design and objective functions clarify trade-offs in an active local water planning process, Northern California"
 author: "Claire Kouba, Leland Scantlebury, Thomas Harter"
-date: "2026-05-12"
+date: "2026-06-10"
 output: 
   bookdown::word_document2:
     fig_caption: yes
@@ -284,17 +284,17 @@ et_crop_depth_m = et_crop_mean * 10^6 / crop_area * -1
 
 ## GSP development
 
-The Scott Valley Groundwater Sustainability Plan (GSP) was developed by the Siskiyou County Flood Control and Water Conservation District, which is the designated Groundwater Sustainability Agency (GSA) charged by the state of California to sustainably manage local groundwater resources pursuant to the Sustainable Groundwater Management Act (SGMA) of 2014. GSP development took place between 2018 and 2021, and was guided by discussions in the monthly public meetings of an Advisory Committee composed of nine local stakeholders. Technical analyses supporting the public meeting deliberations and GSP policies were provided by several technical experts, including authors of this study [Siskiyou County -@SiskiyouCountyScott2021]. The plan was subsequently  subject to statewide public review and regulatory review by the California State Department of Water Resources (CDWR). In their approval, CDWR suggested several necessary improvements to be addressed by 2027, including a clearer definition of what would constitute an undesirable result for groundwater-related stream depletion, while acknowledging that the science supporting these definitions was still developing [DWR -@CADWRGroundwater2023].
+The Scott Valley Groundwater Sustainability Plan (GSP) was developed by the Siskiyou County Flood Control and Water Conservation District, which is the designated Groundwater Sustainability Agency (GSA) charged by the state of California to sustainably manage local groundwater resources pursuant to the Sustainable Groundwater Management Act (SGMA) of 2014. GSP development took place between 2018 and 2021, and was guided by discussions in the monthly public meetings of an Advisory Committee composed of nine local stakeholders. Technical analyses supporting the public meeting deliberations and GSP policies were provided by several technical experts, including authors of this study [Siskiyou County -@SiskiyouCountyScott2021]. The plan was subsequently  subject to statewide public review and regulatory review by the California State Department of Water Resources (CDWR). In their approval, CDWR suggested several necessary improvements to be addressed by 2027, including a clearer definition of what would constitute an undesirable result for groundwater-related stream depletion, while acknowledging that the specific criteria supporting these definitions were still developing [DWR -@CADWRGroundwater2023].
 
-SGMA requires each local GSA to define sustainability in the negative, by quantifying and then avoiding "undesirable results" that would be "significant and unreasonable". The central undesirable result in Scott Valley is streamflow depletion due to groundwater pumping. Consequently, a central challenge of GSP development was balancing demands and determining the amount of (estimated) streamflow depletion that the GSA should aim to reverse, by accounting for environmental water demand versus the degree of water security that was owed to local agriculture.
+SGMA requires each local GSA to define sustainability in the negative, by quantifying and then avoiding "undesirable results" that would be "significant and unreasonable". The central undesirable result in Scott Valley is excessive streamflow depletion due to groundwater pumping. Consequently, a central challenge of GSP development was balancing demands and determining the amount of (estimated) streamflow depletion that the GSA should aim to reverse, by accounting for environmental water demand versus the degree of water security that was owed to local agriculture.
 
-During GSP development, the authors of this study simulated dozens of land and water use scenarios to facilitate the comparison of management alternatives that could reduce streamflow depletion to various degrees. Simulations were conducted with a spatially explicit, integrated surface water-groundwater model [@TolleyEtAlSensitivity2019], as described below in Section 3.3.
+During GSP development, dozens of land and water use scenarios were simulated to facilitate the comparison of management alternatives that could reduce streamflow depletion to various degrees. Simulations were conducted with a spatially explicit, integrated surface water-groundwater model [@TolleyEtAlSensitivity2019], as described in Section 3.3.
 
 # Methods
 
-After 2021, we expanded on this public planning effort with a research study, based on the suite of management scenarios designed for the GSP, in the hopes that it could inform water management decisions during 5-year GSP updates over the coming decades. 
+Building on the 2021 GSP planning process, we evaluated a suite of management scenarios designed for the GSP, in the hopes that it could inform water management decisions during 5-year GSP updates over the coming decades. 
 
-In particular, we developed two quantitative objective functions and one categorical objective proxy to evaluate the management scenarios developed for the GSP. The three objectives were: 
+The basis for evaluation was two quantitative objective metrics and one categorical objective proxy to evaluate the management scenarios developed for the GSP. The three objectives were: 
 
 1) maximize specific environmental flows, 
 2) maintain current levels of agricultural productivity (represented as minimizing reduction in agricultural water use), and 
@@ -341,13 +341,13 @@ capmaker_all_models = model_name_to_coefs_df(model_names)
 
 Conceptually, the Hydrologic Benefit (HB) function aims to answer the question: to what degree does this water year provide enough flow, at the right time, for this species?
 
-In a previous study, we empirically identified hydrograph features of high importance to Scott River coho and Chinook, based on correlations between hydrology and ecological observations such as outmigrating juvenile abundance [@KoubaEtAlWatershedSpecific2025]. The HB function is represented as a linear combination of these high-importance annual functional flow values. 
+Previously in @KoubaEtAlWatershedSpecific2025, hydrograph features of high importance to Scott River coho and Chinook were empirically identified based on correlations between hydrology and ecological observations such as outmigrating juvenile abundance. The HB function is represented as a linear combination of these high-importance annual functional flow values. 
 
-Functional flows are set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena [@YarnellEtAlFunctional2015; @PattersonEtAlHydrologic2020; @CarpenterAccurately2024]. In the HB function, these were weighted according to their power to predict coho and Chinook outcomes, such as smolt production or smolt production normalized per female spawner. The combination of these weighted metrics can be interpreted as a prediction of coho reproduction that is empirically *associated with* and appears to be *supported by* hydrologic factors. Importantly, the HB functions developed in this exercise explain only about *40% to 60%* of variation in observed smolt abundance, and the remaining 60%-40% of variation is assumed related to other life conditions, e.g., number of returning spawners, water quality, food resources, and internal fishery population dynamics [@KoubaEtAlWatershedSpecific2025]. 
+Functional flows are set of streamflow metrics related to the timing, amplitude, and duration of flow phenomena [@YarnellEtAlFunctional2015; @PattersonEtAlHydrologic2020; @CarpenterAccurately2024]. In the HB function, these were weighted according to their power to predict coho and Chinook outcomes, such as smolt production or smolt production normalized per female spawner. The combination of these weighted metrics can be interpreted as a prediction of coho reproduction that is empirically *associated with* and appears to be *supported by* hydrologic factors. Importantly, the HB functions developed in @KoubaEtAlWatershedSpecific2025 explain only about *40% to 60%* of variation in observed smolt abundance, and the remaining 60%-40% of variation is assumed related to other life conditions, e.g., number of returning spawners, water quality, food resources, and internal fishery population dynamics. 
 
 There are many different possible HB function formulations; one example HB function is included below and three additional formulations are explored in Supporting Information, Text S1. These four HB functions correspond to the best-fit statistical model for two species (coho and Chinook) as measured using two different units of annual salmon reproduction (outmigrating smolt abundance and normalized smolt-per-adult-spawner in the relevant brood year). See  Supporting Information, Text S1 for more HB function design information.
 
-The example HB function highlighted here is based on coho juvenile outmigrant abundance. It predicts that a higher number of coho smolt produced (coho smolt-equivalent) is related to higher fall flows during a cohort's parents' spawning, lower fall flows during a cohort's time as overwintering yearlings, and a slower spring recession during outmigration (see coefficient values in Table \@ref(tab:coefTabMainText)).
+The example HB function highlighted here is based on coho juvenile outmigrant abundance. It predicts that a higher number of coho smolt produced (coho smolt-equivalent) is related to higher fall flows during a cohort's parents' spawning, lower fall flows during a cohort's time as overwintering yearlings, and a slower spring recession during outmigration (Table \@ref(tab:coefTabMainText)).
 
 
 ```{r coefTabMainText, echo = FALSE, results = 'asis'}
@@ -377,13 +377,15 @@ hb_ft
 
 ```
 
-Functional flow metrics informing the HB function were calculated from the observed daily average flow record of the FJ gauge ($FJ_{obs}$), using signal processing algorithms developed by the California Environmental Flows Framework [@YarnellEtAlFunctional2015; @PattersonEtAlHydrologic2020; @CarpenterAccurately2024]. One key model result of the historical base case scenario in SVIHM is a *simulated* estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$). However, although SVIHM was extensively calibrated [@TolleyEtAlSensitivity2019], because all models involve structural simplifications of a full-scale watershed, $FJ_{sim,~basecase}$ sometimes over- or under-estimates $FJ_{obs}$. To control for this, all base case HB values used in this study are derived from $FJ_{sim,~basecase}$, making them directly comparable to HB values derived from the simulated FJ flow records in the hypothetical management scenarios.
+Functional flow metrics informing the HB function were calculated from the observed daily average flow record of the FJ gauge ($FJ_{obs}$), using signal processing algorithms developed by the California Environmental Flows Framework [@YarnellEtAlFunctional2015; @PattersonEtAlHydrologic2020; @CarpenterAccurately2024]. One key model result of the historical base case scenario in SVIHM is a *simulated* estimate of the historical FJ gauge record ($FJ_{sim,~basecase}$). Although SVIHM was calibrated to match historical observations [@TolleyEtAlSensitivity2019], differences between $FJ_{sim,~basecase}$ and $FJ_{obs}$ are expected because watershed models are simplified represntations of complex natural systems [@DohertyWelterShort2010], and because streamflow observations contain measurement error. To control for this, all base case HB values used in this study are derived from $FJ_{sim,~basecase}$, making them directly comparable to HB values derived from the simulated FJ flow records in the hypothetical management scenarios.
+
+
 
 ### ET volume function (agricultural benefit proxy)
 
 The annual crop ET volume, which is explicitly simulated in the hydrologic model, is used here as a proxy for agricultural productivity. Other options for framing the agricultural water use objective function include crop yields and total revenue, which may be of greater concern to stakeholders; however, annual crop ET was selected because the impacts of reduced water availability on yield or revenue will likely vary by grower and over time.
 
-Additionally, for alfalfa and pasture, which continue growing as long as water is available, a strong relationship between crop ET and yield is assumed [@CarterSheafferAlfalfa1983]. However, we assume that grain, another important local crop, has a different relationship than alfalfa between ET and revenue, as grain is harvested once per year in mid-to-late summer and alfalfa is harvested three to four times per year in this region [@HarterHinesSCOTT2008]. This makes interpretation of the agricultural objective functions more complicated for three crop change scenarios in which alfalfa is converted to grain; this is explored further in the Discussion section. 
+Additionally, for alfalfa and pasture, which continue growing as long as water is available, a strong relationship between crop ET and yield is assumed [@CarterSheafferAlfalfa1983]. However, we assume that grain, another important local crop, has a different relationship than alfalfa between ET and revenue, as grain is harvested once per year in mid-to-late summer and alfalfa is harvested three to four times per year in this region [@HarterHinesSCOTT2008]. This makes interpretation of the agricultural objective functions more complicated for three crop change scenarios in which alfalfa is converted to grain (see Discussion). 
 
 ### Proxy for scenario infrastructure investment
 
@@ -395,13 +397,13 @@ In lieu of detailed cost estimates or feasibility studies, we chose to group man
 3. Requires new infrastructure that would take 3-5 years to build
 4. Requires new infrastructure that would take 5+ years to build
 
-This reflects the first-order understanding that, for example, building a reservoir (assigned to category 4) will take more effort and resources in terms of permitting and construction than widespread installation of higher-efficiency irrigation technology (assigned to category 2). See Table \@ref(tab:scenarioResultsTabMainText) for full list of assigned categories.
+This reflects the first-order understanding that, for example, building a reservoir (category 4) will take more effort and resources in terms of permitting and construction than widespread installation of higher-efficiency irrigation technology (category 2). See Table \@ref(tab:scenarioResultsTabMainText) for full list of assigned categories.
 
 ## Analyses of objective function values
 
 ### Trade-off efficiency
 
-Combining two of the three objectives, scenarios can also be compared in terms of environmental benefit per agricultural cost. This "trade-off efficiency" of a management scenario, or $Eff_{scen}$, is unitless (i.e., it has units of smolt-equiv. per smolt-equiv. / million m^3^ per million m^3^) (see equations below).
+Combining two of the three objectives, scenarios can also be compared in terms of the 25-year average environmental benefit ($HB_{avg,~scen} - HB_{avg,~basecase}$) per average agricultural cost ($ET_{avg,~scen} - ET_{avg,~basecase}$). This "trade-off efficiency" of a management scenario, or $Eff_{scen}$, is unitless (i.e., it has units of smolt-equiv. per smolt-equiv. / million m^3^ per million m^3^).
 
 $$HB_{avg} = \frac{1}{n_{wy}}\sum_{i = wy_1}^{wy_n}{HB_{wy_{i}}}$$
 
@@ -416,9 +418,7 @@ After calculating the objective function values for each scenario, we applied a 
 
 ## Hydrologic model summary
 
-The Scott Valley Integrated Hydrologic Model (SVIHM) [-@TolleyEtAlSensitivity2019] is a surface and groundwater model driven by tributary stream inflows, precipitation, and reference evapotranspiration (ET~0~). Like all models, it does not perfectly reproduce historical observations, but it successfully captures key watershed-scale hydrologic phenomena that can be used to evaluate potential outcomes of specific management actions.
-
-The SVIHM is composed of three cascading sub-models. First, complete daily records of tributary stream inflow are generated using a statistical streamflow regression model, in which the continuous Fort Jones record was used to predict missing values in the daily flow records of 12 major tributaries [@FogliaEtAlScott2013]. Second, a custom-built soil water budget model simulated irrigation demand, irrigation applied (surface and groundwater), ET and percolation to aquifer calculated on a field-by-field, daily time step basis. This model simulates individual irrigation applications and assumes the farmer has perfect foresight of daily irrigation demand. Finally, the boundary conditions of stream inflow, aquifer recharge, and groundwater extraction are used to drive an integrated groundwater-surface water model using MODFLOW; stream-aquifer flux and surface flow routing was simulated using the MODFLOW SFR package [@TolleyEtAlSensitivity2019]. 
+SVIHM is a surface and groundwater model composed of three cascading sub-models. First, complete daily records of tributary stream inflow are generated using a streamflow regression model, in which the continuous Fort Jones record was used to predict missing values in the daily flow records of 12 major tributaries [@FogliaEtAlScott2013]. Second, a custom-built soil water budget model simulated irrigation demand, irrigation applied (surface and groundwater), ET and percolation to aquifer calculated on a field-by-field, daily time step basis. This model simulates irrigation applications and assumes the farmer has perfect foresight of daily irrigation demand. Finally, the boundary conditions of stream inflow, aquifer recharge, and groundwater extraction are used to drive an integrated groundwater-surface water model using MODFLOW; stream-aquifer flux and surface flow routing was simulated using the MODFLOW SFR package [@TolleyEtAlSensitivity2019]. 
 
 For GSP development, SVIHM was used extensively to perform what-if scenarios using the historic climate and land use, covering 1991-2018. (For purposes of this study, the model period has been extended through Sept. 30, 2025.) Scenario simulations repeat the calibrated historical base case simulation of SVIHM while varying specific changes in SVIHM boundary conditions (BCs). The set of changes in the BCs of a particular scenario represent specific changes in land use, irrigation management, climate, water management rules, etc. Scenario outcomes are compared against those of the base case simulation. Key results of each SVIHM scenario, used in the objective functions described below, are:
 
@@ -427,9 +427,9 @@ For GSP development, SVIHM was used extensively to perform what-if scenarios usi
 
 ## Management scenario descriptions
 
-For the Scott Valley GSP, SVIHM was used to simulate 64 management action scenarios; in most other California GSPs, between one and five scenarios was more common [e.g., FCGMA -@FoxCanyonGroundwaterManagementAgencyGroundwater2019; YSGA -@YoloSubbasinGroundwaterAgencyYolo2022]. This high number of scenarios was possible because the SVIHM had been under development for 8 years prior to the start of GSP work [e.g., @FogliaEtAlScott2013; @TolleyEtAlSensitivity2019], and cost-effective technical support was provided by graduate students and researchers at the University of California, Davis. Of the 64 scenarios, only 25 are considered here. Several were ruled out as obviously unfeasible (e.g., construction of a 134 thousand acre-foot reservoir to ensure 100% flow reliability even during severe drought, in an area with topography that could not support such a large capacity), and some were excluded due to redundancy. 
+For the Scott Valley GSP, SVIHM was used to simulate 64 management action scenarios; in most other California GSPs, between one and five scenarios was more common [e.g., FCGMA -@FoxCanyonGroundwaterManagementAgencyGroundwater2019; YSGA -@YoloSubbasinGroundwaterAgencyYolo2022]. Of the 64 scenarios, only 25 are considered here. Several were ruled out as obviously unfeasible (e.g., construction of a 134 thousand acre-foot reservoir to ensure 100% flow reliability even during severe drought, in an area with topography that could not support such a large capacity), and some were excluded due to redundancy. 
 
-The scenarios are grouped here by category (Table \@ref(tab:scenCategoryTab)). Within each category various details were altered (e.g., an alfalfa irrigation cessation date of July 10 versus August 15). Additional scenario descriptions are included below in Results and in Supporting Information, Figures S1 and S2.
+The scenarios are grouped here by category (Table \@ref(tab:scenCategoryTab)). Within each category various details were altered (e.g., an alfalfa irrigation cessation date of July 10 versus August 15). Additional scenario descriptions are included in Section 4.3, Table \@ref(tab:scenarioResultsTabMainText), and in Supporting Information, Figures S1 and S2.
 
 ```{r scenCategoryTab, echo = FALSE, results = 'asis'}
 
@@ -608,7 +608,7 @@ The HB formulations represent four ways of answering the question, "to what degr
 Management scenarios tended to have a uniform effect on total ET over time, shifting it by about the same amount each year relative to base case (Figure \@ref(fig:benefitByWYMainText)). Conversely, in some years, many scenarios seem to have very little effect on HB function, though this is variable over time, regardless of which HB units are used (Figure \@ref(fig:benefitByWYMainText) and Figures S3-S6). 
 
 
-```{r benefitByWYMainText, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are base case (black circles) and a scenario from each of three categories: Enhanced Recharge, Crop Change, and eight thousand acres of irrigated crops converted to low-ET Native Vegetation. Dry-type water years (vertical bars) are 1991, ’92, ’94, 2001, ’09, ’13, ’14, ’18, and ’20-’22. Shown also in Figure S3." , warning=F}
+```{r benefitByWYMainText, echo = F, fig.cap="\\label{fig:benefitByWY} Comparison of annual performance in two objective functions (Hydrologic Benefit and ET, representing environmental and agricultural objectives, respectively) for brood years 1991-2025. The scenarios pictured are base case (black circles) and three example scenarios. Shown also in Figure S3." , warning=F}
 
 y_val_x_axis_label = model_name_to_y_val_label(model_name)
 
@@ -618,6 +618,9 @@ if(print_for_slides==T){
 
   plot_scenarios1 = c("basecase", "maxMAR_fields2024",
                       "grain_12k", "natveg_low_8k")
+  legend_text = c("Base case", "Enhanced Recharge",
+                  "Crop Change, 12k acres perm. grain", 
+                  "Native Veg, low ET, 8k acres")
 
   par(mfcol = c(2,1))
   plot_obj_fn_by_wy(plot_scenarios = plot_scenarios1,
@@ -625,7 +628,8 @@ if(print_for_slides==T){
                                          "green4","darkgoldenrod"),
                                        length(plot_scenarios1)),
                     panel_labels = c("A","B"),
-                    y_val_label = y_val_x_axis_label)
+                    y_val_label = y_val_x_axis_label,
+                    legend_text = legend_text)
   dev.off()
 }
 
@@ -636,7 +640,7 @@ fig_i = fig_i + 1
 
 
 
-The small effect of some scenarios on HB values implies that these scenarios do not alter the HB function component flows relative to base case (Figures S7-S10). For coho juvenile abundance, in the base case scenario, it seems that when the HB function predicts a particularly good year for smolt production (i.e., > 20,000 coho smolt-equiv.), it is driven by a large magnitude fall flow difference, or fall pulse. Conversely, in the years where the HB function predicts a particularly bad year (i.e., '95, '98, '04), it is driven by a rapid first spring recession rate (Figure S7). Conversely, for coho juveniles per spawner (base case), both good and bad years seem to be largely driven by wet season onset timing (Figure S8). 
+The small effect of some scenarios on HB values implies that these scenarios do not alter the HB function component flows relative to base case (Figures S7-S10). For coho juvenile abundance, in the base case scenario, it seems that when the HB function predicts a particularly good year for smolt production (i.e., > 20,000 coho smolt-equiv.), it is driven by a large magnitude fall flow difference, or fall pulse, driven by a large fall storm event. Conversely, in the years where the HB function predicts a particularly bad year (i.e., '95, '98, '04), it is driven by a rapid first spring recession rate (Figure S7). Conversely, for coho juveniles per spawner (base case), both good and bad years seem to be largely driven by wet season onset timing (Figure S8). 
 
 In both cases for coho, second fall flow difference makes minor contributions (Figures S7 and S8), and is assigned a negative coefficient (Table \@ref(tab:coefTabMainText)). This suggests higher flows in the second fall (for juvenile overwintering coho) are consistently associated with lower smolt production, but other factors such as first fall flow difference and wet season timing seem to exert greater overall influence.
 
@@ -647,7 +651,7 @@ For Chinook, predictions of both high and low smolt production are driven by wet
 The 35-year mean values of HB and ET can be used to map all scenarios on one two-dimensional landscape, which facilitates the evaluation of trade-offs between objectives (Figure \@ref(fig:farmerFishTradeoffFigureMainText)). 
 
 
-```{r farmerFishTradeoffFigureMainText, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for base case (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for exampe time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
+```{r farmerFishTradeoffFigureMainText, echo = F, fig.cap="\\label{fig:farmerFishTradeoffFigure} Environmental and agricultural objective function performance (in terms of Hydrologic Benefit, or HB, value; and crop ET volume) for base case (black circle in upper left) and 25 management scenarios. Symbol x and y coordinates are the average of 35 annual HB and ET values for each scenario over the full model period (water years 1991-2025); for example time series of annual values, see previous figure." , fig.height=8, fig.width=7, warning=F}
 
 fig_path = file.path(save_figs_here, paste0("Figure ",fig_i,".png"))
 if(print_for_slides==T){
@@ -673,7 +677,7 @@ if(print_for_slides==T){png(filename = file.path(save_figs_here, paste0("Figure 
 
 ```{r scenarioResultsTabMainText, echo = FALSE, results = 'asis'}
 
-# Calculate HB gained and ET lost relative to basecase
+  # Calculate HB gained and ET lost relative to basecase
 bc_sel = scenario_tab$scenario_id=="basecase"
 hb_bc_mean = scenario_tab$HBF_mean[bc_sel]
 et_bc_mean = scenario_tab$et_mean[bc_sel]
@@ -733,6 +737,21 @@ st_ft = flextable::width(st_ft,j=5,  width = .7)
 st_ft = flextable::width(st_ft,j=6,  width = .8)
 st_ft = flextable::width(st_ft,j=7,  width = .8)
 
+n_bins_feas = length(unique(scen_tab$feas_cat))
+gradient_cols = c("tomato","orange", "gold","green4")
+colors_feas = get_palette(gradient_cols, n_bins_feas)[factor(scen_tab$feas_cat)]
+n_bins_hb = length(unique(scen_tab$HBF_mean))
+colors_hb = get_palette(gradient_cols, n_bins_hb)[factor(scen_tab$HBF_mean)]
+n_bins_hb = length(unique(scen_tab$HBF_mean))
+colors_hb = get_palette(gradient_cols, n_bins_hb)[factor(scen_tab$HBF_mean)]
+n_bins_et = length(unique(scen_tab$et_mean))
+colors_et = get_palette(gradient_cols, n_bins_et)[factor(scen_tab$et_mean)]
+
+
+st_ft = flextable::bg(st_ft, j=3, bg = colors_feas)
+st_ft = flextable::bg(st_ft,j=4,  bg = colors_hb)
+st_ft = flextable::bg(st_ft,j=5,  bg = colors_et)
+
 st_ft
 
 
@@ -740,13 +759,13 @@ st_ft
 
 
 
-In units of coho smolt abundance, three management scenarios actually produce poorer fish outcomes than base case, but the majority of scenarios produce more favorable flows for smolt production (Figure \@ref(fig:farmerFishTradeoffFigureMainText)). This is larguly due to scenario impacts on the largest single component of the HB function for coho smolt abundance, first fall flow difference or `f1_FA_Dif_num`. This metric is calculated as the difference between dry season median discharge and peak fall pulse discharge; in years with no detectable fall pulse flow, this value is set to 0 [@CarpenterAccurately2024; @BaruchEtAlMimicking2024] (see also Supporting Information, Data Set 1, and Figure S7). The high degree of correlation between this flow and coho smolt abundance is corroborated by the species' natural history: fall run timing is somewhat more flexible for coho than Chinook, and coho seem to respond strongly to pulse flows, possibly due to olfactory signals from their natal streams [CDFW -@CDFWInfluence2021]. Because changes in water use can affect both the dry season minimum and the magnitude of a fall pulse flow, management scenarios may have positive or negative effect on this functional flow, which in turn will influence the total calculated HB value.
+In units of coho smolt abundance, three management scenarios produce poorer fish outcomes than base case, but the majority of scenarios produce more favorable flows for smolt production (Figure \@ref(fig:farmerFishTradeoffFigureMainText)). This is largely due to impacts on the largest single component of the HB function for coho smolt abundance, first fall flow difference or `f1_FA_Dif_num`. This metric is calculated as the difference between dry season median discharge and peak fall pulse discharge; in years with no detectable fall pulse flow, this value is set to zero [@CarpenterAccurately2024; @BaruchEtAlMimicking2024] (see also Supporting Information, Data Set 1, and Figure S7). The high degree of correlation between this flow and coho smolt abundance is corroborated by the species' natural history: fall run timing is somewhat more flexible for coho than Chinook, and coho seem to respond strongly to pulse flows, possibly due to olfactory signals from their natal streams [CDFW -@CDFWInfluence2021]. Because changes in water use can affect both the dry season minimum and the magnitude of a fall pulse flow, management scenarios may have positive or negative effect on this functional flow, which in turn will influence the total calculated HB value.
 
 ### Small Reservoir 
 
 Reservoir scenarios simulate how flows would change if a small reservoir (9 thousand acre-feet, or `r round(9000*af_to_m3/1000000,1)` 10^6^ m^3^, approximately `r round(9000*af_to_m3/1000000 / scen_et_range[2] * 100)`% of mean annual irrigation), located in the headwaters on one of 3 tributaries, were operated with the following objectives: retain winter flow until full (Dec-Mar), pass along growing season flow (Apr-Aug), and supplement dry season flow (Sep-Nov).
 
-Somewhat contrary to expectations, reservoir scenarios provide limited benefit to coho populations, relative to other management options: small reservoirs may not have capacity to add fall flow during dry years when baseflows are lowest (Figure \@ref(fig:farmerFishTradeoffFigureMainText), green squares, and Figures S11 and S12). Reservoir scenarios seem to support Chinook populations significantly more than coho: even a small reservoir on one tributary appears to dampen wet season stormflows enough to benefit Chinook (Figures S13 and S14).
+Somewhat contrary to expectations, reservoir scenarios provide limited benefit to coho populations, relative to other management options: small reservoirs may not have capacity to add fall flow during dry years when baseflows are lowest (Figure \@ref(fig:farmerFishTradeoffFigureMainText), green squares, and Figures S11 and S12). Reservoir scenarios seem to support Chinook populations significantly more than coho: even a small reservoir on one tributary appears to reduce mainstem river peak stormflows enough to provide some benefit for Chinook (Figures S13 and S14).
 
 ### Enhanced Recharge and Irrigation Efficiency
 
@@ -766,7 +785,7 @@ In all four HB formulations, Enhanced Recharge has a minimal effect, while Irrig
 
 ### Irrigation Curtailment (alfalfa; all crops)
 
-Early cessation of irrigation on alfalfa fields effectively means that growers forgo the harvest of one or more hay cuttings, which can be a significant economic impact for a farm; however, in watershed-wide total ET terms, the effects are relatively small for scenarios in this category (Figure \@ref(fig:farmerFishTradeoffFigureMainText), orange diamonds). The second category simulated a blanket curtailment on all irrigation, including on pasture, the other primary crop besides alfalfa (Table \@ref(tab:scottLanduseTable); Figure \@ref(fig:farmerFishTradeoffFigureMainText), gray diamonds). In both categories, scenario cutoff dates for irrigation were August 15, July 31, and July 15, while the assumed base case alfalfa irrigation cutoff date is September 5 [@FogliaEtAlScott2013]. 
+Early cessation of irrigation on alfalfa fields effectively means growers forgo the harvest of one or more hay cuttings, which can be a significant economic impact for farms; however, in watershed-wide total ET terms, the effects are relatively small for scenarios in this category (Figure \@ref(fig:farmerFishTradeoffFigureMainText), orange diamonds). The second category simulated a blanket curtailment on all irrigation, including on pasture, the other primary crop besides alfalfa (Table \@ref(tab:scottLanduseTable); Figure \@ref(fig:farmerFishTradeoffFigureMainText), gray diamonds). In both categories, scenario cutoff dates for irrigation were August 15, July 31, and July 15, while the assumed base case alfalfa irrigation cutoff date is September 5 [@FogliaEtAlScott2013]. 
 
 In general, this series of cutoff dates has a progressive effect on fall flows: the earlier the cutoff date, the greater the impact on raising summer low flows, producing earlier fall flow increases, and slowing the spring recession rate (see alfalfa scenario flow results in Figure S2). For Chinook HB units, the impact on HB values is similarly progressive (Table S7 and S8 and Figures S13-S14), but for coho units, the impact on HB values is more variable, since management scenarios may have a positive or negative effect on a `f1_FA_Dif_num` (see above).
 <!-- range of ET and HB diff from basecase? -->
@@ -852,7 +871,7 @@ By plotting the environmental, agricultural, and infrastructure objectives in a 
 * AlfIrr (2-3 of 3), and 
 * Curtail (2-3 of 3). 
 
-```{r farmerFishInfraFigure3D, echo = F, fig.align='center', fig.cap="\\label{fig:farmerFishInfraFigure3D} A three-dimensional scatter plot of the objective function values for base case and 24 management scenarios, averaged over 35 water years (1991-2025). Larger spheres are shown for the Pareto-optimal set of scenarios. Scenario colors correspond to legend in Figure 6. The corner corresponding to optimal values of all objective functions (the 'best' corner) is highlighted with a red arrow." , out.width="80%", warning=F}
+```{r farmerFishInfraFigure3D, echo = F, fig.align='center', fig.cap="\\label{fig:farmerFishInfraFigure3D} A three-dimensional scatter plot of the objective function values for base case and 24 management scenarios, averaged over 35 water years (1991-2025). Larger spheres are shown for the Pareto-optimal set of scenarios.The corner corresponding to optimal values of all objective functions (the 'best' corner) is highlighted with a red arrow. A 3D rotating view of this figure is available in Supplemental Information (Movie S1)." , out.width="80%", warning=F}
 
 
 save_3d_plot = F
@@ -964,15 +983,15 @@ In Scott Valley, like in many semi-arid rural areas, agricultural and ecological
 
 Total agricultural productivity in Scott Valley (as estimated through crop ET) is buffered against the weather and is relatively stable year-to-year. Conversely, flow in the undammed Scott River is subject to the full range of climate variability and human water uses. As a result, the historical performance in the environmental flows objective is much more variable than in the agricultural objective, and is influenced by the specific flow metrics included in the environmental objective function (explored further in Discussion.)
 
-Rather than perform a randomized sampling of the full range of decision variables, this study builds on an existing public water management process (and informal transdisciplinary collaborative), taking stakeholder-proposed management options as a pre-screened, computationally-feasible set of scenarios for simulation. Among the set of options considered here, it takes a high infrastructure cost (reservoir scenarios) to escape the trade-offs defined in the regulatory scenario categories. Furthermore, although the existing GSP management priorities emphasized minimal agricultural water cuts, the Pareto-optimal set of management actions included many regulatory approaches and high-cost reservoir scenarios. We should note that the optimal set includes complete cessation of irrigated agriculture, because it yielded the maximum environmental benefit, demonstrating that not all of the scenarios identified as Pareto-optimal would be politically desirable, and in general, three objective functions cannot capture all the technical, political and economic dimensions of water management. However, this objective-function approach could be used in future stakeholder discussions to clarify group goals and make trade-offs more explicit.
+Rather than perform a randomized sampling of the full range of decision variables, this study builds on an existing public water management process (and informal transdisciplinary collaborative), taking stakeholder-proposed management options as a pre-screened, computationally feasible set of scenarios for simulation. Among the set of options considered here, it takes a high infrastructure cost (reservoir scenarios) to escape the trade-offs defined in the regulatory scenario categories. Furthermore, although the existing GSP management priorities emphasized minimal agricultural water cuts, the Pareto-optimal set of management actions included many regulatory approaches and high-cost reservoir scenarios. We should note that the optimal set includes complete cessation of irrigated agriculture, because it yielded the maximum environmental benefit, demonstrating that not all of the scenarios identified as Pareto-optimal would be politically desirable, and in general, three objective functions cannot capture all the technical, political and economic dimensions of water management. However, this objective-function approach could be used in future stakeholder discussions to clarify group goals and make trade-offs more explicit.
 
-In this case study, we demonstrate that in basins using hydrologic models for water management, a scenario design process conducted in a public collaborative setting can yield a politically-relevant set of scenarios, and stakeholder-driven objective functions can be used to clarify tradeoffs and build a management "landscape" of outcomes. Such a landscape can be a valuable tool in assessing reasonableness of any proposed management action, and in generating community buy-in, as rural semi-arid regions work to implement adaptive water management.
+In this case study, we demonstrate that in basins using hydrologic models for water management, a scenario design process conducted in a public collaborative setting can yield a politically relevant set of scenarios, and stakeholder-driven objective functions can be used to clarify tradeoffs and build a management "landscape" of outcomes. Such a landscape can be a valuable tool in assessing reasonableness of any proposed management action, and in generating community buy-in, as rural semi-arid regions work to implement adaptive water management.
 
 
 \newpage
 
 # Acknowledgments {-}
-<!-- The authors are grateful for feedback from two reviewers and financial support from the California State Water Resources Control Board Agreement, #19-12-110 and #21-066-300; and the Nora S. Gustavsson Endowed Professorship for Groundwater Resources in Agriculture, University of California Davis. This paper emerged from dissertation work to support SGMA water resource planning in Siskiyou County, California. Instrumental in this work were Dr. Laura Foglia and Kelsey McNeill at Larry Walker and Associates. Input from and collaboration with state and county agencies, regional organizations and local stakeholders were invaluable to the development of this study. -->
+The authors are grateful for financial support from the Nora S. Gustavsson Endowed Professorship for Groundwater Resources in Agriculture, University of California Davis. This paper emerged from dissertation work to support SGMA water resource planning in Siskiyou County, California. Instrumental in this work were Dr. Laura Foglia and Kelsey McNeill, among others, at Larry Walker and Associates. Input from and collaboration with state and county agencies, regional organizations and local stakeholders were invaluable to the development of this study.
 
 # References
 

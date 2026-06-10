@@ -723,7 +723,7 @@ model_name_to_coefs_df = function(model_names, extra_info = T){
 
 results8_cap_maker = function(attr){
   return(
-    paste0("Coefficients for the Hydrologic Benefit function, an emperical estimate of ecological services provided to ",
+    paste0("Coefficients for the Hydrologic Benefit function, an empirical estimate of ecological services provided to ",
            attr$species,
            " salmon by specific functional flows. The predicted value is in units of log10(",
            attr$predicted_cap_text,
@@ -1141,7 +1141,8 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
                              dry_years = c(1991, 1992, 1994, 2001,
                                            2009, 2013, 2014, 2018,
                                            2020, 2021, 2022),
-                             y_val_label) {
+                             y_val_label,
+                             legend_text = NULL) {
   n_scen = length(plot_scenarios)
   if(sum(is.na(cols))>1){cols = my_colors = colorblind_pal()(length(plot_scenarios))}
   cols[1] = basecase_col
@@ -1182,6 +1183,7 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
     lines(x = obj_fn_wy$wy[scen_selector], y = obj_fn_wy$hbf_total[scen_selector],
           col = cols[i])
   }
+  legend(x="topright",legend = "Dry Water Years", fill = dry_yr_col, border = NA)
   text(x = 1991, y = 10, labels = panel_labels[1]) # Panel label
 
 
@@ -1213,8 +1215,8 @@ plot_obj_fn_by_wy = function(plot_scenarios, cols = NA, panel_labels = c("A","B"
 
   }
   legend(x = "bottomright", pch = pchs, lwd = rep(1,n_scen), pt.lwd = 2,
-         col = cols, cex = 1.2, ncol=2,
-         legend = plot_scenarios, bg = "white")
+         col = cols, cex = 1.2, #ncol=2,
+         legend = legend_text, bg = "white")
   # legend(x = "bottomleft", pch = 15, pt.cex = 2,
   #        col = dry_yr_col, legend = "Dry-type water years", bg = "white")
   text(x = 1991, y = 30, labels = panel_labels[2])

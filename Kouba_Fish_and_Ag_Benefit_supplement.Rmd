@@ -1,5 +1,5 @@
 ---
-title: "Supplement E: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+title: "Results for Four Hydrologic Benefit Functions"
 author: "Claire Kouba"
 date: "2026-03-10"
 output: 
@@ -13,16 +13,16 @@ bibliography: library.bib
 
 ```{r modelNamer, echo = FALSE, results = 'asis'}
 
-# "Supplement B: Results with Hydrologic Benefit Function based on coho juvenile abundance"
+# "HBF A: Results with Hydrologic Benefit Function based on coho juvenile abundance"
 # model_name = "coho_lasso_juv_on_hydro"; fig_i = 21
 
-# "Supplement C: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
+# "HBF B: Results with Hydrologic Benefit Function based on coho juveniles per spawner"
 # model_name = "coho_lasso_jps_on_hydro"; fig_i = 31
 
-# "Supplement D: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
+# "HBF C: Results with Hydrologic Benefit Function based on Chinook juvenile abundance"
 # model_name = "chinook_lasso_juv_on_hydro"; fig_i = 41
 
-# "Supplement E: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
+# "HBF D: Results with Hydrologic Benefit Function based on Chinook juveniles per spawner"
 model_name = "chinook_lasso_jps_on_hydro"; fig_i = 51
 
 
@@ -282,12 +282,12 @@ save_3d_plot = F
 
 if(save_3d_plot == T){
   # need to run pareto_set_calc R chunk first
-plot3d(x = scenario_tab$HBF_mean/1000000, 
+plot3d(x = scenario_tab$HBF_mean, 
        y = scenario_tab$et_mean / (-1 * 10^6), 
        z = scenario_tab$feas_cat,
        type = "s", col = scenario_tab$color, 
        radius = scenario_tab$size_3d,
-       xlab = "HB/10^6",#"Hyd. Ben Value",
+       xlab = "Hyd. Ben Value",#"HB/10^3",
        ylab = "ET vol.",
        zlab = "Infrastructure")
   
