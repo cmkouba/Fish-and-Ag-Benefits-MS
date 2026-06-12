@@ -45,6 +45,8 @@ marilr_col = "darkorange"
 mar_col = "firebrick1"
 ilr_col = "yellow1"
 color_river = "blue"
+color_trib = "dodgerblue2"
+color_basin = "black"
 color_gauges = "yellow"
 
 sv_places = c("Etna","Fort Jones", "Greenview")
@@ -58,6 +60,25 @@ year_type_colors = data.frame(type = c("Dry","Below Avg","Above Avg","Wet"),
 
 
 hillshade_palette_yellow = colorRampPalette(c("lightgoldenrod2", "lightgoldenrodyellow")) # This washed-out hillshade palette allows legends to be plotted on top
+
+# Reduce number of streams to major tributaries.
+mapped_stream_names = c("Shackleford Creek","Mill Creek", "Oro Fino Creek",
+                        "Moffett Creek", "Kidder Creek", "Patterson Creek",
+                        "Crystal Creek","Johnson Creek", "Etna Creek",
+                        "Clark Creek", "French Creek", "Miners Creek", "Sugar Creek",
+                        "Scott River", "East Fork Scott River",
+                        "South Fork Scott River",
+                        "Wildcat Creek")
+mapped_streams = named_streams[named_streams$gnis_name %in% mapped_stream_names,]
+#clean up mill and patterson creeks - there are multiple creeks with that name and we just want the major tributaries
+patterson_reaches = 18010208000000 + c(203, 204, 205, 1691)
+patterson_reaches_exclude = 18010208000000 + c(237, 583, 2579, 2622, 2639)
+mill_reaches = 18010208000000 + c(580, 1888, 7481, 58, 59, 60)
+mill_exclude_reaches = 18010208000000 + c(157, 158, 159, 160, 161, 162, 163, 164, 165, 349, 350, 351, 352)
+eliminate_these_reaches = (mapped_streams$gnis_name == "Mill Creek" & !(mapped_streams$reachcode %in% mill_reaches)) |
+  (mapped_streams$gnis_name == "Patterson Creek"
+   & !(mapped_streams$reachcode %in% patterson_reaches))
+mapped_streams = mapped_streams[!eliminate_these_reaches,]
 
 # data processing --------------------------------------------------------
 riv = named_streams[named_streams$gnis_name == "Scott River",]
@@ -773,13 +794,14 @@ landuse_figure_2016=function(){
   lu_processed$color = lu_dwr2016_legend$color[match(lu_processed$crop_category_2,lu_dwr2016_legend$descrip)]
 
   lu_crop=st_buffer(lu_processed,byid=T,dist=0) # clean up invalid polygons
-  basin_buffer = st_buffer(basin, dist = 1000) # for map extent
+  basin_buffer = st_buffer(basin, dist = 2000) # for map extent
 
   main_map = tm_shape(basin_buffer, is.master=T) + tm_borders(col = NA, lwd = 0) +
-    tm_shape(lu_crop) + tm_polygons(col = "color", legend.show = F, border.col = NA ) +
+    tm_shape(lu_crop) + tm_polygons(col = "color", legend.show = F, border.col = NA) +
     # tm_shape(hill_wsh) + tm_raster(palette = hillshade_palette_faded(10), legend.show = F, alpha = .3) +
     # tm_shape(hill_wsh) + tm_raster(palette = hillshade_palette_yellow(10), legend.show = F, alpha = .3) +
-    tm_shape(adj_zone) + tm_borders(color_adj, lwd = 1.5) +
+    # tm_shape(adj_zone) + tm_borders(color_adj, lwd = 1.5) +
+    tm_shape(mapped_streams) + tm_lines(color_trib, lwd = 1) +
     tm_shape(riv) + tm_lines(color_river, lwd = 2) +
     tm_shape(cities_centroid) + tm_symbols(color_cities, size = 0.7) +
     tm_text("NAME", fontface = "bold", xmod = cities_centroid$label_xmod2, ymod = cities_centroid$label_ymod2) +
@@ -789,8 +811,8 @@ landuse_figure_2016=function(){
     # tm_shape(basin, name = "Groundwater Basin", is.master=T ) + tm_borders(color_basin, lwd = 2) +
     tm_add_legend(type="symbol", col = c(color_cities, color_gauges), border.lwd = c(1.5, 1),
                   size = 1, shape = c(21, 22), labels = c("Town or Place", "USGS FJ Stream Gauge")) +
-    tm_add_legend( type = "line", lwd = 2, col = c(color_river, color_adj),
-                   labels = c("Scott River","Adjudicated Zone")) +
+    tm_add_legend( type = "line", lwd = c(1,2), col = c(color_trib,color_river),
+                   labels = c("Tributaries","Scott River"))+
     tm_add_legend(type = "fill", labels = as.character(lu_dwr2016_legend$descrip),
                   col = as.character(lu_dwr2016_legend$color), title = "Land Use Categories") +
 
